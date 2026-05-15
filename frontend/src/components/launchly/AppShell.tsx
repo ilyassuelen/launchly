@@ -1,0 +1,163 @@
+import { Link, useRouterState } from "@tanstack/react-router";
+import {
+  LayoutDashboard, FileText, Mail, Mic, Linkedin, Github, Map,
+  Briefcase, Brain, Settings, Search, Bell, Sparkles, Plus,
+} from "lucide-react";
+import logo from "../../../static/logo.png";
+import {
+  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
+  SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger,
+  SidebarHeader, SidebarFooter, useSidebar,
+} from "@/components/ui/sidebar";
+
+const items = [
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Resume Builder", url: "/resume", icon: FileText },
+  { title: "Cover Letters", url: "/cover-letters", icon: Mail },
+  { title: "Recruiter View", url: "/recruiter-view", icon: Sparkles },
+  { title: "Interview Simulator", url: "/interview", icon: Mic },
+  { title: "LinkedIn Analyzer", url: "/linkedin", icon: Linkedin },
+  { title: "Portfolio Analyzer", url: "/portfolio", icon: Github },
+  { title: "Career Path", url: "/career-path", icon: Map },
+  { title: "Applications", url: "/applications", icon: Briefcase },
+  { title: "AI Coach", url: "/coach", icon: Brain },
+];
+
+function AppSidebar() {
+  const { state } = useSidebar();
+  const collapsed = state === "collapsed";
+  const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const isActive = (url: string) => pathname === url || pathname.startsWith(url + "/");
+
+  return (
+    <Sidebar collapsible="icon" className="border-r border-white/5">
+      <SidebarHeader className="px-3 py-4">
+        <Link to="/" className="flex items-center justify-center">
+          <img
+            src={logo}
+            alt="Launchly logo"
+            className={`${collapsed ? "h-8" : "h-10"} w-auto object-contain transition-all`}
+          />
+        </Link>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          {!collapsed && <SidebarGroupLabel>Workspace</SidebarGroupLabel>}
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items.map(item => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild isActive={isActive(item.url)}
+                    className={`${isActive(item.url) ? "bg-gradient-brand-soft text-foreground ring-1 ring-white/10" : ""}`}>
+                    <Link to={item.url} className="flex items-center gap-2">
+                      <item.icon className="size-4" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild isActive={isActive("/settings")}>
+              <Link to="/settings"><Settings className="size-4" />{!collapsed && <span>Settings</span>}</Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}
+
+export function AppShell({ children, title, subtitle, action }: {
+  children: React.ReactNode; title: string; subtitle?: string; action?: React.ReactNode;
+}) {
+  return (
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-background">
+        <AppSidebar />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <header className="sticky top-0 z-40 flex h-16 items-center gap-3 border-b border-white/5 bg-background/70 px-4 backdrop-blur md:px-6">
+            <SidebarTrigger className="text-muted-foreground" />
+            <div className="hidden flex-1 md:block">
+              <div className="flex items-center gap-2 rounded-xl glass px-3 py-2 text-sm text-muted-foreground max-w-md">
+                <Search className="size-4" />
+                <input className="w-full bg-transparent outline-none placeholder:text-muted-foreground" placeholder="Search resumes, jobs, prompts…" />
+                <kbd className="rounded bg-white/10 px-1.5 py-0.5 text-[10px]">⌘K</kbd>
+              </div>
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              <button className="grid size-9 place-items-center rounded-lg glass hover:bg-white/10">
+                <Bell className="size-4" />
+              </button>
+              <button className="hidden items-center gap-1.5 rounded-lg bg-gradient-brand px-3 py-2 text-xs font-semibold text-primary-foreground glow md:inline-flex">
+                <Plus className="size-4" /> New
+              </button>
+              <div className="grid size-9 place-items-center rounded-full bg-gradient-brand text-xs font-semibold text-primary-foreground">M</div>
+            </div>
+          </header>
+          <div className="px-4 pt-6 md:px-8">
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">{title}</h1>
+                {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
+              </div>
+              {action}
+            </div>
+          </div>
+          <main className="flex-1 px-4 pb-16 pt-6 md:px-8 animate-fade-up">{children}</main>
+        </div>
+      </div>
+    </SidebarProvider>
+  );
+}
+
+export function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return <div className={`glass rounded-2xl p-5 shadow-card ${className}`}>{children}</div>;
+}
+
+export function StatCard({ label, value, delta, icon: Icon, tone = "violet" }: {
+  label: string; value: string; delta?: string; icon: React.ComponentType<{ className?: string }>; tone?: "violet"|"cyan"|"pink"|"green";
+}) {
+  const tones: Record<string,string> = {
+    violet: "from-[oklch(0.55_0.20_295)] to-[oklch(0.45_0.16_260)]",
+    cyan: "from-[oklch(0.55_0.18_200)] to-[oklch(0.45_0.14_220)]",
+    pink: "from-[oklch(0.60_0.20_340)] to-[oklch(0.45_0.16_310)]",
+    green: "from-[oklch(0.62_0.18_155)] to-[oklch(0.45_0.14_180)]",
+  };
+  return (
+    <div className="relative overflow-hidden rounded-2xl glass p-5 shadow-card">
+      <div className={`absolute -right-8 -top-8 size-28 rounded-full bg-gradient-to-br ${tones[tone]} opacity-30 blur-2xl`} />
+      <div className="flex items-center justify-between">
+        <div className="text-xs text-muted-foreground">{label}</div>
+        <div className="grid size-8 place-items-center rounded-lg bg-white/5 ring-1 ring-white/10">
+          <Icon className="size-4 text-[oklch(0.85_0.14_250)]" />
+        </div>
+      </div>
+      <div className="mt-2 flex items-baseline gap-2">
+        <div className="text-3xl font-semibold tracking-tight">{value}</div>
+        {delta && <div className="text-xs text-[oklch(0.78_0.17_155)]">{delta}</div>}
+      </div>
+    </div>
+  );
+}
+
+export function Progress({ value, label, color = "brand" }: { value: number; label?: string; color?: "brand"|"green"|"pink" }) {
+  const bg = color === "green" ? "bg-[oklch(0.78_0.17_155)]" : color === "pink" ? "bg-[oklch(0.78_0.18_340)]" : "bg-gradient-brand";
+  return (
+    <div>
+      {label && (
+        <div className="mb-1 flex items-center justify-between text-xs">
+          <span>{label}</span><span className="text-muted-foreground">{value}%</span>
+        </div>
+      )}
+      <div className="h-2 overflow-hidden rounded-full bg-white/5">
+        <div className={`h-full ${bg}`} style={{ width: `${Math.min(100, Math.max(0, value))}%` }} />
+      </div>
+    </div>
+  );
+}
