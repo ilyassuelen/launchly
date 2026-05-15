@@ -1,5 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell, Card, StatCard } from "@/components/launchly/AppShell";
+import { useAuth } from "@/context/AuthContext";
 import { Briefcase, Plus, Bell, CheckCircle2, Clock, XCircle, Send } from "lucide-react";
 
 export const Route = createFileRoute("/applications")({
@@ -29,6 +31,29 @@ const cols = [
 ];
 
 function Applications() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[oklch(0.145_0.02_270)] text-white">
+        <div className="text-sm text-white/60">
+          Loading applications...
+        </div>
+      </div>
+    );
+  }
+
+  useEffect(() => {
+      if (!loading && !user) {
+          navigate({ to: "/login" });
+      }
+  }, [user, loading, navigate]);
+
+  if (loading || !user) {
+      return null;
+  }
+
   return (
     <AppShell title="Applications" subtitle="A calm, modern board for the chaos of job hunting."
       action={<button className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-sm font-semibold text-primary-foreground glow"><Plus className="size-4"/> Add application</button>}>

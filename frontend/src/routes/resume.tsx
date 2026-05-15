@@ -1,4 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  redirect,
+} from "@tanstack/react-router";
 import { AppShell, Card, Progress } from "@/components/launchly/AppShell";
 import {
   Sparkles,
@@ -28,7 +31,29 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/resume")({
-  head: () => ({ meta: [{ title: "AI Resume Builder — Launchly" }, { name: "description", content: "Build a recruiter-ready resume with live AI feedback and ATS scoring." }] }),
+  beforeLoad: () => {
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+      throw redirect({
+        to: "/login",
+      });
+    }
+  },
+
+  head: () => ({
+    meta: [
+      {
+        title: "AI Resume Builder — Launchly",
+      },
+      {
+        name: "description",
+        content:
+          "Build a recruiter-ready resume with live AI feedback and ATS scoring.",
+      },
+    ],
+  }),
+
   component: ResumeBuilder,
 });
 

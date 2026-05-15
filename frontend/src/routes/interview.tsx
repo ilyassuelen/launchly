@@ -1,5 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell, Card, Progress } from "@/components/launchly/AppShell";
+import { useAuth } from "@/context/AuthContext";
 import {
   Mic,
   Send,
@@ -24,6 +26,28 @@ export const Route = createFileRoute("/interview")({
 });
 
 function Interview() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[oklch(0.145_0.02_270)] text-white">
+        <div className="text-sm text-white/60">
+          Loading interview simulator...
+        </div>
+      </div>
+    );
+  }
+
+  useEffect(() => {
+      if (!loading && !user) {
+          navigate({ to: "/login" });
+      }
+  }, [user, loading, navigate]);
+
+  if (loading || !user) {
+      return null;
+  }
   return (
     <AppShell title="Interview Simulator" subtitle="Real questions. AI follow-ups. Honest feedback that builds confidence."
       action={<button className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-sm font-semibold text-primary-foreground glow"><Play className="size-4"/> Start mock</button>}>

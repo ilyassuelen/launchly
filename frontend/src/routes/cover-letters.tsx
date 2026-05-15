@@ -1,5 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell, Card } from "@/components/launchly/AppShell";
+import { useAuth } from "@/context/AuthContext";
 import {
   Sparkles,
   Copy,
@@ -36,6 +38,28 @@ export const Route = createFileRoute("/cover-letters")({
 });
 
 function CoverLetters() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[oklch(0.145_0.02_270)] text-white">
+        <div className="text-sm text-white/60">
+          Loading cover letters...
+        </div>
+      </div>
+    );
+  }
+
+  useEffect(() => {
+      if (!loading && !user) {
+          navigate({ to: "/login" });
+      }
+  }, [user, loading, navigate]);
+
+  if (loading || !user) {
+      return null;
+  }
   return (
     <AppShell
       title="Cover Letters"

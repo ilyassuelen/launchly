@@ -11,8 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ResumeRouteImport } from './routes/resume'
+import { Route as RegisterRouteImport } from './routes/register'
 import { Route as RecruiterViewRouteImport } from './routes/recruiter-view'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as LinkedinRouteImport } from './routes/linkedin'
 import { Route as InterviewRouteImport } from './routes/interview'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -32,6 +34,11 @@ const ResumeRoute = ResumeRouteImport.update({
   path: '/resume',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RecruiterViewRoute = RecruiterViewRouteImport.update({
   id: '/recruiter-view',
   path: '/recruiter-view',
@@ -40,6 +47,11 @@ const RecruiterViewRoute = RecruiterViewRouteImport.update({
 const PortfolioRoute = PortfolioRouteImport.update({
   id: '/portfolio',
   path: '/portfolio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LinkedinRoute = LinkedinRouteImport.update({
@@ -92,8 +104,10 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/interview': typeof InterviewRoute
   '/linkedin': typeof LinkedinRoute
+  '/login': typeof LoginRoute
   '/portfolio': typeof PortfolioRoute
   '/recruiter-view': typeof RecruiterViewRoute
+  '/register': typeof RegisterRoute
   '/resume': typeof ResumeRoute
   '/settings': typeof SettingsRoute
 }
@@ -106,8 +120,10 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/interview': typeof InterviewRoute
   '/linkedin': typeof LinkedinRoute
+  '/login': typeof LoginRoute
   '/portfolio': typeof PortfolioRoute
   '/recruiter-view': typeof RecruiterViewRoute
+  '/register': typeof RegisterRoute
   '/resume': typeof ResumeRoute
   '/settings': typeof SettingsRoute
 }
@@ -121,8 +137,10 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/interview': typeof InterviewRoute
   '/linkedin': typeof LinkedinRoute
+  '/login': typeof LoginRoute
   '/portfolio': typeof PortfolioRoute
   '/recruiter-view': typeof RecruiterViewRoute
+  '/register': typeof RegisterRoute
   '/resume': typeof ResumeRoute
   '/settings': typeof SettingsRoute
 }
@@ -137,8 +155,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/interview'
     | '/linkedin'
+    | '/login'
     | '/portfolio'
     | '/recruiter-view'
+    | '/register'
     | '/resume'
     | '/settings'
   fileRoutesByTo: FileRoutesByTo
@@ -151,8 +171,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/interview'
     | '/linkedin'
+    | '/login'
     | '/portfolio'
     | '/recruiter-view'
+    | '/register'
     | '/resume'
     | '/settings'
   id:
@@ -165,8 +187,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/interview'
     | '/linkedin'
+    | '/login'
     | '/portfolio'
     | '/recruiter-view'
+    | '/register'
     | '/resume'
     | '/settings'
   fileRoutesById: FileRoutesById
@@ -180,8 +204,10 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   InterviewRoute: typeof InterviewRoute
   LinkedinRoute: typeof LinkedinRoute
+  LoginRoute: typeof LoginRoute
   PortfolioRoute: typeof PortfolioRoute
   RecruiterViewRoute: typeof RecruiterViewRoute
+  RegisterRoute: typeof RegisterRoute
   ResumeRoute: typeof ResumeRoute
   SettingsRoute: typeof SettingsRoute
 }
@@ -202,6 +228,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResumeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/recruiter-view': {
       id: '/recruiter-view'
       path: '/recruiter-view'
@@ -214,6 +247,13 @@ declare module '@tanstack/react-router' {
       path: '/portfolio'
       fullPath: '/portfolio'
       preLoaderRoute: typeof PortfolioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/linkedin': {
@@ -284,8 +324,10 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   InterviewRoute: InterviewRoute,
   LinkedinRoute: LinkedinRoute,
+  LoginRoute: LoginRoute,
   PortfolioRoute: PortfolioRoute,
   RecruiterViewRoute: RecruiterViewRoute,
+  RegisterRoute: RegisterRoute,
   ResumeRoute: ResumeRoute,
   SettingsRoute: SettingsRoute,
 }

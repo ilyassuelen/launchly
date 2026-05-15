@@ -1,6 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import logo from "../../static/logo.png";
+import { useEffect } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell, Card, StatCard, Progress } from "@/components/launchly/AppShell";
+import { useAuth } from "@/context/AuthContext";
+import logo from "../../static/logo.png";
 import {
   Sparkles,
   TrendingUp,
@@ -30,6 +32,31 @@ const growth = [
 ];
 
 function Dashboard() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[oklch(0.145_0.02_270)] text-white">
+        <div className="text-sm text-white/60">
+          Loading dashboard...
+        </div>
+      </div>
+    );
+  }
+
+  useEffect(() => {
+      if (!loading && !user) {
+          navigate({ to: "/login" });
+      }
+  }, [user, loading, navigate]);
+
+  if (!user) return null;
+
+  const firstName =
+    user?.first_name ||
+    user?.username ||
+    "User";
   return (
     <AppShell
         logo={
@@ -39,7 +66,7 @@ function Dashboard() {
             className="h-8 w-auto object-contain"
           />
         }
-        title="Welcome back, Maya 👋"
+        title={`Welcome back, ${firstName} 👋`}
         subtitle="Here's how your career is moving this week."
       action={<button className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-sm font-semibold text-primary-foreground glow"><Zap className="size-4"/> Run AI review</button>}>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

@@ -1,5 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell, Card, Progress } from "@/components/launchly/AppShell";
+import { useAuth } from "@/context/AuthContext";
 import {
   Eye,
   AlertTriangle,
@@ -17,6 +19,28 @@ export const Route = createFileRoute("/recruiter-view")({
 });
 
 function RecruiterView() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[oklch(0.145_0.02_270)] text-white">
+        <div className="text-sm text-white/60">
+          Loading recruiter view...
+        </div>
+      </div>
+    );
+  }
+
+  useEffect(() => {
+      if (!loading && !user) {
+          navigate({ to: "/login" });
+      }
+  }, [user, loading, navigate]);
+
+  if (loading || !user) {
+      return null;
+  }
   return (
     <AppShell title="Recruiter View" subtitle="A 7-second simulated recruiter scan of your profile — with the receipts."
       action={<button className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-sm font-semibold text-primary-foreground glow"><Eye className="size-4"/> Re-run scan</button>}>

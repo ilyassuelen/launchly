@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.core.config import settings
-from backend.app.routers import health
+from backend.app.routers import health, auth, users
 
 
 app = FastAPI(
@@ -20,9 +20,12 @@ app.add_middleware(
 )
 
 
-app.include_router(health.router)
+app.include_router(health.router, tags=["Health"])
+app.include_router(auth.router, prefix="/auth", tags=["Auth"])
+app.include_router(users.router)
 
 
 @app.get("/")
 def root():
+    """Simple API status endpoint."""
     return {"message": "Launchly API running"}

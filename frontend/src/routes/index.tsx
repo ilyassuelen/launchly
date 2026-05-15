@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useAuth } from "@/context/AuthContext";
 import logo from "../../static/logo.png";
 import {
   ArrowRight,
@@ -102,6 +103,7 @@ function Landing() {
 }
 
 function Nav() {
+  const { user, logoutUser } = useAuth();
   return (
     <header className="sticky top-0 z-50 px-4 pt-5">
       <div className="mx-auto flex max-w-7xl items-center justify-between rounded-2xl border border-white/6 bg-[rgba(7,10,18,0.72)] px-6 py-4 shadow-[0_20px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
@@ -143,23 +145,43 @@ function Nav() {
         </nav>
 
         <div className="relative z-10 flex items-center gap-3">
-          <Link
-            to="/dashboard"
-            className="hidden text-sm text-white/55 transition hover:text-white md:inline-flex"
-          >
-            Sign in
-          </Link>
+          {user ? (
+            <>
+              <Link
+                to="/dashboard"
+                className="hidden text-sm text-white/70 transition hover:text-white md:inline-flex"
+              >
+                Dashboard
+              </Link>
 
-          <Link
-            to="/dashboard"
-            className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-violet-400/20 bg-[linear-gradient(135deg,rgba(139,92,246,1)_0%,rgba(99,102,241,1)_45%,rgba(34,211,238,1)_100%)] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(124,58,237,0.35)] transition duration-300 hover:scale-[1.03]"
-          >
-            <div className="absolute inset-0 bg-[linear-gradient(120deg,transparent_20%,rgba(255,255,255,0.16)_50%,transparent_80%)] opacity-0 transition duration-700 group-hover:translate-x-[180%] group-hover:opacity-100 -translate-x-[180%]" />
+              <button
+                onClick={logoutUser}
+                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-red-400/20 bg-red-500/10 px-5 py-2.5 text-sm font-semibold text-red-200 transition duration-300 hover:bg-red-500/20"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="hidden text-sm text-white/55 transition hover:text-white md:inline-flex"
+              >
+                Sign in
+              </Link>
 
-            <span className="relative">Launch app</span>
+              <Link
+                to="/register"
+                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-violet-400/20 bg-[linear-gradient(135deg,rgba(139,92,246,1)_0%,rgba(99,102,241,1)_45%,rgba(34,211,238,1)_100%)] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(124,58,237,0.35)] transition duration-300 hover:scale-[1.03]"
+              >
+                <div className="absolute inset-0 bg-[linear-gradient(120deg,transparent_20%,rgba(255,255,255,0.16)_50%,transparent_80%)] opacity-0 transition duration-700 group-hover:translate-x-[180%] group-hover:opacity-100 -translate-x-[180%]" />
 
-            <ArrowRight className="relative size-4 transition group-hover:translate-x-0.5" />
-          </Link>
+                <span className="relative">Launch app</span>
+
+                <ArrowRight className="relative size-4 transition group-hover:translate-x-0.5" />
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
@@ -167,6 +189,7 @@ function Nav() {
 }
 
 function Hero() {
+  const { user } = useAuth();
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(124,58,237,0.35),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(34,211,238,0.18),transparent_30%)]" />
@@ -195,13 +218,23 @@ function Hero() {
           </p>
 
           <div className="mt-10 flex flex-wrap gap-4">
-            <Link
-              to="/dashboard"
-              className="group inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-violet-500 to-cyan-400 px-7 py-4 text-sm font-semibold text-white shadow-2xl shadow-violet-500/30 transition hover:scale-[1.02]"
-            >
-              Start for free
-              <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
-            </Link>
+            {user ? (
+              <Link
+                to="/dashboard"
+                className="group inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-violet-500 to-cyan-400 px-7 py-4 text-sm font-semibold text-white shadow-2xl shadow-violet-500/30 transition hover:scale-[1.02]"
+              >
+                Go to dashboard
+                <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
+              </Link>
+            ) : (
+              <Link
+                to="/register"
+                className="group inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-violet-500 to-cyan-400 px-7 py-4 text-sm font-semibold text-white shadow-2xl shadow-violet-500/30 transition hover:scale-[1.02]"
+              >
+                Start for free
+                <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
+              </Link>
+            )}
 
             <a
               href="#features"
@@ -962,6 +995,8 @@ function RecruiterSection() {
 }
 
 function CTASection() {
+  const { user } = useAuth();
+
   return (
     <section className="mx-auto max-w-7xl px-4 pb-28">
       <div className="relative overflow-hidden rounded-[40px] border border-white/10 bg-white/[0.04] px-8 py-20 text-center backdrop-blur-2xl">
@@ -982,13 +1017,23 @@ function CTASection() {
             Launchly helps you stop guessing and start improving strategically.
           </p>
 
-          <Link
-            to="/dashboard"
-            className="group mt-10 inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-violet-500 to-cyan-400 px-8 py-4 text-sm font-semibold text-white shadow-2xl shadow-violet-500/30 transition hover:scale-[1.02]"
-          >
-            Launch your career
-            <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
-          </Link>
+          {user ? (
+            <Link
+              to="/dashboard"
+              className="group mt-10 inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-violet-500 to-cyan-400 px-8 py-4 text-sm font-semibold text-white shadow-2xl shadow-violet-500/30 transition hover:scale-[1.02]"
+            >
+              Go to dashboard
+              <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
+            </Link>
+          ) : (
+            <Link
+              to="/register"
+              className="group mt-10 inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-violet-500 to-cyan-400 px-8 py-4 text-sm font-semibold text-white shadow-2xl shadow-violet-500/30 transition hover:scale-[1.02]"
+            >
+              Launch your career
+              <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
+            </Link>
+          )}
         </div>
       </div>
     </section>

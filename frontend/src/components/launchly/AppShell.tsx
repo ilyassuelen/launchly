@@ -2,8 +2,12 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, FileText, Mail, Mic, Linkedin, Github, Map,
   Briefcase, Brain, Settings, Search, Bell, Sparkles, Plus,
+  User, LogOut, ChevronDown,
 } from "lucide-react";
 import logo from "../../../static/logo.png";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { useAuth } from "@/context/AuthContext";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger,
@@ -76,6 +80,35 @@ function AppSidebar() {
 export function AppShell({ children, title, subtitle, action }: {
   children: React.ReactNode; title: string; subtitle?: string; action?: React.ReactNode;
 }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
+  const { logoutUser } = useAuth();
+
+  function handleLogout() {
+    logoutUser();
+    navigate({ to: "/" });
+  }
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node)
+      ) {
+        setMenuOpen(false);
+      }
+    }
+
+    if (menuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuOpen]);
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
@@ -97,7 +130,39 @@ export function AppShell({ children, title, subtitle, action }: {
               <button className="hidden items-center gap-1.5 rounded-lg bg-gradient-brand px-3 py-2 text-xs font-semibold text-primary-foreground glow md:inline-flex">
                 <Plus className="size-4" /> New
               </button>
-              <div className="grid size-9 place-items-center rounded-full bg-gradient-brand text-xs font-semibold text-primary-foreground">M</div>
+              <div className="relative" ref={menuRef}>
+                <button
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  className="flex size-9 items-center justify-center rounded-full bg-gradient-brand text-primary-foreground transition hover:scale-[1.03]"
+                >
+                  <User className="size-4" />
+                </button>
+
+                {menuOpen && (
+                  <div className="absolute right-0 top-12 z-50 w-52 overflow-hidden rounded-2xl border border-white/10 bg-[rgba(10,14,24,0.96)] shadow-[0_20px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
+                    <button
+                      onClick={() => {
+                        setMenuOpen(false);
+                        navigate({ to: "/settings" });
+                      }}
+                      className="flex w-full items-center gap-3 px-4 py-3 text-sm text-white/80 transition hover:bg-white/[0.05] hover:text-white"
+                    >
+                      <Settings className="size-4" />
+                      Settings
+                    </button>
+
+                    <div className="h-px bg-white/5" />
+
+                    <button
+                      onClick={handleLogout}
+                      className="flex w-full items-center gap-3 px-4 py-3 text-sm text-red-200 transition hover:bg-red-400/10"
+                    >
+                      <LogOut className="size-4" />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </header>
           <div className="px-4 pt-6 md:px-8">
