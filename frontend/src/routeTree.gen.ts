@@ -10,7 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as ResumeRouteImport } from './routes/resume'
+import { Route as ResumeExportRouteImport } from './routes/resume-export'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as RecruiterViewRouteImport } from './routes/recruiter-view'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
@@ -23,15 +23,17 @@ import { Route as CoachRouteImport } from './routes/coach'
 import { Route as CareerPathRouteImport } from './routes/career-path'
 import { Route as ApplicationsRouteImport } from './routes/applications'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ResumesIndexRouteImport } from './routes/resumes.index'
+import { Route as ResumesResumeIdRouteImport } from './routes/resumes.$resumeId'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ResumeRoute = ResumeRouteImport.update({
-  id: '/resume',
-  path: '/resume',
+const ResumeExportRoute = ResumeExportRouteImport.update({
+  id: '/resume-export',
+  path: '/resume-export',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterRoute = RegisterRouteImport.update({
@@ -94,6 +96,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResumesIndexRoute = ResumesIndexRouteImport.update({
+  id: '/resumes/',
+  path: '/resumes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResumesResumeIdRoute = ResumesResumeIdRouteImport.update({
+  id: '/resumes/$resumeId',
+  path: '/resumes/$resumeId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -108,8 +120,10 @@ export interface FileRoutesByFullPath {
   '/portfolio': typeof PortfolioRoute
   '/recruiter-view': typeof RecruiterViewRoute
   '/register': typeof RegisterRoute
-  '/resume': typeof ResumeRoute
+  '/resume-export': typeof ResumeExportRoute
   '/settings': typeof SettingsRoute
+  '/resumes/$resumeId': typeof ResumesResumeIdRoute
+  '/resumes/': typeof ResumesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -124,8 +138,10 @@ export interface FileRoutesByTo {
   '/portfolio': typeof PortfolioRoute
   '/recruiter-view': typeof RecruiterViewRoute
   '/register': typeof RegisterRoute
-  '/resume': typeof ResumeRoute
+  '/resume-export': typeof ResumeExportRoute
   '/settings': typeof SettingsRoute
+  '/resumes/$resumeId': typeof ResumesResumeIdRoute
+  '/resumes': typeof ResumesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -141,8 +157,10 @@ export interface FileRoutesById {
   '/portfolio': typeof PortfolioRoute
   '/recruiter-view': typeof RecruiterViewRoute
   '/register': typeof RegisterRoute
-  '/resume': typeof ResumeRoute
+  '/resume-export': typeof ResumeExportRoute
   '/settings': typeof SettingsRoute
+  '/resumes/$resumeId': typeof ResumesResumeIdRoute
+  '/resumes/': typeof ResumesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -159,8 +177,10 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/recruiter-view'
     | '/register'
-    | '/resume'
+    | '/resume-export'
     | '/settings'
+    | '/resumes/$resumeId'
+    | '/resumes/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -175,8 +195,10 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/recruiter-view'
     | '/register'
-    | '/resume'
+    | '/resume-export'
     | '/settings'
+    | '/resumes/$resumeId'
+    | '/resumes'
   id:
     | '__root__'
     | '/'
@@ -191,8 +213,10 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/recruiter-view'
     | '/register'
-    | '/resume'
+    | '/resume-export'
     | '/settings'
+    | '/resumes/$resumeId'
+    | '/resumes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -208,8 +232,10 @@ export interface RootRouteChildren {
   PortfolioRoute: typeof PortfolioRoute
   RecruiterViewRoute: typeof RecruiterViewRoute
   RegisterRoute: typeof RegisterRoute
-  ResumeRoute: typeof ResumeRoute
+  ResumeExportRoute: typeof ResumeExportRoute
   SettingsRoute: typeof SettingsRoute
+  ResumesResumeIdRoute: typeof ResumesResumeIdRoute
+  ResumesIndexRoute: typeof ResumesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -221,11 +247,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/resume': {
-      id: '/resume'
-      path: '/resume'
-      fullPath: '/resume'
-      preLoaderRoute: typeof ResumeRouteImport
+    '/resume-export': {
+      id: '/resume-export'
+      path: '/resume-export'
+      fullPath: '/resume-export'
+      preLoaderRoute: typeof ResumeExportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/register': {
@@ -312,6 +338,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/resumes/': {
+      id: '/resumes/'
+      path: '/resumes'
+      fullPath: '/resumes/'
+      preLoaderRoute: typeof ResumesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resumes/$resumeId': {
+      id: '/resumes/$resumeId'
+      path: '/resumes/$resumeId'
+      fullPath: '/resumes/$resumeId'
+      preLoaderRoute: typeof ResumesResumeIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -328,8 +368,10 @@ const rootRouteChildren: RootRouteChildren = {
   PortfolioRoute: PortfolioRoute,
   RecruiterViewRoute: RecruiterViewRoute,
   RegisterRoute: RegisterRoute,
-  ResumeRoute: ResumeRoute,
+  ResumeExportRoute: ResumeExportRoute,
   SettingsRoute: SettingsRoute,
+  ResumesResumeIdRoute: ResumesResumeIdRoute,
+  ResumesIndexRoute: ResumesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

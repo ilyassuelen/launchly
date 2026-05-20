@@ -16,7 +16,7 @@ import {
 
 const items = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Resume Builder", url: "/resume", icon: FileText },
+  { title: "Resume Builder", url: "/resumes", icon: FileText },
   { title: "Cover Letters", url: "/cover-letters", icon: Mail },
   { title: "Recruiter View", url: "/recruiter-view", icon: Sparkles },
   { title: "Interview Simulator", url: "/interview", icon: Mic },
@@ -27,9 +27,19 @@ const items = [
   { title: "AI Coach", url: "/coach", icon: Brain },
 ];
 
-function AppSidebar() {
-  const { state } = useSidebar();
+function AppSidebar({
+  defaultCollapsed = false,
+}: {
+  defaultCollapsed?: boolean;
+}) {
+  const { state, setOpen } = useSidebar();
   const collapsed = state === "collapsed";
+
+  useEffect(() => {
+    if (defaultCollapsed) {
+      setOpen(false);
+    }
+  }, [defaultCollapsed, setOpen]);
   const pathname = useRouterState({ select: (r) => r.location.pathname });
   const isActive = (url: string) => pathname === url || pathname.startsWith(url + "/");
 
@@ -77,8 +87,18 @@ function AppSidebar() {
   );
 }
 
-export function AppShell({ children, title, subtitle, action }: {
-  children: React.ReactNode; title: string; subtitle?: string; action?: React.ReactNode;
+export function AppShell({
+  children,
+  title,
+  subtitle,
+  action,
+  defaultSidebarCollapsed = false,
+}: {
+  children: React.ReactNode;
+  title: string;
+  subtitle?: string;
+  action?: React.ReactNode;
+  defaultSidebarCollapsed?: boolean;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -112,7 +132,9 @@ export function AppShell({ children, title, subtitle, action }: {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
-        <AppSidebar />
+        <AppSidebar
+          defaultCollapsed={defaultSidebarCollapsed}
+        />
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="sticky top-0 z-40 flex h-16 items-center gap-3 border-b border-white/5 bg-background/70 px-4 backdrop-blur md:px-6">
             <SidebarTrigger className="text-muted-foreground" />
