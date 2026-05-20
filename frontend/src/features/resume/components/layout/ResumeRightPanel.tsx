@@ -2,9 +2,6 @@ import {
   Sparkles,
   Target,
   LayoutTemplate,
-  TriangleAlert,
-  TrendingUp,
-  BadgeCheck,
 } from "lucide-react";
 
 import {
@@ -191,64 +188,7 @@ export function ResumeRightPanel({
         </div>
       </Card>
 
-      <Card className="relative overflow-hidden">
-        <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
-          <Sparkles className="size-4 text-cyan-300" />
-          Smart suggestions
-        </div>
 
-        <div className="space-y-3">
-
-          <div className="rounded-2xl border border-orange-400/10 bg-orange-400/[0.06] p-4">
-            <div className="flex items-start gap-2">
-              <TriangleAlert className="mt-0.5 size-4 text-orange-300" />
-
-              <div>
-                <div className="text-sm font-medium text-white">
-                  Add measurable impact
-                </div>
-
-                <div className="mt-1 text-xs text-white/60">
-                  Recruiters prefer numbers, metrics and business outcomes.
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-cyan-400/10 bg-cyan-400/[0.05] p-4">
-            <div className="flex items-start gap-2">
-              <TrendingUp className="mt-0.5 size-4 text-cyan-300" />
-
-              <div>
-                <div className="text-sm font-medium text-white">
-                  ATS optimization
-                </div>
-
-                <div className="mt-1 text-xs text-white/60">
-                  Add keywords like Docker, CI/CD and System Design.
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-emerald-400/10 bg-emerald-400/[0.05] p-4">
-            <div className="flex items-start gap-2">
-              <BadgeCheck className="mt-0.5 size-4 text-emerald-300" />
-
-              <div>
-                <div className="text-sm font-medium text-white">
-                  Strong AI portfolio
-                </div>
-
-                <div className="mt-1 text-xs text-white/60">
-                  Your AI projects already stand out compared to many junior resumes.
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </Card>
     </div>
   );
 }

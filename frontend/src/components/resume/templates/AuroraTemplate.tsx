@@ -464,7 +464,17 @@ export function AuroraTemplate({
   };
   return (
     <div
-      className="relative min-h-[297mm] w-[210mm] rounded-[20px] bg-white shadow-[0_30px_120px_rgba(0,0,0,0.18)]"
+      className="
+        resume-page
+        relative
+        w-[210mm]
+        min-h-[297mm]
+        h-auto
+        overflow-visible
+        rounded-[20px]
+        bg-white
+        shadow-[0_30px_120px_rgba(0,0,0,0.18)]
+      "
       style={{
         fontFamily: typography.fontFamily,
         fontSize: `${typography.fontSize}px`,
@@ -597,7 +607,6 @@ export function AuroraTemplate({
           )}
         </div>
       </div>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 border-t-2 border-dashed border-red-400/70" />
     </div>
   );
 }

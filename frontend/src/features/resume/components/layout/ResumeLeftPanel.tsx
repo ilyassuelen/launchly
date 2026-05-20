@@ -1,5 +1,3 @@
-import { Sparkles } from "lucide-react";
-
 import { Card } from "@/components/launchly/AppShell";
 
 import { PersonalInfoEditor } from "@/features/resume/components/editor/PersonalInfoEditor";
@@ -121,29 +119,7 @@ export function ResumeLeftPanel({
           }
         />
 
-        <div className="rounded-2xl border border-white/5 bg-gradient-to-br from-violet-500/10 to-cyan-400/5 p-4">
 
-          <div className="flex items-center gap-2 text-sm font-semibold">
-            <Sparkles className="size-4 text-cyan-300" />
-            Recruiter analysis
-          </div>
-
-          <div className="mt-4 space-y-3 text-xs text-white/70">
-
-            <div className="rounded-xl bg-black/20 p-3">
-              Your resume structure looks modern and recruiter-friendly.
-            </div>
-
-            <div className="rounded-xl bg-black/20 p-3">
-              Strongest section: Projects & AI Engineering experience.
-            </div>
-
-            <div className="rounded-xl bg-black/20 p-3">
-              Add more measurable business impact to improve recruiter trust.
-            </div>
-
-          </div>
-        </div>
       </div>
     </Card>
   );

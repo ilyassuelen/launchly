@@ -48,6 +48,7 @@ import { SoftSkillEditModal } from "@/features/resume/components/modals/SoftSkil
 import { ResumeRightPanel } from "@/features/resume/components/layout/ResumeRightPanel";
 import { ResumePreviewPanel } from "@/features/resume/components/layout/ResumePreviewPanel";
 import { ResumeLeftPanel } from "@/features/resume/components/layout/ResumeLeftPanel";
+import { ResumeInsightsPanel } from "@/features/resume/components/layout/ResumeInsightsPanel";
 
 
 import { useReactToPrint } from "react-to-print";
@@ -1372,17 +1373,27 @@ const selectedProfile =
           }
         />
 
-        <ResumePreviewPanel
-          resume={resume}
-          zoom={zoom}
-          setZoom={setZoom}
-          hasOverflow={hasOverflow}
-          saveStatus={saveStatus}
-          handleSaveResume={handleSaveResume}
-          handlePrint={handlePrint}
-          printRef={printRef}
-          previewContentRef={previewContentRef}
-        />
+        <div className="space-y-4 lg:col-span-7">
+
+          <ResumePreviewPanel
+            resume={resume}
+            zoom={zoom}
+            setZoom={setZoom}
+            hasOverflow={hasOverflow}
+            saveStatus={saveStatus}
+            handleSaveResume={handleSaveResume}
+            handlePrint={handlePrint}
+            printRef={printRef}
+            previewContentRef={previewContentRef}
+          />
+
+          <div className="max-w-[794px]">
+            <div className="space-y-4">
+              <ResumeInsightsPanel />
+            </div>
+          </div>
+
+        </div>
 
         <ResumeRightPanel
           resume={resume}
@@ -1390,6 +1401,7 @@ const selectedProfile =
           typography={typography}
           updateTypography={updateTypography}
         />
+
       </div>
 
       <ExperienceEditModal

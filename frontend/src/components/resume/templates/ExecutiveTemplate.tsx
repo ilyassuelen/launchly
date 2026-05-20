@@ -496,7 +496,17 @@ export function ExecutiveTemplate({
   };
   return (
     <div
-      className="relative min-h-[297mm] w-[210mm] overflow-hidden bg-[#f8f5ef] text-[#1f2937] shadow-[0_25px_90px_rgba(0,0,0,0.18)]"
+      className="
+        resume-page
+        relative
+        w-[210mm]
+        min-h-[297mm]
+        h-auto
+        overflow-visible
+        bg-[#f8f5ef]
+        text-[#1f2937]
+        shadow-[0_25px_90px_rgba(0,0,0,0.18)]
+      "
       style={{
         fontFamily: typography.fontFamily,
         fontSize: `${typography.fontSize}px`,
@@ -620,11 +630,6 @@ export function ExecutiveTemplate({
             ],
         )}
         </div>
-      </div>
-
-      <div className="pointer-events-none absolute inset-x-0 bottom-[18px] border-t border-dashed border-red-400/70" />
-
-      <div className="absolute bottom-[6px] right-6 rounded-full border border-red-400/40 bg-red-400/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-red-500">
       </div>
     </div>
   );

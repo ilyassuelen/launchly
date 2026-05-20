@@ -428,7 +428,21 @@ export function GradientTemplate({
 
   return (
     <div
-      className="relative w-[210mm] min-h-[297mm] overflow-hidden rounded-[18px] bg-gradient-to-br from-cyan-400 via-blue-500 to-violet-600 p-[1px] shadow-[0_30px_120px_rgba(0,0,0,0.25)]"
+      className="
+        resume-page
+        relative
+        w-[210mm]
+        min-h-[297mm]
+        h-auto
+        overflow-visible
+        rounded-[18px]
+        bg-gradient-to-br
+        from-cyan-400
+        via-blue-500
+        to-violet-600
+        p-[1px]
+        shadow-[0_30px_120px_rgba(0,0,0,0.25)]
+      "
       style={{
         fontFamily: typography.fontFamily,
         fontSize: `${typography.fontSize}px`,
@@ -436,9 +450,6 @@ export function GradientTemplate({
       }}
     >
 
-      {/* A4 SAFE AREA */}
-
-      <div className="absolute inset-[26px] rounded-[14px] border border-dashed border-red-400/30 pointer-events-none" />
 
       <div className="rounded-[17px] bg-[#0b1020] text-white">
 

@@ -478,7 +478,19 @@ export function MonoTemplate({
   };
   return (
     <div
-      className="relative min-h-[297mm] w-[210mm] overflow-hidden bg-white px-12 py-10 text-black shadow-[0_20px_70px_rgba(0,0,0,0.15)]"
+      className="
+        resume-page
+        relative
+        w-[210mm]
+        min-h-[297mm]
+        h-auto
+        overflow-visible
+        bg-white
+        px-12
+        py-10
+        text-black
+        shadow-[0_20px_70px_rgba(0,0,0,0.15)]
+      "
       style={{
         fontFamily: typography.fontFamily,
         fontSize: `${typography.fontSize}px`,
@@ -602,10 +614,7 @@ export function MonoTemplate({
 
 </div>
 
-<div className="absolute bottom-[18px] left-0 right-0 border-t border-dashed border-red-400/70" />
 
-      <div className="absolute bottom-[6px] right-6 rounded-full border border-red-400/40 bg-red-400/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-red-500">
-      </div>
     </div>
   );
 }
