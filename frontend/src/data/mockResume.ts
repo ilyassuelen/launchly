@@ -2,7 +2,7 @@ import type { Resume } from "../types/resume";
 
 export const mockResume: Resume = {
 
-  title: "AI Engineer Resume",
+  title: "New Resume",
 
   template: "aurora",
   theme: "aurora",

@@ -15,6 +15,12 @@ SessionLocal = sessionmaker(
 
 Base = declarative_base()
 
+from backend.app.models.user import User
+from backend.app.models.resume import Resume
+from backend.app.models.cover_letter import CoverLetter
+
+Base.metadata.create_all(bind=engine)
+
 
 def get_db():
     db = SessionLocal()

@@ -18,13 +18,14 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as LinkedinRouteImport } from './routes/linkedin'
 import { Route as InterviewRouteImport } from './routes/interview'
 import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as CoverLettersRouteImport } from './routes/cover-letters'
 import { Route as CoachRouteImport } from './routes/coach'
 import { Route as CareerPathRouteImport } from './routes/career-path'
 import { Route as ApplicationsRouteImport } from './routes/applications'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ResumesIndexRouteImport } from './routes/resumes.index'
+import { Route as CoverLettersIndexRouteImport } from './routes/cover-letters.index'
 import { Route as ResumesResumeIdRouteImport } from './routes/resumes.$resumeId'
+import { Route as CoverLettersCoverLetterIdRouteImport } from './routes/cover-letters.$coverLetterId'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
@@ -71,11 +72,6 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CoverLettersRoute = CoverLettersRouteImport.update({
-  id: '/cover-letters',
-  path: '/cover-letters',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CoachRoute = CoachRouteImport.update({
   id: '/coach',
   path: '/coach',
@@ -101,18 +97,28 @@ const ResumesIndexRoute = ResumesIndexRouteImport.update({
   path: '/resumes/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CoverLettersIndexRoute = CoverLettersIndexRouteImport.update({
+  id: '/cover-letters/',
+  path: '/cover-letters/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResumesResumeIdRoute = ResumesResumeIdRouteImport.update({
   id: '/resumes/$resumeId',
   path: '/resumes/$resumeId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CoverLettersCoverLetterIdRoute =
+  CoverLettersCoverLetterIdRouteImport.update({
+    id: '/cover-letters/$coverLetterId',
+    path: '/cover-letters/$coverLetterId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/applications': typeof ApplicationsRoute
   '/career-path': typeof CareerPathRoute
   '/coach': typeof CoachRoute
-  '/cover-letters': typeof CoverLettersRoute
   '/dashboard': typeof DashboardRoute
   '/interview': typeof InterviewRoute
   '/linkedin': typeof LinkedinRoute
@@ -122,7 +128,9 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/resume-export': typeof ResumeExportRoute
   '/settings': typeof SettingsRoute
+  '/cover-letters/$coverLetterId': typeof CoverLettersCoverLetterIdRoute
   '/resumes/$resumeId': typeof ResumesResumeIdRoute
+  '/cover-letters/': typeof CoverLettersIndexRoute
   '/resumes/': typeof ResumesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -130,7 +138,6 @@ export interface FileRoutesByTo {
   '/applications': typeof ApplicationsRoute
   '/career-path': typeof CareerPathRoute
   '/coach': typeof CoachRoute
-  '/cover-letters': typeof CoverLettersRoute
   '/dashboard': typeof DashboardRoute
   '/interview': typeof InterviewRoute
   '/linkedin': typeof LinkedinRoute
@@ -140,7 +147,9 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/resume-export': typeof ResumeExportRoute
   '/settings': typeof SettingsRoute
+  '/cover-letters/$coverLetterId': typeof CoverLettersCoverLetterIdRoute
   '/resumes/$resumeId': typeof ResumesResumeIdRoute
+  '/cover-letters': typeof CoverLettersIndexRoute
   '/resumes': typeof ResumesIndexRoute
 }
 export interface FileRoutesById {
@@ -149,7 +158,6 @@ export interface FileRoutesById {
   '/applications': typeof ApplicationsRoute
   '/career-path': typeof CareerPathRoute
   '/coach': typeof CoachRoute
-  '/cover-letters': typeof CoverLettersRoute
   '/dashboard': typeof DashboardRoute
   '/interview': typeof InterviewRoute
   '/linkedin': typeof LinkedinRoute
@@ -159,7 +167,9 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/resume-export': typeof ResumeExportRoute
   '/settings': typeof SettingsRoute
+  '/cover-letters/$coverLetterId': typeof CoverLettersCoverLetterIdRoute
   '/resumes/$resumeId': typeof ResumesResumeIdRoute
+  '/cover-letters/': typeof CoverLettersIndexRoute
   '/resumes/': typeof ResumesIndexRoute
 }
 export interface FileRouteTypes {
@@ -169,7 +179,6 @@ export interface FileRouteTypes {
     | '/applications'
     | '/career-path'
     | '/coach'
-    | '/cover-letters'
     | '/dashboard'
     | '/interview'
     | '/linkedin'
@@ -179,7 +188,9 @@ export interface FileRouteTypes {
     | '/register'
     | '/resume-export'
     | '/settings'
+    | '/cover-letters/$coverLetterId'
     | '/resumes/$resumeId'
+    | '/cover-letters/'
     | '/resumes/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -187,7 +198,6 @@ export interface FileRouteTypes {
     | '/applications'
     | '/career-path'
     | '/coach'
-    | '/cover-letters'
     | '/dashboard'
     | '/interview'
     | '/linkedin'
@@ -197,7 +207,9 @@ export interface FileRouteTypes {
     | '/register'
     | '/resume-export'
     | '/settings'
+    | '/cover-letters/$coverLetterId'
     | '/resumes/$resumeId'
+    | '/cover-letters'
     | '/resumes'
   id:
     | '__root__'
@@ -205,7 +217,6 @@ export interface FileRouteTypes {
     | '/applications'
     | '/career-path'
     | '/coach'
-    | '/cover-letters'
     | '/dashboard'
     | '/interview'
     | '/linkedin'
@@ -215,7 +226,9 @@ export interface FileRouteTypes {
     | '/register'
     | '/resume-export'
     | '/settings'
+    | '/cover-letters/$coverLetterId'
     | '/resumes/$resumeId'
+    | '/cover-letters/'
     | '/resumes/'
   fileRoutesById: FileRoutesById
 }
@@ -224,7 +237,6 @@ export interface RootRouteChildren {
   ApplicationsRoute: typeof ApplicationsRoute
   CareerPathRoute: typeof CareerPathRoute
   CoachRoute: typeof CoachRoute
-  CoverLettersRoute: typeof CoverLettersRoute
   DashboardRoute: typeof DashboardRoute
   InterviewRoute: typeof InterviewRoute
   LinkedinRoute: typeof LinkedinRoute
@@ -234,7 +246,9 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute
   ResumeExportRoute: typeof ResumeExportRoute
   SettingsRoute: typeof SettingsRoute
+  CoverLettersCoverLetterIdRoute: typeof CoverLettersCoverLetterIdRoute
   ResumesResumeIdRoute: typeof ResumesResumeIdRoute
+  CoverLettersIndexRoute: typeof CoverLettersIndexRoute
   ResumesIndexRoute: typeof ResumesIndexRoute
 }
 
@@ -303,13 +317,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/cover-letters': {
-      id: '/cover-letters'
-      path: '/cover-letters'
-      fullPath: '/cover-letters'
-      preLoaderRoute: typeof CoverLettersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/coach': {
       id: '/coach'
       path: '/coach'
@@ -345,11 +352,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResumesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cover-letters/': {
+      id: '/cover-letters/'
+      path: '/cover-letters'
+      fullPath: '/cover-letters/'
+      preLoaderRoute: typeof CoverLettersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resumes/$resumeId': {
       id: '/resumes/$resumeId'
       path: '/resumes/$resumeId'
       fullPath: '/resumes/$resumeId'
       preLoaderRoute: typeof ResumesResumeIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cover-letters/$coverLetterId': {
+      id: '/cover-letters/$coverLetterId'
+      path: '/cover-letters/$coverLetterId'
+      fullPath: '/cover-letters/$coverLetterId'
+      preLoaderRoute: typeof CoverLettersCoverLetterIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -360,7 +381,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApplicationsRoute: ApplicationsRoute,
   CareerPathRoute: CareerPathRoute,
   CoachRoute: CoachRoute,
-  CoverLettersRoute: CoverLettersRoute,
   DashboardRoute: DashboardRoute,
   InterviewRoute: InterviewRoute,
   LinkedinRoute: LinkedinRoute,
@@ -370,7 +390,9 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   ResumeExportRoute: ResumeExportRoute,
   SettingsRoute: SettingsRoute,
+  CoverLettersCoverLetterIdRoute: CoverLettersCoverLetterIdRoute,
   ResumesResumeIdRoute: ResumesResumeIdRoute,
+  CoverLettersIndexRoute: CoverLettersIndexRoute,
   ResumesIndexRoute: ResumesIndexRoute,
 }
 export const routeTree = rootRouteImport

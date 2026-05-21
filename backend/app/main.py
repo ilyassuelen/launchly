@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from backend.app.core.config import settings
-from backend.app.routers import health, auth, users, resume
+from backend.app.routers import health, auth, users, resume, cover_letter
 
 app = FastAPI(
     title="Launchly API",
@@ -47,6 +47,11 @@ app.include_router(
 app.include_router(
     resume.router,
     tags=["Resumes"],
+)
+
+app.include_router(
+    cover_letter.router,
+    tags=["Cover Letters"],
 )
 
 
