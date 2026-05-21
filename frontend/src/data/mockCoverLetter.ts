@@ -20,6 +20,10 @@ export const mockCoverLetter: CoverLetter =
     sender: {
       fullName: "",
 
+      currentRole: "",
+
+      skills: [],
+
       street: "",
 
       zip: "",

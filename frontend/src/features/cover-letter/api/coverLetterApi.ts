@@ -55,3 +55,22 @@ export async function duplicateCoverLetter(
     },
   );
 }
+
+export async function generateAICoverLetter(
+  payload: {
+    language: string;
+    tone: string;
+    sender_name: string;
+    current_role: string;
+    skills: string[];
+    job_posting: string;
+  },
+) {
+  return apiFetch(
+    "/ai/cover-letter/generate",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+  );
+}

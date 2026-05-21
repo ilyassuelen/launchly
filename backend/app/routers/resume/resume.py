@@ -14,13 +14,13 @@ from backend.app.core.database import (
     get_db,
 )
 
-from backend.app.models.resume import (
+from backend.app.models.resume.resume import (
     Resume,
 )
 
-from backend.app.models.user import User
+from backend.app.models.user.user import User
 
-from backend.app.schemas.resume import (
+from backend.app.schemas.resume.resume import (
     ResumeCreate,
 )
 

@@ -5,10 +5,10 @@ from sqlalchemy.orm import Session
 
 from backend.app.core.database import get_db
 
-from backend.app.models.cover_letter import CoverLetter
-from backend.app.models.user import User
+from backend.app.models.cover_letter.cover_letter import CoverLetter
+from backend.app.models.user.user import User
 
-from backend.app.schemas.cover_letter import CoverLetterCreate
+from backend.app.schemas.cover_letter.cover_letter import CoverLetterCreate
 
 from backend.app.core.deps import get_current_user
 

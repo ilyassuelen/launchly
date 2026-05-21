@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from backend.app.models.user import User
-from backend.app.schemas.user import UserResponse, UpdateUserRequest
+from backend.app.models.user.user import User
+from backend.app.schemas.user.user import UserResponse, UpdateUserRequest
 from backend.app.core.deps import get_current_user
 
 from backend.app.core.database import get_db

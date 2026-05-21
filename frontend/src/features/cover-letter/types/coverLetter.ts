@@ -15,6 +15,10 @@ export interface CoverLetterTypography {
 export interface CoverLetterSender {
   fullName: string;
 
+  currentRole?: string;
+
+  skills?: string[];
+
   street: string;
 
   zip: string;
@@ -50,6 +54,10 @@ export interface CoverLetter {
   id?: number | string;
 
   title: string;
+
+  selectedResumeId?: string | number;
+
+  resumeContext?: string;
 
   language?: "english" | "german";
 

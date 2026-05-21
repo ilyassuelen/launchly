@@ -5,6 +5,7 @@ import {
 } from "@tanstack/react-router";
 
 import {
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -23,6 +24,12 @@ import { CoverLetterRightPanel } from "@/features/cover-letter/components/layout
 
 import { CoverLetterInsightsPanel } from "@/features/cover-letter/components/layout/CoverLetterInsightsPanel";
 
+import { generateAICoverLetter } from "@/features/cover-letter/api/coverLetterApi";
+import {
+  getResumes,
+  getResume,
+} from "@/features/resume/api/resumeApi";
+
 import {
   Download,
   WandSparkles,
@@ -30,6 +37,7 @@ import {
   ZoomOut,
   Save,
   Copy,
+  Loader2
 } from "lucide-react";
 
 export const Route =
@@ -91,6 +99,14 @@ function CoverLetterBuilder() {
   const [zoom, setZoom] =
     useState(0.82);
 
+  const [resumes, setResumes] =
+    useState<any[]>([]);
+
+  const [
+      isGenerating,
+      setIsGenerating,
+  ] = useState(false);
+
   const typography =
       coverLetter?.typography || {
         fontFamily: "Inter",
@@ -142,6 +158,25 @@ const inputClassName =
 
 const textareaClassName =
   "w-full resize-none rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-violet-400/30";
+
+  useEffect(() => {
+      async function loadResumes() {
+        try {
+          const response =
+            await getResumes();
+
+          setResumes(
+            response?.data ||
+            response ||
+            [],
+          );
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      loadResumes();
+  }, []);
 
   if (
     isLoading ||
@@ -227,6 +262,60 @@ const textareaClassName =
         },
       }));
   };
+
+  const handleGenerateCoverLetter =
+      async () => {
+        try {
+          setIsGenerating(true);
+
+          const response =
+            await generateAICoverLetter({
+              language:
+                coverLetter.language ||
+                "english",
+
+              tone:
+                coverLetter.tone,
+
+              sender_name:
+                coverLetter.sender.fullName,
+
+              current_role:
+                coverLetter.sender.currentRole ||
+                "",
+
+              skills:
+                coverLetter.sender.skills ||
+                [],
+
+              resume_context:
+                coverLetter.resumeContext || "",
+
+              job_posting:
+                coverLetter.jobPosting,
+            });
+
+          setCoverLetter(
+            (prev: any) => ({
+              ...prev,
+
+              content: {
+                ...prev.content,
+
+                subject:
+                  response.subject,
+
+                body:
+                  response.body,
+              },
+            }),
+          );
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setIsGenerating(false);
+        }
+      };
 
   return (
     <AppShell
@@ -547,6 +636,95 @@ const textareaClassName =
             </div>
 
             <div>
+              <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Resume
+              </div>
+
+              <select
+                value={
+                  coverLetter.selectedResumeId || ""
+                }
+                onChange={async (e) => {
+                  const resumeId =
+                    e.target.value;
+
+                  updateField(
+                    "selectedResumeId",
+                    resumeId,
+                  );
+
+                  if (!resumeId) {
+                      updateField(
+                          "resumeContext",
+                          "",
+                      );
+                      return;
+                  }
+
+                  try {
+                    const response =
+                      await getResume(
+                        resumeId,
+                      );
+
+                    const resume =
+                      response?.data ||
+                      response;
+
+                    if (!resume) {
+                      return;
+                    }
+
+                    const resumeContext = `
+Name:
+${resume.personalInfo?.fullName || ""}
+
+Headline:
+${resume.personalInfo?.headline || ""}
+
+Summary:
+${resume.summary || ""}
+
+Skills:
+${resume.skills
+  ?.map((s: any) => s.name)
+  .join(", ") || ""}
+
+Projects:
+${resume.projects
+  ?.map(
+    (p: any) =>
+      `${p.title}: ${p.description}`,
+  )
+  .join("\n") || ""}
+`;
+
+                    updateField(
+                      "resumeContext",
+                      resumeContext,
+                    );
+                  } catch (error) {
+                    console.error(error);
+                  }
+                }}
+                className={inputClassName}
+              >
+                <option value="">
+                  Select a resume
+                </option>
+
+                {resumes.map((resume) => (
+                  <option
+                    key={resume.id}
+                    value={resume.id}
+                  >
+                    {resume.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
               <div className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-white/45">
                 Job Posting
               </div>
@@ -565,9 +743,40 @@ const textareaClassName =
               />
             </div>
 
-            <button className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-brand px-4 py-3 text-sm font-semibold text-primary-foreground shadow-[0_15px_50px_rgba(168,85,247,0.35)] transition hover:scale-[1.01]">
-              <WandSparkles className="size-4" />
-              Generate cover letter
+            <button
+              onClick={handleGenerateCoverLetter}
+              disabled={isGenerating}
+              className="
+                mt-4
+                flex
+                w-full
+                items-center
+                justify-center
+                gap-2
+                rounded-2xl
+                bg-gradient-brand
+                px-4
+                py-3
+                text-sm
+                font-semibold
+                text-primary-foreground
+                shadow-[0_15px_50px_rgba(168,85,247,0.35)]
+                transition
+                hover:opacity-90
+                disabled:opacity-50
+              "
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <WandSparkles className="size-4" />
+                  Generate with AI
+                </>
+              )}
             </button>
 
           </div>

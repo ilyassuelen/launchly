@@ -2,8 +2,8 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from backend.app.core.security import create_access_token, hash_password, verify_password
-from backend.app.models.user import User
-from backend.app.schemas.auth import RegisterRequest
+from backend.app.models.user.user import User
+from backend.app.schemas.auth.auth import RegisterRequest
 
 
 def register_user(db: Session, user_data: RegisterRequest):

@@ -4,7 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from backend.app.core.config import settings
-from backend.app.routers import health, auth, users, resume, cover_letter
+from backend.app.routers import health
+from backend.app.routers.auth import auth
+from backend.app.routers.users import users
+from backend.app.routers.resume import resume
+from backend.app.routers.cover_letter import cover_letter
+from backend.app.routers.cover_letter.ai_cover_letter import router as ai_cover_letter_router
 
 app = FastAPI(
     title="Launchly API",
@@ -53,6 +58,8 @@ app.include_router(
     cover_letter.router,
     tags=["Cover Letters"],
 )
+
+app.include_router(ai_cover_letter_router)
 
 
 @app.get("/")
