@@ -139,6 +139,36 @@ def create_resume(
     )
 
 
+@router.get("/latest")
+def get_latest_resume(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user,
+    ),
+):
+    resume = (
+        db.query(Resume)
+        .filter(
+            Resume.user_id
+            == current_user.id,
+        )
+        .order_by(
+            Resume.updated_at.desc()
+        )
+        .first()
+    )
+
+    if not resume:
+        raise HTTPException(
+            status_code=404,
+            detail="No resume found",
+        )
+
+    return serialize_resume(
+        resume
+    )
+
+
 @router.get("/{resume_id}")
 def get_resume(
     resume_id: str,
