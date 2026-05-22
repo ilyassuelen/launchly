@@ -4,11 +4,37 @@ import {
   BadgeCheck,
   TriangleAlert,
   Brain,
+  Loader2
 } from "lucide-react";
 
 import { Card } from "@/components/launchly/AppShell";
 
-export function CoverLetterInsightsPanel() {
+import type {
+  CoverLetterAnalysis,
+} from "@/features/cover-letter/types/coverLetterAnalysis";
+
+interface Props {
+  analysis: CoverLetterAnalysis | null;
+
+  isAnalyzing: boolean;
+
+  onAnalyze: () => void;
+
+  canAnalyze: boolean;
+}
+
+export function CoverLetterInsightsPanel({
+  analysis,
+  isAnalyzing,
+  onAnalyze,
+  canAnalyze,
+}: Props) {
+  const smartSuggestions =
+    analysis?.smart_suggestions || [];
+
+  const recruiterAnalysis =
+    analysis?.recruiter_analysis;
+
   return (
     <div className="mx-auto w-full max-w-[1700px]">
 
@@ -17,91 +43,145 @@ export function CoverLetterInsightsPanel() {
         {/* SMART SUGGESTIONS */}
         <Card className="overflow-hidden">
 
-          <div className="flex items-center gap-2 border-b border-white/5 pb-4">
+          <div className="flex items-start justify-between gap-4 border-b border-white/5 pb-4">
 
-            <Sparkles className="size-5 text-cyan-300" />
+            <div className="flex items-center gap-2">
 
-            <div>
+              <Sparkles className="size-5 text-cyan-300" />
 
-              <div className="text-sm font-semibold">
-                Smart suggestions
-              </div>
+              <div>
 
-              <div className="mt-1 text-xs text-muted-foreground">
-                AI-powered recommendations to improve recruiter response
+                <div className="text-sm font-semibold">
+                  Smart suggestions
+                </div>
+
+                <div className="mt-1 text-xs text-muted-foreground">
+                  AI-powered recommendations to improve recruiter response
+                </div>
+
               </div>
 
             </div>
+
+            <button
+              onClick={onAnalyze}
+              disabled={!canAnalyze || isAnalyzing}
+              className="
+                inline-flex
+                min-w-[220px]
+                items-center
+                justify-center
+                gap-2
+                rounded-2xl
+                border
+                border-cyan-400/20
+                bg-cyan-400/[0.06]
+                px-5
+                py-3
+                text-sm
+                font-semibold
+                text-cyan-200
+                transition-all
+                duration-200
+                hover:bg-cyan-400/[0.10]
+                disabled:cursor-not-allowed
+                disabled:opacity-50
+              "
+            >
+              {isAnalyzing ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <Brain className="size-4" />
+
+                  {analysis
+                      ? "Re-Analyze"
+                      : "Analyze Cover Letter"}
+                </>
+              )}
+            </button>
 
           </div>
 
           <div className="mt-5 grid gap-4 xl:grid-cols-3">
 
-            <div className="rounded-3xl border border-orange-400/10 bg-orange-400/[0.06] p-6">
+            {isAnalyzing ? (
+              <div className="col-span-full rounded-3xl border border-white/5 bg-white/[0.03] p-6 text-sm text-white/60">
+                Generating AI analysis...
+              </div>
+            ) : smartSuggestions.length > 0 ? (
+              smartSuggestions.map((suggestion, index) => {
+                const isWarning =
+                  suggestion.type === "warning";
 
-              <div className="flex items-center gap-4">
+                const isSuccess =
+                  suggestion.type === "success";
 
-                <div className="rounded-2xl bg-orange-400/10 p-3">
-
+                const icon = isWarning ? (
                   <TriangleAlert className="size-5 text-orange-300" />
-
-                </div>
-
-                <div className="text-mt font-semibold text-white leading-none">
-                  More role specificity
-                </div>
-
-              </div>
-
-              <div className="mt-6 text-sm leading-relaxed text-white/60">
-                Mentioning concrete technologies and business impact can increase recruiter engagement.
-              </div>
-
-            </div>
-
-            <div className="rounded-3xl border border-cyan-400/10 bg-cyan-400/[0.05] p-6">
-
-              <div className="flex items-center gap-4">
-
-                <div className="rounded-2xl bg-cyan-400/10 p-3">
-
-                  <TrendingUp className="size-5 text-cyan-300" />
-
-                </div>
-
-                <div className="text-mt font-semibold text-white leading-none">
-                  Strong alignment
-                </div>
-
-              </div>
-
-              <div className="mt-6 text-sm leading-relaxed text-white/60">
-                The tone and structure already feel modern and recruiter-friendly.
-              </div>
-
-            </div>
-
-            <div className="rounded-3xl border border-emerald-400/10 bg-emerald-400/[0.05] p-6">
-
-              <div className="flex items-center gap-4">
-
-                <div className="rounded-2xl bg-emerald-400/10 p-3">
-
+                ) : isSuccess ? (
                   <BadgeCheck className="size-5 text-emerald-300" />
+                ) : (
+                  <TrendingUp className="size-5 text-cyan-300" />
+                );
 
-                </div>
+                const cardClasses = isWarning
+                  ? "border-orange-400/10 bg-orange-400/[0.06]"
+                  : isSuccess
+                    ? "border-emerald-400/10 bg-emerald-400/[0.05]"
+                    : "border-cyan-400/10 bg-cyan-400/[0.05]";
 
-                <div className="text-mt font-semibold text-white leading-none">
-                  Human writing style
-                </div>
+                const iconClasses = isWarning
+                  ? "bg-orange-400/10"
+                  : isSuccess
+                    ? "bg-emerald-400/10"
+                    : "bg-cyan-400/10";
 
+                const priorityClasses =
+                  suggestion.priority === "high"
+                    ? "bg-red-400/10 text-red-300"
+                    : suggestion.priority === "medium"
+                      ? "bg-orange-400/10 text-orange-300"
+                      : "bg-cyan-400/10 text-cyan-300";
+
+                return (
+                  <div
+                    key={index}
+                    className={`rounded-3xl border p-6 ${cardClasses}`}
+                  >
+
+                    <div
+                      className={`mb-4 inline-flex rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${priorityClasses}`}
+                    >
+                      {suggestion.priority || "low"} impact
+                    </div>
+                    <div className="flex items-center gap-4">
+
+                      <div className={`rounded-2xl p-3 ${iconClasses}`}>
+                        {icon}
+                      </div>
+
+                      <div className="text-mt font-semibold leading-tight tracking-[-0.02em] text-white">
+                        {suggestion.title}
+                      </div>
+
+                    </div>
+
+                    <div className="mt-5 text-[15px] leading-6 text-white/60">
+                      {suggestion.description}
+                    </div>
+
+                  </div>
+                );
+              })
+            ) : (
+              <div className="col-span-full rounded-3xl border border-white/5 bg-white/[0.03] p-6 text-sm text-white/60">
+                Generate a cover letter to receive AI-powered recruiter analysis.
               </div>
-
-              <div className="mt-6 text-sm leading-relaxed text-white/60">
-                The wording feels natural and avoids overly robotic AI phrasing.
-              </div>
-
-            </div>
+            )}
 
           </div>
 
@@ -134,41 +214,53 @@ export function CoverLetterInsightsPanel() {
 
             <div className="mt-5 space-y-4">
 
-              <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4">
-
-                <div className="text-xs uppercase tracking-[0.18em] text-cyan-300">
-                  Strongest Area
+              {isAnalyzing ? (
+                <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-sm text-white/60">
+                  Analyzing recruiter impression...
                 </div>
+              ) : recruiterAnalysis ? (
+                <>
+                  <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4">
 
-                <div className="mt-2 text-sm text-white/80">
-                  Professional structure and readable formatting
+                    <div className="text-xs uppercase tracking-[0.18em] text-cyan-300">
+                      Strongest Area
+                    </div>
+
+                    <div className="mt-2 text-sm text-white/80">
+                      {recruiterAnalysis.strongest_area}
+                    </div>
+
+                  </div>
+
+                  <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4">
+
+                    <div className="text-xs uppercase tracking-[0.18em] text-orange-300">
+                      Improvement Opportunity
+                    </div>
+
+                    <div className="mt-2 text-sm text-white/80">
+                      {recruiterAnalysis.improvement_opportunity}
+                    </div>
+
+                  </div>
+
+                  <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4">
+
+                    <div className="text-xs uppercase tracking-[0.18em] text-emerald-300">
+                      Recruiter Impression
+                    </div>
+
+                    <div className="mt-2 text-sm text-white/80">
+                      {recruiterAnalysis.recruiter_impression}
+                    </div>
+
+                  </div>
+                </>
+              ) : (
+                <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-sm text-white/60">
+                  No recruiter analysis available yet.
                 </div>
-
-              </div>
-
-              <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4">
-
-                <div className="text-xs uppercase tracking-[0.18em] text-orange-300">
-                  Improvement Opportunity
-                </div>
-
-                <div className="mt-2 text-sm text-white/80">
-                  Add more measurable achievements and company-specific context.
-                </div>
-
-              </div>
-
-              <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4">
-
-                <div className="text-xs uppercase tracking-[0.18em] text-emerald-300">
-                  Recruiter Impression
-                </div>
-
-                <div className="mt-2 text-sm text-white/80">
-                  Premium, modern and significantly above average compared to generic applications.
-                </div>
-
-              </div>
+              )}
 
             </div>
 

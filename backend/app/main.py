@@ -10,6 +10,7 @@ from backend.app.routers.users import users
 from backend.app.routers.resume import resume
 from backend.app.routers.cover_letter import cover_letter
 from backend.app.routers.cover_letter.ai_cover_letter import router as ai_cover_letter_router
+from backend.app.routers.cover_letter.cover_letter_analysis import router as cover_letter_analysis_router
 
 app = FastAPI(
     title="Launchly API",
@@ -60,6 +61,8 @@ app.include_router(
 )
 
 app.include_router(ai_cover_letter_router)
+
+app.include_router(cover_letter_analysis_router)
 
 
 @app.get("/")

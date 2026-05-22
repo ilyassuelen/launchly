@@ -63,11 +63,30 @@ export async function generateAICoverLetter(
     sender_name: string;
     current_role: string;
     skills: string[];
+    resume_context: string;
     job_posting: string;
   },
 ) {
   return apiFetch(
     "/ai/cover-letter/generate",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+  );
+}
+
+export async function analyzeCoverLetter(
+  payload: {
+    tone: string;
+    language: string;
+    job_posting: string;
+    subject: string;
+    body: string;
+  },
+) {
+  return apiFetch(
+    "/ai/cover-letter-analysis/analyze",
     {
       method: "POST",
       body: JSON.stringify(payload),

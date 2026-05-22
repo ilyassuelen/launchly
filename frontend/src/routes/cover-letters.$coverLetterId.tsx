@@ -31,6 +31,14 @@ import {
 } from "@/features/resume/api/resumeApi";
 
 import {
+  analyzeCoverLetter,
+} from "@/features/cover-letter/api/coverLetterApi";
+
+import type {
+  CoverLetterAnalysis,
+} from "@/features/cover-letter/types/coverLetterAnalysis";
+
+import {
   Download,
   WandSparkles,
   ZoomIn,
@@ -107,6 +115,18 @@ function CoverLetterBuilder() {
       setIsGenerating,
   ] = useState(false);
 
+  const [
+      analysis,
+      setAnalysis,
+  ] = useState<CoverLetterAnalysis | null>(
+      null,
+  );
+
+  const [
+      isAnalyzing,
+      setIsAnalyzing,
+  ] = useState(false);
+
   const typography =
       coverLetter?.typography || {
         fontFamily: "Inter",
@@ -177,6 +197,12 @@ const textareaClassName =
 
       loadResumes();
   }, []);
+
+  useEffect(() => {
+    if (!coverLetter?.content?.body) {
+      setAnalysis(null);
+    }
+  }, [coverLetter?.content?.body]);
 
   if (
     isLoading ||
@@ -314,6 +340,38 @@ const textareaClassName =
           console.error(error);
         } finally {
           setIsGenerating(false);
+        }
+      };
+
+  const handleAnalyzeCoverLetter =
+      async (
+        body: string,
+        subject: string,
+      ) => {
+        try {
+          setIsAnalyzing(true);
+
+          const response =
+            await analyzeCoverLetter({
+              tone:
+                coverLetter.tone,
+
+              language:
+                coverLetter.language || "english",
+
+              job_posting:
+                coverLetter.jobPosting,
+
+              subject,
+
+              body,
+            });
+
+          setAnalysis(response);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setIsAnalyzing(false);
         }
       };
 
@@ -899,7 +957,19 @@ ${resume.projects
 
           <div className="max-w-[794px]">
             <div className="space-y-4">
-              <CoverLetterInsightsPanel />
+              <CoverLetterInsightsPanel
+                  analysis={analysis}
+                  isAnalyzing={isAnalyzing}
+                  canAnalyze={
+                      !!coverLetter.content?.body
+                  }
+                  onAnalyze={() =>
+                      handleAnalyzeCoverLetter(
+                          coverLetter.content?.body || "",
+                          coverLetter.content?.subject || "",
+                      )
+                  }
+              />
             </div>
           </div>
 
