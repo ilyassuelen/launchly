@@ -55,3 +55,20 @@ export async function duplicateResume(
     },
   );
 }
+
+export async function analyzeResume(
+  payload: {
+    language: string;
+    tone: string;
+    resume_content: string;
+    target_role?: string;
+  },
+) {
+  return apiFetch(
+    "/ai/resume-analysis/analyze",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+  );
+}

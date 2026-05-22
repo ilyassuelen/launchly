@@ -16,6 +16,7 @@ import { FONT_OPTIONS } from "@/features/resume/constants/typography";
 type Props = {
   resume: any;
   setResume: any;
+  analysis: any;
   typography: any;
   updateTypography: (
     updates: any,
@@ -25,9 +26,15 @@ type Props = {
 export function ResumeRightPanel({
   resume,
   setResume,
+  analysis,
   typography,
   updateTypography,
 }: Props) {
+  const atsScore =
+    analysis?.ats_score?.score || 0;
+
+  const atsBreakdown =
+    analysis?.ats_score?.breakdown;
   return (
     <div className="space-y-4 lg:col-span-2">
 
@@ -39,7 +46,7 @@ export function ResumeRightPanel({
 
         <div className="flex items-end gap-2">
           <div className="text-5xl font-semibold tracking-tight">
-            88
+            {atsScore}
           </div>
 
           <div className="mb-2 text-sm text-muted-foreground">
@@ -47,7 +54,47 @@ export function ResumeRightPanel({
           </div>
         </div>
 
-        <Progress value={88} color="green" />
+        <Progress
+          value={atsScore}
+          color={
+            atsScore >= 80
+              ? "green"
+              : atsScore >= 60
+                ? "yellow"
+                : "red"
+          }
+        />
+
+        {atsBreakdown && (
+          <div className="mt-4 space-y-2">
+
+            <div className="flex justify-between text-xs text-white/70">
+              <span>Completeness</span>
+              <span>{atsBreakdown.completeness}/20</span>
+            </div>
+
+            <div className="flex justify-between text-xs text-white/70">
+              <span>Keyword Relevance</span>
+              <span>{atsBreakdown.keyword_relevance}/25</span>
+            </div>
+
+            <div className="flex justify-between text-xs text-white/70">
+              <span>Experience Quality</span>
+              <span>{atsBreakdown.experience_quality}/25</span>
+            </div>
+
+            <div className="flex justify-between text-xs text-white/70">
+              <span>Formatting</span>
+              <span>{atsBreakdown.formatting}/15</span>
+            </div>
+
+            <div className="flex justify-between text-xs text-white/70">
+              <span>Readability</span>
+              <span>{atsBreakdown.readability}/15</span>
+            </div>
+
+          </div>
+        )}
       </Card>
 
       <Card>
@@ -84,6 +131,48 @@ export function ResumeRightPanel({
             </button>
           ))}
         </div>
+      </Card>
+
+      {/* LANGUAGE */}
+      <Card>
+
+        <div className="mb-4 flex items-center gap-2 text-sm font-semibold">
+          <Sparkles className="size-4 text-violet-300" />
+          Language
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+
+          {[
+            {
+              value: "english",
+              label: "English",
+            },
+            {
+              value: "german",
+              label: "German",
+            },
+          ].map((language) => (
+            <button
+              key={language.value}
+              onClick={() =>
+                setResume((prev: any) => ({
+                  ...prev,
+                  language: language.value,
+                }))
+              }
+              className={`rounded-2xl border px-4 py-3 text-sm font-medium transition ${
+                resume.language === language.value
+                  ? "border-violet-400/30 bg-violet-500/10"
+                  : "border-white/5 bg-white/[0.03]"
+              }`}
+            >
+              {language.label}
+            </button>
+          ))}
+
+        </div>
+
       </Card>
 
       <Card>

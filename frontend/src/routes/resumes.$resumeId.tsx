@@ -8,6 +8,14 @@ import { useParams } from "@tanstack/react-router";
 import { useResume } from "@/features/resume/hooks/useResume";
 
 import {
+  analyzeResume,
+} from "@/features/resume/api/resumeApi";
+
+import type {
+  ResumeAnalysis,
+} from "@/features/resume/types/resumeAnalysis";
+
+import {
   useEffect,
   useMemo,
   useState,
@@ -99,6 +107,18 @@ function ResumeBuilder() {
   } = useResume(resumeId);
 
   const [zoom, setZoom] = useState(0.82);
+
+  const [
+      analysis,
+      setAnalysis,
+  ] = useState<ResumeAnalysis | null>(
+      null,
+  );
+
+  const [
+      isAnalyzing,
+      setIsAnalyzing,
+  ] = useState(false);
 
   const typography =
       resume?.typography || {
@@ -406,6 +426,12 @@ const selectedProfile =
     };
   }, [resume, typography]);
 
+  useEffect(() => {
+        if (!resume) {
+          setAnalysis(null);
+        }
+  }, [resume]);
+
 
   const websiteLabel =
     resume?.basics?.websiteLabel ||
@@ -585,6 +611,74 @@ const selectedProfile =
         },
       }));
   };
+
+  const buildResumeContext = () => {
+      return `
+Name:
+${resume?.basics?.fullName || ""}
+
+Headline:
+${resume?.basics?.title || ""}
+
+Summary:
+${resume?.summary?.content || ""}
+
+Skills:
+${resume?.skills
+  ?.flatMap((group: any) => group.skills || [])
+  .join(", ") || ""}
+
+Experience:
+${resume?.experience
+  ?.map(
+    (e: any) => `
+${e.role || ""} at ${e.company || ""}
+${e.summary || ""}
+${(e.bullets || []).join(" ")}
+`,
+  )
+  .join("\n") || ""}
+
+Projects:
+${resume?.projects
+  ?.map(
+    (p: any) => `
+${p.title || ""}
+${p.description || ""}
+${(p.bullets || []).join(" ")}
+`,
+  )
+  .join("\n") || ""}
+`;
+  };
+
+  const handleAnalyzeResume =
+    async () => {
+      try {
+        setIsAnalyzing(true);
+
+        const response =
+          await analyzeResume({
+            language:
+              resume?.language || "english",
+
+            tone:
+              "professional",
+
+            resume_content:
+              buildResumeContext(),
+
+            target_role:
+              resume?.basics?.title || "",
+          });
+
+        setAnalysis(response);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsAnalyzing(false);
+      }
+    };
 
   const updateExperienceBullet = (
     experienceId: number | string,
@@ -1389,7 +1483,12 @@ const selectedProfile =
 
           <div className="max-w-[794px]">
             <div className="space-y-4">
-              <ResumeInsightsPanel />
+              <ResumeInsightsPanel
+                analysis={analysis}
+                isAnalyzing={isAnalyzing}
+                canAnalyze={true}
+                onAnalyze={handleAnalyzeResume}
+              />
             </div>
           </div>
 
@@ -1398,6 +1497,7 @@ const selectedProfile =
         <ResumeRightPanel
           resume={resume}
           setResume={setResume}
+          analysis={analysis}
           typography={typography}
           updateTypography={updateTypography}
         />
