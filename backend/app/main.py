@@ -14,6 +14,7 @@ from backend.app.routers.cover_letter.cover_letter_analysis import router as cov
 from backend.app.routers.resume.resume_analysis import router as resume_analysis_router
 from backend.app.routers.recruiter.recruiter import router as recruiter_router
 from backend.app.routers.linkedin.linkedin import router as linkedin_router
+from backend.app.routers.portfolio.portfolio import router as portfolio_router
 
 app = FastAPI(
     title="Launchly API",
@@ -72,6 +73,8 @@ app.include_router(resume_analysis_router)
 app.include_router(recruiter_router)
 
 app.include_router(linkedin_router)
+
+app.include_router(portfolio_router)
 
 
 @app.get("/")
