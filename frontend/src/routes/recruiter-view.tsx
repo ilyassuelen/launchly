@@ -234,22 +234,13 @@ ${(p.bullets || []).join(" ")}
 
     setAnalysis(null);
     setHasAnalyzed(false);
+    setAnimatedScore(0);
+    setScanPhase(0);
   }, [
       selectedResumeId,
       language,
   ]);
 
-
-  useEffect(() => {
-    if (!resume || hasAnalyzed) {
-      return;
-    }
-
-    handleAnalyzeRecruiterView();
-  }, [
-    resume?.id,
-    hasAnalyzed,
-  ]);
 
 
   useEffect(() => {
@@ -321,6 +312,8 @@ ${(p.bullets || []).join(" ")}
               console.log("Recruiter scan triggered");
 
               setScanReplayKey((prev) => prev + 1);
+              setAnimatedScore(0);
+              setScanPhase(0);
               setHasAnalyzed(false);
               await handleAnalyzeRecruiterView();
             }}
