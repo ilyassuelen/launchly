@@ -45,7 +45,8 @@ import {
   ZoomOut,
   Save,
   Copy,
-  Loader2
+  Loader2,
+  Radar,
 } from "lucide-react";
 
 export const Route =
@@ -698,42 +699,49 @@ const textareaClassName =
                 Resume
               </div>
 
-              <select
-                value={
-                  coverLetter.selectedResumeId || ""
-                }
-                onChange={async (e) => {
-                  const resumeId =
-                    e.target.value;
+              <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.045] shadow-[0_12px_40px_rgba(0,0,0,0.18)] backdrop-blur-xl transition hover:border-cyan-300/25 hover:bg-white/[0.07]">
+  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.14),transparent_42%)] opacity-80" />
 
-                  updateField(
-                    "selectedResumeId",
-                    resumeId,
-                  );
+  <div className="pointer-events-none absolute left-3 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-xl border border-cyan-300/15 bg-cyan-300/10 text-cyan-200">
+    <Radar className="size-3.5" />
+  </div>
 
-                  if (!resumeId) {
-                      updateField(
-                          "resumeContext",
-                          "",
-                      );
-                      return;
-                  }
+  <select
+    value={
+      coverLetter.selectedResumeId || ""
+    }
+    onChange={async (e) => {
+      const resumeId =
+        e.target.value;
 
-                  try {
-                    const response =
-                      await getResume(
-                        resumeId,
-                      );
+      updateField(
+        "selectedResumeId",
+        resumeId,
+      );
 
-                    const resume =
-                      response?.data ||
-                      response;
+      if (!resumeId) {
+        updateField(
+          "resumeContext",
+          "",
+        );
+        return;
+      }
 
-                    if (!resume) {
-                      return;
-                    }
+      try {
+        const response =
+          await getResume(
+            resumeId,
+          );
 
-                    const resumeContext = `
+        const resume =
+          response?.data ||
+          response;
+
+        if (!resume) {
+          return;
+        }
+
+        const resumeContext = `
 Name:
 ${resume.personalInfo?.fullName || ""}
 
@@ -757,29 +765,52 @@ ${resume.projects
   .join("\n") || ""}
 `;
 
-                    updateField(
-                      "resumeContext",
-                      resumeContext,
-                    );
-                  } catch (error) {
-                    console.error(error);
-                  }
-                }}
-                className={inputClassName}
-              >
-                <option value="">
-                  Select a resume
-                </option>
+        updateField(
+          "resumeContext",
+          resumeContext,
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    }}
+    className="relative z-10 h-12 w-full cursor-pointer appearance-none bg-transparent pl-12 pr-10 text-sm font-semibold text-white/90 outline-none transition"
+  >
+    <option
+      value=""
+      className="bg-[#0b0f1a] text-white"
+    >
+      Select a resume
+    </option>
 
-                {resumes.map((resume) => (
-                  <option
-                    key={resume.id}
-                    value={resume.id}
-                  >
-                    {resume.title}
-                  </option>
-                ))}
-              </select>
+    {resumes.map((resume) => (
+      <option
+        key={resume.id}
+        value={resume.id}
+        className="bg-[#0b0f1a] text-white"
+      >
+        {resume.title}
+      </option>
+    ))}
+  </select>
+
+  <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-white/45 transition group-hover:text-cyan-200">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M4 6L8 10L12 6"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  </div>
+</div>
             </div>
 
             <div>

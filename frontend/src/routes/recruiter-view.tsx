@@ -360,28 +360,56 @@ ${(p.bullets || []).join(" ")}
               </div>
 
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <select
-                  value={selectedResumeId || ""}
-                  onChange={(event) => {
-                    setSelectedResumeId(
-                      event.target.value,
-                    );
+                <div className="group relative min-w-[220px] overflow-hidden rounded-2xl border border-white/10 bg-white/[0.045] shadow-[0_12px_40px_rgba(0,0,0,0.18)] backdrop-blur-xl transition hover:border-cyan-300/25 hover:bg-white/[0.07]">
+                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.14),transparent_42%)] opacity-80" />
 
-                    setAnalysis(null);
-                    setHasAnalyzed(false);
-                  }}
-                  className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2 text-xs text-white outline-none transition hover:bg-white/[0.07]"
-                >
-                  {resumes.map((item) => (
-                    <option
-                      key={item.id}
-                      value={item.id}
-                      className="bg-[#0b0f1a] text-white"
+                  <div className="pointer-events-none absolute left-3 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-xl border border-cyan-300/15 bg-cyan-300/10 text-cyan-200">
+                    <Radar className="size-3.5" />
+                  </div>
+
+                  <select
+                    value={selectedResumeId || ""}
+                    onChange={(event) => {
+                      setSelectedResumeId(
+                        event.target.value,
+                      );
+
+                      setAnalysis(null);
+                      setHasAnalyzed(false);
+                      setAnimatedScore(0);
+                      setScanPhase(0);
+                    }}
+                    className="relative z-10 h-11 w-full cursor-pointer appearance-none bg-transparent pl-12 pr-10 text-xs font-semibold text-white outline-none transition"
+                  >
+                    {resumes.map((item) => (
+                      <option
+                        key={item.id}
+                        value={item.id}
+                        className="bg-[#0b0f1a] text-white"
+                      >
+                        {item.title || "Untitled Resume"}
+                      </option>
+                    ))}
+                  </select>
+
+                  <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-white/45 transition group-hover:text-cyan-200">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
                     >
-                      {item.title || "Untitled Resume"}
-                    </option>
-                  ))}
-                </select>
+                      <path
+                        d="M4 6L8 10L12 6"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
+                </div>
 
                 <div className="flex items-center gap-2 rounded-2xl border border-cyan-400/10 bg-cyan-400/[0.05] px-4 py-2 text-xs text-cyan-100 shadow-[0_0_30px_rgba(34,211,238,0.08)]">
                   <Activity className="size-10" />
