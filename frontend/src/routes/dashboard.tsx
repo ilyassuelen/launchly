@@ -212,8 +212,21 @@ function Dashboard() {
           className="h-8 w-auto object-contain"
         />
       }
-      title={`Welcome back, ${firstName} 👋`}
-      subtitle="Your AI career command center based on your saved resume, recruiter, LinkedIn, portfolio and application data."
+      title={
+        <div className="flex flex-col gap-2">
+          <div className="inline-flex w-fit items-center gap-2 rounded-full border border-cyan-300/10 bg-cyan-300/[0.06] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
+            Career intelligence dashboard
+          </div>
+
+          <div className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
+            Your career command center,
+            <span className="ml-2 bg-gradient-to-r from-violet-200 via-sky-200 to-cyan-200 bg-clip-text text-transparent">
+              {firstName}
+            </span>
+          </div>
+        </div>
+      }
+      subtitle="Track your readiness, market fit, skill gaps, and next best actions from one focused dashboard."
     >
       <div className="space-y-4">
         {error && (
