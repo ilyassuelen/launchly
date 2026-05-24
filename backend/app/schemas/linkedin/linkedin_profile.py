@@ -1,5 +1,7 @@
-from pydantic import BaseModel
+from datetime import datetime
 from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel
 
 
 class LinkedInProfileBase(BaseModel):
@@ -10,6 +12,8 @@ class LinkedInProfileBase(BaseModel):
     projects: List[str] = []
     target_role: str = ""
     analysis: Optional[Dict[str, Any]] = None
+    latest_profile_score: Optional[int] = None
+    analyzed_at: Optional[datetime] = None
 
 
 class LinkedInProfileUpdate(LinkedInProfileBase):

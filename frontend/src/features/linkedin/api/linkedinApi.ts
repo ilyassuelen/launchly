@@ -1,15 +1,26 @@
 import type {
   LinkedInAnalyzerRequest,
   LinkedInAnalyzerResponse,
-} from "@/features/linkedin/types/linkedinAnalyzer";
-
-import type {
   LinkedInProfileData,
 } from "@/features/linkedin/types/linkedinAnalyzer";
 
 const API_BASE =
   import.meta.env.VITE_API_URL ||
   "http://localhost:8000";
+
+function getAuthHeaders() {
+  const token =
+    localStorage.getItem("access_token");
+
+  return {
+    "Content-Type": "application/json",
+    ...(token
+      ? {
+          Authorization: `Bearer ${token}`,
+        }
+      : {}),
+  };
+}
 
 export async function analyzeLinkedInProfile(
   payload: LinkedInAnalyzerRequest,
@@ -18,11 +29,7 @@ export async function analyzeLinkedInProfile(
     `${API_BASE}/linkedin/analyze`,
     {
       method: "POST",
-
-      headers: {
-        "Content-Type": "application/json",
-      },
-
+      headers: getAuthHeaders(),
       body: JSON.stringify(payload),
     },
   );
@@ -36,17 +43,6 @@ export async function analyzeLinkedInProfile(
   return response.json();
 }
 
-function getAuthHeaders() {
-  const token = localStorage.getItem("access_token");
-
-  return {
-    "Content-Type": "application/json",
-    ...(token
-      ? { Authorization: `Bearer ${token}` }
-      : {}),
-  };
-}
-
 export async function getLinkedInProfile(): Promise<LinkedInProfileData | null> {
   const response = await fetch(
     `${API_BASE}/linkedin/profile`,
@@ -57,7 +53,9 @@ export async function getLinkedInProfile(): Promise<LinkedInProfileData | null> 
   );
 
   if (!response.ok) {
-    throw new Error("Failed to load LinkedIn profile");
+    throw new Error(
+      "Failed to load LinkedIn profile",
+    );
   }
 
   return response.json();
@@ -76,7 +74,9 @@ export async function saveLinkedInProfile(
   );
 
   if (!response.ok) {
-    throw new Error("Failed to save LinkedIn profile");
+    throw new Error(
+      "Failed to save LinkedIn profile",
+    );
   }
 
   return response.json();

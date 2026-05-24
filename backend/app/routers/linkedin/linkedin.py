@@ -15,7 +15,9 @@ from backend.app.schemas.linkedin.linkedin_profile import (
     LinkedInProfileResponse,
 )
 
-from backend.app.services.linkedin.linkedin_analyzer_service import analyze_linkedin_profile
+from backend.app.services.linkedin.linkedin_analyzer_service import (
+    analyze_linkedin_profile,
+)
 
 from backend.app.services.linkedin.linkedin_profile_service import (
     get_linkedin_profile,
@@ -34,9 +36,13 @@ router = APIRouter(
 )
 async def analyze_linkedin(
     payload: LinkedInAnalyzerRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     return await analyze_linkedin_profile(
-        payload,
+        payload=payload,
+        db=db,
+        user_id=current_user.id,
     )
 
 

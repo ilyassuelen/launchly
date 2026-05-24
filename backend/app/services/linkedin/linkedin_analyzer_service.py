@@ -3,6 +3,7 @@ import re
 
 from fastapi import HTTPException
 from openai import AsyncOpenAI
+from sqlalchemy.orm import Session
 
 from backend.app.core.config import settings
 
@@ -18,6 +19,10 @@ from backend.app.schemas.linkedin.linkedin_analyzer import (
     MissingKeyword,
     SearchVisibilityItem,
     RecruiterMatchBreakdown,
+)
+
+from backend.app.services.linkedin.linkedin_profile_service import (
+    save_linkedin_analysis,
 )
 
 client = AsyncOpenAI(
@@ -106,6 +111,12 @@ def _clamp(value: int) -> int:
     return max(0, min(100, value))
 
 
+def _serialize_linkedin_analysis(
+    response: LinkedInAnalyzerResponse,
+) -> dict:
+    return response.model_dump()
+
+
 def calculate_linkedin_signals(
     payload: LinkedInAnalyzerRequest,
 ) -> LinkedInSignals:
@@ -186,6 +197,8 @@ def calculate_linkedin_signals(
 
 async def analyze_linkedin_profile(
     payload: LinkedInAnalyzerRequest,
+    db: Session | None = None,
+    user_id: int | None = None,
 ) -> LinkedInAnalyzerResponse:
     signals = calculate_linkedin_signals(
         payload,
@@ -243,7 +256,7 @@ async def analyze_linkedin_profile(
         {},
     )
 
-    return LinkedInAnalyzerResponse(
+    analysis = LinkedInAnalyzerResponse(
         profile_score=profile_score,
 
         signals=signals,
@@ -304,3 +317,19 @@ async def analyze_linkedin_profile(
             "",
         ),
     )
+
+    if db and user_id:
+        save_linkedin_analysis(
+            db=db,
+            user_id=user_id,
+            language=payload.language,
+            headline=payload.headline,
+            about=payload.about,
+            skills=payload.skills,
+            projects=payload.projects,
+            target_role=payload.target_role,
+            analysis=_serialize_linkedin_analysis(analysis),
+            profile_score=analysis.profile_score,
+        )
+
+    return analysis

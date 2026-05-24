@@ -84,4 +84,8 @@ export interface LinkedInProfileData {
   target_role: string;
 
   analysis?: LinkedInAnalyzerResponse | null;
+
+  latest_profile_score?: number | null;
+
+  analyzed_at?: string | null;
 }

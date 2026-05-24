@@ -83,6 +83,7 @@ function LinkedInPage() {
 
   const {
     analysis,
+    profile,
     isAnalyzing,
     isLoadingProfile,
     isSavingProfile,
@@ -222,6 +223,12 @@ function LinkedInPage() {
       projects,
       target_role: targetRole,
     });
+
+    setSaveStatus("saved");
+
+    window.setTimeout(() => {
+        setSaveStatus("idle");
+    }, 1800);
   };
 
   const handleSaveLinkedInProfile = async () => {
@@ -237,6 +244,10 @@ function LinkedInPage() {
       projects,
       target_role: targetRole,
       analysis,
+      latest_profile_score: analysis?.profile_score ?? null,
+      analyzed_at:
+        profile?.analyzed_at ||
+        (analysis ? new Date().toISOString() : null),
     });
 
     setSaveStatus("saved");

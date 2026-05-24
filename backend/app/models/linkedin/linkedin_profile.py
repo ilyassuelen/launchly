@@ -1,4 +1,12 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, JSON
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Integer,
+    String,
+    Text,
+    ForeignKey,
+    JSON,
+)
 from sqlalchemy.orm import relationship
 
 from backend.app.core.database import Base
@@ -25,5 +33,9 @@ class LinkedInProfile(Base):
     target_role = Column(String, default="", nullable=False)
 
     analysis = Column(JSON, nullable=True)
+
+    latest_profile_score = Column(Integer, nullable=True)
+
+    analyzed_at = Column(DateTime, nullable=True)
 
     user = relationship("User")

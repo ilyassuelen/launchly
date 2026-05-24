@@ -61,6 +61,35 @@ export function useLinkedInAnalyzer() {
 
       setAnalysis(response);
 
+      setProfile((current) => {
+        if (!current) {
+          return {
+            language: payload.language,
+            headline: payload.headline,
+            about: payload.about,
+            skills: payload.skills,
+            projects: payload.projects,
+            target_role: payload.target_role,
+            analysis: response,
+            latest_profile_score: response.profile_score,
+            analyzed_at: new Date().toISOString(),
+          };
+        }
+
+        return {
+          ...current,
+          language: payload.language,
+          headline: payload.headline,
+          about: payload.about,
+          skills: payload.skills,
+          projects: payload.projects,
+          target_role: payload.target_role,
+          analysis: response,
+          latest_profile_score: response.profile_score,
+          analyzed_at: new Date().toISOString(),
+        };
+      });
+
       return response;
     } catch (error) {
       console.error(error);
@@ -86,6 +115,7 @@ export function useLinkedInAnalyzer() {
         await getLinkedInProfile();
 
       setProfile(response);
+      setAnalysis(response?.analysis || null);
 
       return response;
     } catch (error) {
@@ -116,6 +146,7 @@ export function useLinkedInAnalyzer() {
         );
 
       setProfile(response);
+      setAnalysis(response.analysis || null);
 
       return response;
     } catch (error) {
@@ -137,6 +168,7 @@ export function useLinkedInAnalyzer() {
     setAnalysis(null);
     setError(null);
   };
+
   return {
     analysis,
     profile,
@@ -149,5 +181,6 @@ export function useLinkedInAnalyzer() {
     saveProfile,
     resetAnalysis,
     setAnalysis,
+    setProfile,
   };
 }
