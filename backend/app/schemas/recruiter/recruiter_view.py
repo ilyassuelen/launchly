@@ -1,5 +1,7 @@
+from datetime import datetime
+from typing import List, Optional
+
 from pydantic import BaseModel
-from typing import List
 
 
 class RecruiterSignal(BaseModel):
@@ -20,17 +22,25 @@ class RecruiterViewRequest(BaseModel):
     language: str
     resume_content: str
     target_role: str | None = None
+    resume_id: int | None = None
 
 
 class RecruiterViewResponse(BaseModel):
     recruiter_score: int
-
     signals: RecruiterSignal
-
     strengths: List[str]
-
     weak_spots: List[str]
-
     missing_impact: List[str]
-
     ai_feedback: List[RecruiterFeedbackCard]
+
+
+class SavedRecruiterViewResponse(BaseModel):
+    id: int
+    user_id: int
+    resume_id: int
+    recruiter_score: Optional[int] = None
+    analysis: Optional[RecruiterViewResponse] = None
+    analyzed_at: datetime
+
+    class Config:
+        from_attributes = True

@@ -1,12 +1,8 @@
 import { useEffect, useState } from "react";
 
 import {
-  analyzeRecruiterView,
-} from "@/features/recruiter/api/recruiterApi";
-
-import type {
-  RecruiterViewResponse,
-} from "@/features/recruiter/types/recruiterView";
+  useRecruiterView,
+} from "@/features/recruiter/hooks/useRecruiterView";
 
 import {
   useResumes,
@@ -44,13 +40,15 @@ function RecruiterView() {
   const [language, setLanguage] =
       useState("english");
 
-  const [analysis, setAnalysis] =
-      useState<RecruiterViewResponse | null>(
-        null,
-      );
+  const {
+      analysis,
+      isAnalyzing,
+      isLoadingSavedAnalysis,
+      analyze,
+      loadSavedAnalysis,
+      resetAnalysis,
+  } = useRecruiterView();
 
-  const [isAnalyzing, setIsAnalyzing] =
-      useState(false);
   const [hasAnalyzed, setHasAnalyzed] =
       useState(false);
 
@@ -197,10 +195,10 @@ ${(p.bullets || []).join(" ")}
       }
 
       try {
-        setIsAnalyzing(true);
-
         const response =
-          await analyzeRecruiterView({
+          await analyze({
+            resume_id: selectedResumeId || resume.id,
+
             language,
 
             resume_content:
@@ -210,14 +208,11 @@ ${(p.bullets || []).join(" ")}
               resume?.basics?.title || "",
           });
 
-        setAnalysis(response);
         setHasAnalyzed(true);
 
+        return response;
       } catch (error) {
         console.error(error);
-
-      } finally {
-        setIsAnalyzing(false);
       }
     };
 
@@ -228,17 +223,25 @@ ${(p.bullets || []).join(" ")}
   }, [user, loading, navigate]);
 
   useEffect(() => {
-    if (!resume) {
-      return;
-    }
+      if (!selectedResumeId) {
+        resetAnalysis();
+        setHasAnalyzed(false);
+        setAnimatedScore(0);
+        setScanPhase(0);
+        return;
+      }
 
-    setAnalysis(null);
-    setHasAnalyzed(false);
-    setAnimatedScore(0);
-    setScanPhase(0);
+      setHasAnalyzed(false);
+      setAnimatedScore(0);
+      setScanPhase(0);
+
+      loadSavedAnalysis(selectedResumeId).then((saved) => {
+        if (saved?.analysis) {
+          setHasAnalyzed(true);
+        }
+      });
   }, [
       selectedResumeId,
-      language,
   ]);
 
 
@@ -287,7 +290,7 @@ ${(p.bullets || []).join(" ")}
   }, [isAnalyzing, scanSteps.length]);
 
 
-  if (loading || resumesLoading) {
+  if (loading || resumesLoading || isLoadingSavedAnalysis) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[oklch(0.145_0.02_270)] text-white">
         <div className="text-sm text-white/60">
@@ -374,7 +377,7 @@ ${(p.bullets || []).join(" ")}
                         event.target.value,
                       );
 
-                      setAnalysis(null);
+                      resetAnalysis();
                       setHasAnalyzed(false);
                       setAnimatedScore(0);
                       setScanPhase(0);
@@ -627,8 +630,6 @@ ${(p.bullets || []).join(" ")}
                   key={lang.value}
                   onClick={() => {
                     setLanguage(lang.value);
-                    setAnalysis(null);
-                    setHasAnalyzed(false);
                   }}
                   className={`rounded-2xl border px-4 py-3 text-sm font-medium transition ${
                     language === lang.value

@@ -7,3 +7,4 @@ from backend.app.models.resume.resume import Resume
 from backend.app.models.resume.resume_education import ResumeEducation
 from backend.app.models.resume.resume_experience import ResumeExperience
 from backend.app.models.resume.resume_project import ResumeProject
+from backend.app.models.recruiter.recruiter import RecruiterViewAnalysis

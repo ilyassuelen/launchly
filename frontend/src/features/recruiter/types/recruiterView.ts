@@ -38,4 +38,20 @@ export interface RecruiterViewRequest {
   resume_content: string;
 
   target_role?: string;
+
+  resume_id?: number | string;
+}
+
+export interface SavedRecruiterViewResponse {
+  id: number;
+
+  user_id: number;
+
+  resume_id: number;
+
+  recruiter_score: number | null;
+
+  analysis: RecruiterViewResponse | null;
+
+  analyzed_at: string;
 }
