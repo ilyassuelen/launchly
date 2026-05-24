@@ -33,6 +33,7 @@ class ResumeAnalysisRequest(BaseModel):
     language: str
     resume_content: str
     target_role: str | None = None
+    resume_id: int | None = None
 
 
 class ResumeAnalysisResponse(BaseModel):

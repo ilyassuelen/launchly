@@ -1,3 +1,7 @@
+import type {
+  ResumeAnalysis,
+} from "@/features/resume/types/resumeAnalysis";
+
 export type ResumeTheme =
   | "aurora"
   | "mono"
@@ -143,4 +147,8 @@ export interface Resume {
   sidebarSectionOrder?: string[];
 
   mainSectionOrder?: string[];
+
+  latest_ats_score?: number | null;
+  latest_resume_analysis?: ResumeAnalysis | null;
+  analyzed_at?: string | null;
 }

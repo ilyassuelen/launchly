@@ -427,10 +427,13 @@ const selectedProfile =
   }, [resume, typography]);
 
   useEffect(() => {
-        if (!resume) {
-          setAnalysis(null);
-        }
-  }, [resume]);
+      if (!resume) {
+        setAnalysis(null);
+        return;
+      }
+
+      setAnalysis(resume.latest_resume_analysis || null);
+  }, [resume?.id, resume?.latest_resume_analysis]);
 
 
   const websiteLabel =
@@ -659,6 +662,8 @@ ${(p.bullets || []).join(" ")}
 
         const response =
           await analyzeResume({
+            resume_id: resume.id,
+
             language:
               resume?.language || "english",
 
@@ -673,6 +678,19 @@ ${(p.bullets || []).join(" ")}
           });
 
         setAnalysis(response);
+
+        setResume((prev) => {
+            if (!prev) {
+                return prev;
+            }
+
+            return {
+                ...prev,
+                latest_ats_score: response.ats_score.score,
+                latest_resume_analysis: response,
+                analyzed_at: new Date().toISOString(),
+            };
+        });
       } catch (error) {
         console.error(error);
       } finally {

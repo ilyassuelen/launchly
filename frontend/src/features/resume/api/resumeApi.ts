@@ -1,5 +1,9 @@
 import { apiFetch } from "@/lib/api";
 
+import type {
+  ResumeAnalysis,
+} from "@/features/resume/types/resumeAnalysis";
+
 export async function getResumes() {
   return apiFetch("/resumes");
 }
@@ -62,13 +66,20 @@ export async function analyzeResume(
     tone: string;
     resume_content: string;
     target_role?: string;
+    resume_id?: number | string;
   },
-) {
+): Promise<ResumeAnalysis> {
   return apiFetch(
     "/ai/resume-analysis/analyze",
     {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        ...payload,
+        resume_id:
+          payload.resume_id !== undefined
+            ? Number(payload.resume_id)
+            : undefined,
+      }),
     },
   );
 }

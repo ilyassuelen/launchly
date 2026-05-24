@@ -38,6 +38,21 @@ class Resume(Base):
         nullable=True,
     )
 
+    latest_ats_score = Column(
+        Integer,
+        nullable=True,
+    )
+
+    latest_resume_analysis = Column(
+        JSON,
+        nullable=True,
+    )
+
+    analyzed_at = Column(
+        DateTime,
+        nullable=True,
+    )
+
     created_at = Column(
         DateTime,
         default=datetime.utcnow,

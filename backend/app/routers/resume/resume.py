@@ -10,23 +10,11 @@ from fastapi import (
 
 from sqlalchemy.orm import Session
 
-from backend.app.core.database import (
-    get_db,
-)
-
-from backend.app.models.resume.resume import (
-    Resume,
-)
-
+from backend.app.core.database import get_db
+from backend.app.models.resume.resume import Resume
 from backend.app.models.user.user import User
-
-from backend.app.schemas.resume.resume import (
-    ResumeCreate,
-)
-
-from backend.app.core.deps import (
-    get_current_user,
-)
+from backend.app.schemas.resume.resume import ResumeCreate
+from backend.app.core.deps import get_current_user
 
 from backend.app.services.storage.resume_photo_storage import (
     save_resume_photo,
@@ -44,6 +32,9 @@ def serialize_resume(resume: Resume):
         "title": resume.title,
         "template": resume.template,
         "data": resume.data,
+        "latest_ats_score": resume.latest_ats_score,
+        "latest_resume_analysis": resume.latest_resume_analysis,
+        "analyzed_at": resume.analyzed_at,
         "created_at": resume.created_at,
         "updated_at": resume.updated_at,
     }
@@ -52,9 +43,7 @@ def serialize_resume(resume: Resume):
 @router.post("/upload-photo")
 async def upload_resume_photo(
     file: UploadFile = File(...),
-    current_user: User = Depends(
-        get_current_user,
-    ),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     allowed_types = [
@@ -69,11 +58,9 @@ async def upload_resume_photo(
             detail="Invalid image type",
         )
 
-    photo_url = (
-        await save_resume_photo(
-            file,
-            current_user.id,
-        )
+    photo_url = await save_resume_photo(
+        file,
+        current_user.id,
     )
 
     return {
@@ -84,31 +71,17 @@ async def upload_resume_photo(
 @router.get("/")
 def get_resumes(
     db: Session = Depends(get_db),
-    current_user: User = Depends(
-        get_current_user,
-    ),
+    current_user: User = Depends(get_current_user),
 ):
     resumes = (
         db.query(Resume)
-        .filter(
-            Resume.user_id
-            == current_user.id
-        )
-        .order_by(
-            Resume.updated_at.desc()
-        )
+        .filter(Resume.user_id == current_user.id)
+        .order_by(Resume.updated_at.desc())
         .all()
     )
 
     return [
-        {
-            "id": resume.id,
-            "title": resume.title,
-            "template": resume.template,
-            "updated_at": resume.updated_at,
-            "created_at": resume.created_at,
-            "data": resume.data,
-        }
+        serialize_resume(resume)
         for resume in resumes
     ]
 
@@ -117,9 +90,7 @@ def get_resumes(
 def create_resume(
     payload: ResumeCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(
-        get_current_user,
-    ),
+    current_user: User = Depends(get_current_user),
 ):
     resume = Resume(
         title=payload.title,
@@ -134,27 +105,18 @@ def create_resume(
 
     db.refresh(resume)
 
-    return serialize_resume(
-        resume
-    )
+    return serialize_resume(resume)
 
 
 @router.get("/latest")
 def get_latest_resume(
     db: Session = Depends(get_db),
-    current_user: User = Depends(
-        get_current_user,
-    ),
+    current_user: User = Depends(get_current_user),
 ):
     resume = (
         db.query(Resume)
-        .filter(
-            Resume.user_id
-            == current_user.id,
-        )
-        .order_by(
-            Resume.updated_at.desc()
-        )
+        .filter(Resume.user_id == current_user.id)
+        .order_by(Resume.updated_at.desc())
         .first()
     )
 
@@ -164,25 +126,20 @@ def get_latest_resume(
             detail="No resume found",
         )
 
-    return serialize_resume(
-        resume
-    )
+    return serialize_resume(resume)
 
 
 @router.get("/{resume_id}")
 def get_resume(
-    resume_id: str,
+    resume_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(
-        get_current_user,
-    ),
+    current_user: User = Depends(get_current_user),
 ):
     resume = (
         db.query(Resume)
         .filter(
             Resume.id == resume_id,
-            Resume.user_id
-            == current_user.id,
+            Resume.user_id == current_user.id,
         )
         .first()
     )
@@ -193,26 +150,21 @@ def get_resume(
             detail="Resume not found",
         )
 
-    return serialize_resume(
-        resume
-    )
+    return serialize_resume(resume)
 
 
 @router.put("/{resume_id}")
 def update_resume(
-    resume_id: str,
+    resume_id: int,
     payload: dict,
     db: Session = Depends(get_db),
-    current_user: User = Depends(
-        get_current_user,
-    ),
+    current_user: User = Depends(get_current_user),
 ):
     resume = (
         db.query(Resume)
         .filter(
             Resume.id == resume_id,
-            Resume.user_id
-            == current_user.id,
+            Resume.user_id == current_user.id,
         )
         .first()
     )
@@ -236,25 +188,20 @@ def update_resume(
 
     db.refresh(resume)
 
-    return serialize_resume(
-        resume
-    )
+    return serialize_resume(resume)
 
 
 @router.post("/{resume_id}/duplicate")
 def duplicate_resume(
-    resume_id: str,
+    resume_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(
-        get_current_user,
-    ),
+    current_user: User = Depends(get_current_user),
 ):
     resume = (
         db.query(Resume)
         .filter(
             Resume.id == resume_id,
-            Resume.user_id
-            == current_user.id,
+            Resume.user_id == current_user.id,
         )
         .first()
     )
@@ -267,45 +214,32 @@ def duplicate_resume(
 
     duplicated_resume = Resume(
         user_id=current_user.id,
-
         title=f"{resume.title} (Copy)",
-
         template=resume.template,
-
-        data=deepcopy(
-            resume.data
-        ),
+        data=deepcopy(resume.data),
+        latest_ats_score=resume.latest_ats_score,
+        latest_resume_analysis=deepcopy(resume.latest_resume_analysis),
+        analyzed_at=resume.analyzed_at,
     )
 
-    db.add(
-        duplicated_resume
-    )
-
+    db.add(duplicated_resume)
     db.commit()
+    db.refresh(duplicated_resume)
 
-    db.refresh(
-        duplicated_resume
-    )
-
-    return serialize_resume(
-        duplicated_resume
-    )
+    return serialize_resume(duplicated_resume)
 
 
 @router.delete("/{resume_id}")
 def delete_resume(
-    resume_id: str,
+    resume_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(
-        get_current_user,
-    ),
+    current_user: User = Depends(get_current_user),
 ):
     resume = (
         db.query(Resume)
         .filter(
             Resume.id == resume_id,
-            Resume.user_id
-            == current_user.id,
+            Resume.user_id == current_user.id,
         )
         .first()
     )
@@ -317,18 +251,13 @@ def delete_resume(
         )
 
     current_photo = (
-        resume.data.get(
-            "basics",
-            {},
-        ).get("photo")
+        resume.data.get("basics", {}).get("photo")
         if resume.data
         else None
     )
 
     if current_photo:
-        delete_resume_photo(
-            current_photo
-        )
+        delete_resume_photo(current_photo)
 
     db.delete(resume)
 
@@ -336,6 +265,5 @@ def delete_resume(
 
     return {
         "success": True,
-        "message":
-            "Resume deleted",
+        "message": "Resume deleted",
     }
