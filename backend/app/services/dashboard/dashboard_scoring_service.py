@@ -77,7 +77,9 @@ def calculate_core_scores(data: dict) -> dict:
         active_applications=data.get("applications", {}).get("active", 0),
     )
 
-    interview_score = 0
+    interview_score = clamp(
+        data.get("interview", {}).get("latest_score", 0)
+    )
 
     weighted_scores = [
         resume_score * 1.15,

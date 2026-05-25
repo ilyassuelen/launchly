@@ -10,3 +10,6 @@ from backend.app.models.resume.resume_project import ResumeProject
 from backend.app.models.recruiter.recruiter import RecruiterViewAnalysis
 from backend.app.models.dashboard.dashboard_snapshot import DashboardSnapshot
 from backend.app.models.dashboard.dashboard_review import DashboardReview
+from backend.app.models.interview.interview_session import InterviewSession
+from backend.app.models.interview.interview_message import InterviewMessage
+from backend.app.models.interview.interview_result import InterviewResult

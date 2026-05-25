@@ -9,6 +9,7 @@ from backend.app.models.linkedin.linkedin_profile import LinkedInProfile
 from backend.app.models.portfolio.portfolio_profile import PortfolioProfile
 from backend.app.models.applications.application import Application
 from backend.app.models.dashboard.dashboard_snapshot import DashboardSnapshot
+from backend.app.models.interview.interview_result import InterviewResult
 
 
 def _safe_int(value: Any) -> int:
@@ -108,6 +109,25 @@ def collect_dashboard_data(
         .order_by(DashboardSnapshot.created_at.desc())
         .first()
     )
+
+    latest_interview_result = (
+        db.query(InterviewResult)
+        .filter(InterviewResult.user_id == user_id)
+        .order_by(InterviewResult.created_at.desc())
+        .first()
+    )
+
+    interview_results = (
+        db.query(InterviewResult)
+        .filter(InterviewResult.user_id == user_id)
+        .all()
+    )
+
+    interview_scores = [
+        _safe_int(result.overall_score)
+        for result in interview_results
+        if result.overall_score is not None
+    ]
 
     resume_scores = [
         _safe_int(resume.latest_ats_score)
@@ -212,5 +232,12 @@ def collect_dashboard_data(
             "created_at": latest_snapshot.created_at.isoformat()
             if latest_snapshot
             else None,
+        },
+        "interview": {
+            "count": len(interview_results),
+            "scores": interview_scores,
+            "latest_score": latest_interview_result.overall_score
+            if latest_interview_result
+            else 0,
         },
     }

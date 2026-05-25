@@ -1,12 +1,12 @@
 import json
 from datetime import datetime
+from typing import Any
 
-from openai import AsyncOpenAI
 from fastapi import HTTPException
+from openai import AsyncOpenAI
 from sqlalchemy.orm import Session
 
 from backend.app.core.config import settings
-
 from backend.app.models.resume.resume import Resume
 
 from backend.app.prompts.resume.resume_analysis_prompts import (
@@ -15,10 +15,10 @@ from backend.app.prompts.resume.resume_analysis_prompts import (
 )
 
 from backend.app.schemas.resume.resume_analysis import (
+    RecruiterAnalysis,
     ResumeAnalysisRequest,
     ResumeAnalysisResponse,
     SmartSuggestion,
-    RecruiterAnalysis,
 )
 
 from backend.app.services.resume.ats_score_service import (
@@ -30,10 +30,187 @@ client = AsyncOpenAI(
 )
 
 
+STRUCTURED_RESUME_KEYS = [
+    "summary",
+    "candidate_summary",
+    "professional_summary",
+    "profile_summary",
+    "resume_summary",
+    "skills",
+    "detected_skills",
+    "core_skills",
+    "key_skills",
+    "technical_skills",
+    "professional_skills",
+    "soft_skills",
+    "hard_skills",
+    "transferable_skills",
+    "domain_skills",
+    "tools",
+    "software",
+    "platforms",
+    "systems",
+    "technologies",
+    "tech_stack",
+    "projects",
+    "project_experience",
+    "portfolio_projects",
+    "case_studies",
+    "work_samples",
+    "experience",
+    "work_experience",
+    "employment_history",
+    "professional_experience",
+    "career_history",
+    "responsibilities",
+    "tasks",
+    "duties",
+    "role_responsibilities",
+    "key_responsibilities",
+    "education",
+    "studies",
+    "academic_background",
+    "certifications",
+    "certificates",
+    "licenses",
+    "courses",
+    "achievements",
+    "accomplishments",
+    "impact",
+    "results",
+    "outcomes",
+    "highlights",
+    "awards",
+    "industries",
+    "domains",
+    "sectors",
+    "keywords",
+    "ats_keywords",
+    "role_keywords",
+    "resume_keywords",
+    "target_roles",
+    "desired_roles",
+    "job_titles",
+    "candidate_level",
+    "seniority",
+    "experience_level",
+]
+
+
+PRIORITY_ORDER = {
+    "high": 0,
+    "medium": 1,
+    "low": 2,
+}
+
+
+def _safe_dict(value: Any) -> dict:
+    if isinstance(value, dict):
+        return value
+
+    return {}
+
+
+def _safe_list(value: Any) -> list:
+    if isinstance(value, list):
+        return [
+            item
+            for item in value
+            if item not in [None, "", [], {}]
+        ]
+
+    return []
+
+
+def _safe_string(value: Any) -> str:
+    if value is None:
+        return ""
+
+    return str(value).strip()
+
+
+def _normalize_priority(value: Any) -> str:
+    priority = _safe_string(value).lower()
+
+    if priority in PRIORITY_ORDER:
+        return priority
+
+    return "low"
+
+
+def _normalize_smart_suggestion(item: Any) -> dict | None:
+    if not isinstance(item, dict):
+        return None
+
+    title = _safe_string(item.get("title"))
+    description = _safe_string(item.get("description"))
+
+    if not title or not description:
+        return None
+
+    return {
+        **item,
+        "title": title,
+        "description": description,
+        "priority": _normalize_priority(item.get("priority")),
+    }
+
+
+def _normalize_smart_suggestions(parsed: dict) -> list[dict]:
+    suggestions = [
+        suggestion
+        for suggestion in [
+            _normalize_smart_suggestion(item)
+            for item in _safe_list(parsed.get("smart_suggestions"))
+        ]
+        if suggestion is not None
+    ]
+
+    return sorted(
+        suggestions,
+        key=lambda item: PRIORITY_ORDER.get(
+            item.get("priority", "low"),
+            2,
+        ),
+    )[:3]
+
+
+def _extract_structured_resume_data(
+    *,
+    parsed: dict,
+    payload: ResumeAnalysisRequest,
+) -> dict:
+    structured = {}
+
+    for key in STRUCTURED_RESUME_KEYS:
+        value = parsed.get(key)
+
+        if value not in [None, "", [], {}]:
+            structured[key] = value
+
+    recruiter_analysis = _safe_dict(parsed.get("recruiter_analysis"))
+
+    for key in STRUCTURED_RESUME_KEYS:
+        value = recruiter_analysis.get(key)
+
+        if value not in [None, "", [], {}] and key not in structured:
+            structured[key] = value
+
+    structured["target_role"] = payload.target_role or ""
+    structured["language"] = payload.language
+    structured["tone"] = payload.tone
+    structured["resume_content_preview"] = payload.resume_content[:1200]
+
+    return structured
+
+
 def _serialize_resume_analysis(
     response: ResumeAnalysisResponse,
+    *,
+    raw_analysis: dict | None = None,
+    structured_resume_data: dict | None = None,
 ) -> dict:
-    return {
+    serialized = {
         "smart_suggestions": [
             suggestion.model_dump()
             for suggestion in response.smart_suggestions
@@ -42,6 +219,15 @@ def _serialize_resume_analysis(
         "ats_score": response.ats_score.model_dump(),
     }
 
+    if structured_resume_data:
+        serialized.update(structured_resume_data)
+        serialized["structured_resume_data"] = structured_resume_data
+
+    if raw_analysis:
+        serialized["raw_ai_analysis"] = raw_analysis
+
+    return serialized
+
 
 def _save_resume_analysis(
     *,
@@ -49,6 +235,8 @@ def _save_resume_analysis(
     user_id: int,
     resume_id: int,
     analysis: ResumeAnalysisResponse,
+    raw_analysis: dict | None = None,
+    structured_resume_data: dict | None = None,
 ) -> None:
     resume = (
         db.query(Resume)
@@ -68,6 +256,8 @@ def _save_resume_analysis(
     resume.latest_ats_score = analysis.ats_score.score
     resume.latest_resume_analysis = _serialize_resume_analysis(
         analysis,
+        raw_analysis=raw_analysis,
+        structured_resume_data=structured_resume_data,
     )
     resume.analyzed_at = datetime.utcnow()
 
@@ -89,7 +279,7 @@ async def analyze_resume(
 
     response = await client.chat.completions.create(
         model="gpt-4o-mini",
-        temperature=0.4,
+        temperature=0.35,
         response_format={
             "type": "json_object",
         },
@@ -105,7 +295,7 @@ async def analyze_resume(
         ],
     )
 
-    content = response.choices[0].message.content
+    content = response.choices[0].message.content or "{}"
 
     try:
         parsed = json.loads(content)
@@ -115,19 +305,10 @@ async def analyze_resume(
             detail="Invalid AI response format",
         )
 
-    priority_order = {
-        "high": 0,
-        "medium": 1,
-        "low": 2,
-    }
-
-    parsed["smart_suggestions"] = sorted(
-        parsed.get("smart_suggestions", []),
-        key=lambda x: priority_order.get(
-            x.get("priority", "low"),
-            2,
-        ),
-    )[:3]
+    parsed = _safe_dict(parsed)
+    parsed["smart_suggestions"] = _normalize_smart_suggestions(
+        parsed,
+    )
 
     ats_score = calculate_ats_score(
         resume_content=payload.resume_content,
@@ -145,12 +326,19 @@ async def analyze_resume(
         ats_score=ats_score,
     )
 
+    structured_resume_data = _extract_structured_resume_data(
+        parsed=parsed,
+        payload=payload,
+    )
+
     if payload.resume_id and db and user_id:
         _save_resume_analysis(
             db=db,
             user_id=user_id,
             resume_id=payload.resume_id,
             analysis=analysis,
+            raw_analysis=parsed,
+            structured_resume_data=structured_resume_data,
         )
 
     return analysis
