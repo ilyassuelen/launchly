@@ -18,6 +18,7 @@ from backend.app.routers.portfolio.portfolio import router as portfolio_router
 from backend.app.routers.applications.applications import router as applications_router
 from backend.app.routers.dashboard.dashboard import router as dashboard_router
 from backend.app.routers.interview.interview import router as interview_router
+from backend.app.routers.career_path.career_path import router as career_router
 
 app = FastAPI(
     title="Launchly API",
@@ -84,6 +85,8 @@ app.include_router(applications_router)
 app.include_router(dashboard_router)
 
 app.include_router(interview_router)
+
+app.include_router(career_router)
 
 
 @app.get("/")

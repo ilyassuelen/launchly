@@ -1,0 +1,439 @@
+from datetime import datetime
+from typing import Any
+
+from sqlalchemy.orm import Session
+
+from backend.app.models.resume.resume import Resume
+from backend.app.models.recruiter.recruiter import RecruiterViewAnalysis
+from backend.app.models.linkedin.linkedin_profile import LinkedInProfile
+from backend.app.models.portfolio.portfolio_profile import PortfolioProfile
+from backend.app.models.applications.application import Application
+from backend.app.models.interview.interview_result import InterviewResult
+from backend.app.models.dashboard.dashboard_snapshot import DashboardSnapshot
+from backend.app.models.dashboard.dashboard_review import DashboardReview
+
+
+MAX_ITEMS = 8
+MAX_TEXT_LENGTH = 1200
+
+
+def _safe_text(value: Any) -> str:
+    if value is None:
+        return ""
+
+    text = str(value).strip()
+
+    if len(text) > MAX_TEXT_LENGTH:
+        return text[:MAX_TEXT_LENGTH].rstrip() + "..."
+
+    return text
+
+
+def _safe_list(value: Any) -> list:
+    if isinstance(value, list):
+        return [
+            item
+            for item in value
+            if item not in [None, "", [], {}]
+        ]
+
+    if isinstance(value, str) and value.strip():
+        return [
+            item.strip()
+            for item in value.replace(";", ",").replace("\n", ",").split(",")
+            if item.strip()
+        ]
+
+    return []
+
+
+def _safe_dict(value: Any) -> dict:
+    if isinstance(value, dict):
+        return value
+
+    return {}
+
+
+def _serialize_date(value: Any) -> str | None:
+    if value is None:
+        return None
+
+    if hasattr(value, "isoformat"):
+        return value.isoformat()
+
+    return str(value)
+
+
+def _limit(items: list, limit: int = MAX_ITEMS) -> list:
+    return items[:limit]
+
+
+def _extract_resume_skills(resume_data: dict, analysis: dict) -> list:
+    values = []
+
+    for source in [resume_data, analysis]:
+        for key in [
+            "skills",
+            "technical_skills",
+            "soft_skills",
+            "hard_skills",
+            "detected_skills",
+            "core_skills",
+            "key_skills",
+            "tools",
+            "technologies",
+            "tech_stack",
+        ]:
+            values.extend(_safe_list(source.get(key)))
+
+    seen = set()
+    result = []
+
+    for value in values:
+        text = _safe_text(value)
+
+        if not text:
+            continue
+
+        key = text.lower()
+
+        if key in seen:
+            continue
+
+        seen.add(key)
+        result.append(text)
+
+    return _limit(result, 20)
+
+
+def _extract_resume_summary(resume_data: dict, analysis: dict) -> str:
+    for source in [resume_data, analysis]:
+        for key in [
+            "summary",
+            "professional_summary",
+            "profile_summary",
+            "candidate_summary",
+            "overview",
+            "content_summary",
+            "resume_summary",
+        ]:
+            text = _safe_text(source.get(key))
+
+            if text:
+                return text
+
+    return ""
+
+
+def _collect_latest_resume(
+    *,
+    db: Session,
+    user_id: int,
+) -> dict:
+    resume = (
+        db.query(Resume)
+        .filter(Resume.user_id == user_id)
+        .order_by(Resume.updated_at.desc())
+        .first()
+    )
+
+    if not resume:
+        return {}
+
+    resume_data = _safe_dict(resume.data)
+    analysis = _safe_dict(resume.latest_resume_analysis)
+
+    return {
+        "id": resume.id,
+        "title": resume.title,
+        "template": resume.template,
+        "latest_ats_score": resume.latest_ats_score,
+        "analyzed_at": _serialize_date(resume.analyzed_at),
+        "summary": _extract_resume_summary(
+            resume_data=resume_data,
+            analysis=analysis,
+        ),
+        "skills": _extract_resume_skills(
+            resume_data=resume_data,
+            analysis=analysis,
+        ),
+        "raw_data": resume_data,
+        "latest_analysis": analysis,
+        "experiences": _limit(
+            _safe_list(
+                resume_data.get("experiences")
+                or resume_data.get("experience")
+                or resume_data.get("work_experience")
+                or resume_data.get("professional_experience")
+            ),
+        ),
+        "projects": _limit(
+            _safe_list(
+                resume_data.get("projects")
+                or resume_data.get("portfolio_projects")
+            ),
+        ),
+        "education": _limit(
+            _safe_list(
+                resume_data.get("education")
+                or resume_data.get("educations")
+            ),
+        ),
+    }
+
+
+def _collect_recruiter_view(
+    *,
+    db: Session,
+    user_id: int,
+) -> dict:
+    analyses = (
+        db.query(RecruiterViewAnalysis)
+        .filter(RecruiterViewAnalysis.user_id == user_id)
+        .order_by(RecruiterViewAnalysis.analyzed_at.desc())
+        .limit(5)
+        .all()
+    )
+
+    latest = analyses[0] if analyses else None
+
+    return {
+        "count": len(analyses),
+        "latest_score": latest.recruiter_score if latest else None,
+        "latest_analysis": _safe_dict(latest.analysis) if latest else {},
+        "recent": [
+            {
+                "resume_id": item.resume_id,
+                "recruiter_score": item.recruiter_score,
+                "analysis": _safe_dict(item.analysis),
+                "analyzed_at": _serialize_date(item.analyzed_at),
+            }
+            for item in analyses
+        ],
+    }
+
+
+def _collect_linkedin(
+    *,
+    db: Session,
+    user_id: int,
+) -> dict:
+    profile = (
+        db.query(LinkedInProfile)
+        .filter(LinkedInProfile.user_id == user_id)
+        .first()
+    )
+
+    if not profile:
+        return {}
+
+    return {
+        "headline": profile.headline,
+        "about": profile.about,
+        "skills": profile.skills or [],
+        "projects": profile.projects or [],
+        "target_role": profile.target_role,
+        "latest_profile_score": profile.latest_profile_score,
+        "analysis": _safe_dict(profile.analysis),
+        "analyzed_at": _serialize_date(profile.analyzed_at),
+    }
+
+
+def _collect_portfolio(
+    *,
+    db: Session,
+    user_id: int,
+) -> dict:
+    profile = (
+        db.query(PortfolioProfile)
+        .filter(PortfolioProfile.user_id == user_id)
+        .first()
+    )
+
+    if not profile:
+        return {}
+
+    return {
+        "github_username": profile.github_username,
+        "language": profile.language,
+        "analysis": _safe_dict(profile.analysis),
+    }
+
+
+def _collect_applications(
+    *,
+    db: Session,
+    user_id: int,
+) -> dict:
+    applications = (
+        db.query(Application)
+        .filter(Application.user_id == user_id)
+        .order_by(Application.applied_date.desc())
+        .limit(12)
+        .all()
+    )
+
+    status_counts: dict[str, int] = {}
+
+    for application in applications:
+        status = (application.status or "unknown").lower()
+        status_counts[status] = status_counts.get(status, 0) + 1
+
+    return {
+        "total_recent": len(applications),
+        "status_counts": status_counts,
+        "recent": [
+            {
+                "company_name": application.company_name,
+                "job_title": application.job_title,
+                "status": application.status,
+                "applied_date": _serialize_date(application.applied_date),
+                "follow_up_date": _serialize_date(application.follow_up_date),
+                "notes": _safe_text(application.notes),
+            }
+            for application in applications
+        ],
+    }
+
+
+def _collect_interviews(
+    *,
+    db: Session,
+    user_id: int,
+) -> dict:
+    results = (
+        db.query(InterviewResult)
+        .filter(InterviewResult.user_id == user_id)
+        .order_by(InterviewResult.created_at.desc())
+        .limit(8)
+        .all()
+    )
+
+    latest = results[0] if results else None
+
+    return {
+        "count": len(results),
+        "latest": {
+            "role": latest.role,
+            "mode": latest.mode,
+            "difficulty": latest.difficulty,
+            "overall_score": latest.overall_score,
+            "confidence_score": latest.confidence_score,
+            "communication_score": latest.communication_score,
+            "structure_score": latest.structure_score,
+            "specificity_score": latest.specificity_score,
+            "strengths": latest.strengths or [],
+            "weaknesses": latest.weaknesses or [],
+            "recruiter_insights": latest.recruiter_insights or [],
+            "coaching_tips": latest.coaching_tips or [],
+            "created_at": _serialize_date(latest.created_at),
+        }
+        if latest
+        else {},
+        "recent": [
+            {
+                "role": item.role,
+                "mode": item.mode,
+                "difficulty": item.difficulty,
+                "overall_score": item.overall_score,
+                "confidence_score": item.confidence_score,
+                "communication_score": item.communication_score,
+                "structure_score": item.structure_score,
+                "specificity_score": item.specificity_score,
+                "strengths": item.strengths or [],
+                "weaknesses": item.weaknesses or [],
+                "coaching_tips": item.coaching_tips or [],
+                "created_at": _serialize_date(item.created_at),
+            }
+            for item in results
+        ],
+    }
+
+
+def _collect_dashboard(
+    *,
+    db: Session,
+    user_id: int,
+) -> dict:
+    snapshot = (
+        db.query(DashboardSnapshot)
+        .filter(DashboardSnapshot.user_id == user_id)
+        .order_by(DashboardSnapshot.created_at.desc())
+        .first()
+    )
+
+    review = (
+        db.query(DashboardReview)
+        .filter(DashboardReview.user_id == user_id)
+        .order_by(DashboardReview.created_at.desc())
+        .first()
+    )
+
+    return {
+        "latest_snapshot": {
+            "career_score": snapshot.career_score,
+            "recruiter_impression_score": snapshot.recruiter_impression_score,
+            "resume_health_score": snapshot.resume_health_score,
+            "linkedin_score": snapshot.linkedin_score,
+            "portfolio_score": snapshot.portfolio_score,
+            "applications_score": snapshot.applications_score,
+            "interview_readiness_score": snapshot.interview_readiness_score,
+            "summary": snapshot.summary or {},
+            "profile_strength": snapshot.profile_strength or {},
+            "career_growth": snapshot.career_growth or [],
+            "missing_skills": snapshot.missing_skills or [],
+            "skill_gaps": snapshot.skill_gaps or [],
+            "next_best_actions": snapshot.next_best_actions or [],
+            "weekly_plan": snapshot.weekly_plan or [],
+            "created_at": _serialize_date(snapshot.created_at),
+        }
+        if snapshot
+        else {},
+        "latest_review": {
+            "status": review.status,
+            "input_data": review.input_data or {},
+            "result": review.result or {},
+            "created_at": _serialize_date(review.created_at),
+        }
+        if review
+        else {},
+    }
+
+
+def collect_career_path_context(
+    *,
+    db: Session,
+    user_id: int,
+) -> dict:
+    return {
+        "user_id": user_id,
+        "generated_at": datetime.utcnow().isoformat(),
+        "resume": _collect_latest_resume(
+            db=db,
+            user_id=user_id,
+        ),
+        "recruiter_view": _collect_recruiter_view(
+            db=db,
+            user_id=user_id,
+        ),
+        "linkedin": _collect_linkedin(
+            db=db,
+            user_id=user_id,
+        ),
+        "portfolio": _collect_portfolio(
+            db=db,
+            user_id=user_id,
+        ),
+        "applications": _collect_applications(
+            db=db,
+            user_id=user_id,
+        ),
+        "interviews": _collect_interviews(
+            db=db,
+            user_id=user_id,
+        ),
+        "dashboard": _collect_dashboard(
+            db=db,
+            user_id=user_id,
+        ),
+    }

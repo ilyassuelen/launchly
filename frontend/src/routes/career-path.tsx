@@ -1,102 +1,371 @@
 import { useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { AppShell, Card, Progress } from "@/components/launchly/AppShell";
+import {
+  AlertTriangle,
+  ArrowRight,
+  BrainCircuit,
+  CheckCircle2,
+  Loader2,
+  Map,
+  Sparkles,
+  Target,
+  TrendingUp,
+} from "lucide-react";
+
+import { AppShell } from "@/components/launchly/AppShell";
 import { useAuth } from "@/context/AuthContext";
-import { Map, Sparkles, Target, BookOpen, Code2, Rocket } from "lucide-react";
+
+import { useCareerPath } from "@/features/career-path/hooks/useCareerPath";
+
+import { CareerPathForm } from "@/features/career-path/components/CareerPathForm";
+import { CareerPathTimeline } from "@/features/career-path/components/CareerPathTimeline";
+import { CareerPathSkillGaps } from "@/features/career-path/components/CareerPathSkillGaps";
+import { CareerPathLearningPlan } from "@/features/career-path/components/CareerPathLearningPlan";
+import { CareerPathProjects } from "@/features/career-path/components/CareerPathProjects";
+import { CareerPathApplicationStrategy } from "@/features/career-path/components/CareerPathApplicationStrategy";
+
+import type { CareerPathGenerateRequest } from "@/features/career-path/types/careerPath";
+
+function getRoleFitLabel(roleFit?: string | null) {
+  const normalized = roleFit?.toLowerCase();
+
+  if (normalized === "very_low") {
+    return "Very Low";
+  }
+
+  if (normalized === "low") {
+    return "Low";
+  }
+
+  if (normalized === "medium") {
+    return "Medium";
+  }
+
+  if (normalized === "high") {
+    return "High";
+  }
+
+  return "Not assessed";
+}
+
+function getRoleFitClassName(roleFit?: string | null) {
+  const normalized = roleFit?.toLowerCase();
+
+  if (normalized === "high") {
+    return "bg-emerald-400/[0.10] text-emerald-100";
+  }
+
+  if (normalized === "medium") {
+    return "bg-cyan-400/[0.10] text-cyan-100";
+  }
+
+  if (normalized === "low") {
+    return "bg-amber-400/[0.10] text-amber-100";
+  }
+
+  if (normalized === "very_low") {
+    return "bg-red-400/[0.10] text-red-100";
+  }
+
+  return "bg-white/[0.05] text-white/60";
+}
 
 export const Route = createFileRoute("/career-path")({
-  head: () => ({ meta: [{ title: "Career Path — Launchly" }, { name: "description", content: "An AI-generated career roadmap with skills, projects and roles tailored to your goal." }] }),
+  head: () => ({
+    meta: [
+      {
+        title: "Career Path — Launchly",
+      },
+      {
+        name: "description",
+        content:
+          "AI-generated career roadmap based on your saved resume, applications, interviews, LinkedIn and portfolio insights.",
+      },
+    ],
+  }),
   component: CareerPath,
 });
-
-const milestones = [
-  { y: "Now", t: "Junior Frontend Engineer", s: "Stripe-style consumer apps", done: true, icon: Rocket },
-  { y: "+6mo", t: "Mid Frontend Engineer", s: "Lead small features end-to-end", done: false, icon: Code2 },
-  { y: "+18mo", t: "Senior Engineer", s: "Own a product surface, mentor juniors", done: false, icon: Target },
-  { y: "+3y", t: "Staff / Lead", s: "Set technical direction across a team", done: false, icon: Sparkles },
-];
 
 function CareerPath() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
-  if (loading) {
+  const {
+    selectedCareerPath,
+    latestCareerPath,
+    isLoading,
+    isGenerating,
+    error,
+    createCareerPath,
+    clearError,
+  } = useCareerPath();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate({ to: "/login" });
+    }
+  }, [user, loading, navigate]);
+
+  const handleGenerateCareerPath = async (
+    payload: CareerPathGenerateRequest,
+  ) => {
+    clearError();
+    await createCareerPath(payload);
+  };
+
+  if (loading || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[oklch(0.145_0.02_270)] text-white">
-        <div className="text-sm text-white/60">
+        <div className="flex items-center gap-2 text-sm text-white/60">
+          <Loader2 className="h-4 w-4 animate-spin" />
           Loading career path...
         </div>
       </div>
     );
   }
 
-  useEffect(() => {
-      if (!loading && !user) {
-          navigate({ to: "/login" });
-      }
-  }, [user, loading, navigate]);
+  const careerPath = selectedCareerPath || latestCareerPath;
+  const confidence = careerPath?.confidence_score ?? 0;
+  const roleFitLabel = getRoleFitLabel(careerPath?.role_fit);
+  const roleFitClassName = getRoleFitClassName(careerPath?.role_fit);
 
-  if (loading || !user) {
-      return null;
-  }
   return (
-    <AppShell title="Career Path" subtitle="A living, AI-generated roadmap for the next 3 years."
-      action={<button className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-sm font-semibold text-primary-foreground glow"><Map className="size-4"/> Re-generate roadmap</button>}>
+    <AppShell
+      title="Career Path"
+      subtitle="Generate a roadmap from your saved profile signals."
+    >
+      <div className="space-y-6">
+        <CareerPathForm
+          isGenerating={isGenerating}
+          onSubmit={handleGenerateCareerPath}
+        />
 
-      <Card>
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <div className="text-sm font-semibold">Path: Frontend → Senior Product Engineer</div>
-            <div className="text-xs text-muted-foreground">Tailored to your skills, market and goals</div>
-          </div>
-          <span className="rounded-full bg-gradient-brand-soft px-3 py-1 text-xs ring-1 ring-white/10">Confidence 91%</span>
-        </div>
+        {error && (
+          <div className="flex items-start gap-3 rounded-3xl border border-red-500/20 bg-red-500/10 p-5 text-red-100">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
 
-        <div className="relative">
-          <div className="absolute left-0 right-0 top-7 hidden h-px bg-gradient-to-r from-transparent via-[oklch(0.72_0.20_295)]/60 to-transparent md:block" />
-          <div className="grid gap-6 md:grid-cols-4">
-            {milestones.map((m, i) => (
-              <div key={m.t} className="relative">
-                <div className={`mx-auto grid size-14 place-items-center rounded-2xl ring-1 ring-white/10 ${m.done?"bg-gradient-brand glow":"glass"}`}>
-                  <m.icon className="size-5"/>
-                </div>
-                <div className="mt-3 text-center text-xs text-muted-foreground">{m.y}</div>
-                <div className="mt-1 text-center text-sm font-semibold">{m.t}</div>
-                <div className="mt-1 text-center text-xs text-muted-foreground">{m.s}</div>
-                {i<milestones.length-1 && <div className="absolute right-0 top-7 hidden size-2 -translate-y-1/2 translate-x-1/2 rotate-45 border-r border-t border-white/20 md:block" />}
+            <div>
+              <div className="text-sm font-semibold">
+                Failed to load career path
               </div>
-            ))}
-          </div>
-        </div>
-      </Card>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-3">
-        <Card>
-          <div className="mb-3 flex items-center gap-2 text-sm font-semibold"><Target className="size-4"/> Skills to grow</div>
-          <div className="space-y-3">
-            <Progress label="System Design" value={28} color="pink" />
-            <Progress label="Backend / Postgres" value={42} color="pink" />
-            <Progress label="Performance" value={56} />
-            <Progress label="Mentorship" value={20} color="pink" />
+              <div className="mt-1 text-sm text-red-100/75">
+                {error}
+              </div>
+            </div>
           </div>
-        </Card>
-        <Card>
-          <div className="mb-3 flex items-center gap-2 text-sm font-semibold"><BookOpen className="size-4"/> Suggested learning</div>
-          <ul className="space-y-2 text-sm">
-            <li>• "Designing Data-Intensive Applications" — chapters 1–3</li>
-            <li>• Next.js 15 server actions deep dive</li>
-            <li>• Build one Postgres-backed CRUD with auth</li>
-            <li>• Watch 3 system-design talks weekly</li>
-          </ul>
-        </Card>
-        <Card>
-          <div className="mb-3 flex items-center gap-2 text-sm font-semibold"><Code2 className="size-4"/> Suggested projects</div>
-          <ul className="space-y-2 text-sm">
-            <li>• Realtime collab editor (CRDTs + WS)</li>
-            <li>• Postgres-backed feature flag service</li>
-            <li>• Public API with rate limits + docs</li>
-          </ul>
-        </Card>
+        )}
+
+        {isLoading && !careerPath ? (
+          <div className="flex min-h-[300px] items-center justify-center rounded-3xl border border-white/10 bg-black/20">
+            <div className="flex items-center gap-2 text-sm text-white/60">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Loading your latest roadmap...
+            </div>
+          </div>
+        ) : careerPath ? (
+          <>
+            <section className="overflow-hidden rounded-[32px] border border-white/10 bg-black/20">
+              <div className="grid gap-0 xl:grid-cols-[1fr_360px]">
+                <div className="p-6 lg:p-8">
+                  <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-white/60">
+                    <Sparkles className="h-3.5 w-3.5 text-violet-300" />
+                    AI Career Intelligence
+                  </div>
+
+                  <h2 className="max-w-4xl text-3xl font-semibold leading-tight text-white lg:text-4xl">
+                    Your career trajectory toward{" "}
+                    <span className="bg-gradient-to-r from-violet-200 to-cyan-200 bg-clip-text text-transparent">
+                      {careerPath.target_role}
+                    </span>
+                  </h2>
+
+                  <p className="mt-4 max-w-3xl text-sm leading-7 text-white/58 lg:text-[15px]">
+                    {careerPath.summary ||
+                      "Your profile-based roadmap is ready."}
+                  </p>
+
+                  <div className="mt-8 rounded-3xl bg-white/[0.03] p-5">
+                    <div className="mb-5 flex items-center justify-between gap-4">
+                      <div>
+                        <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/35">
+                          Career Readiness Trajectory
+                        </div>
+                        <div className="mt-1 text-sm text-white/55">
+                          Profile fit → job-ready positioning
+                        </div>
+                      </div>
+
+                      <div className="hidden items-center gap-2 rounded-full bg-violet-400/[0.08] px-3 py-1.5 text-xs font-medium text-violet-100/75 sm:flex">
+                        <BrainCircuit className="h-3.5 w-3.5" />
+                        Profile-based
+                      </div>
+                    </div>
+
+                    <div className="relative">
+                      <div className="absolute left-0 right-0 top-4 h-px bg-white/10" />
+                      <div
+                        className="absolute left-0 top-4 h-px bg-gradient-to-r from-violet-400 to-cyan-300"
+                        style={{ width: `${confidence}%` }}
+                      />
+
+                      <div className="relative grid grid-cols-4 gap-3">
+                        {[
+                          "Current",
+                          "Developing",
+                          "Intermediate",
+                          "Job Ready",
+                        ].map((label, index) => {
+                          const nodeProgress = [0, 35, 70, 100][index];
+                          const isActive = confidence >= nodeProgress;
+
+                          return (
+                            <div
+                              key={label}
+                              className="flex flex-col items-center text-center"
+                            >
+                              <div
+                                className={`mb-3 flex h-8 w-8 items-center justify-center rounded-full border ${
+                                  isActive
+                                    ? "border-violet-300/40 bg-violet-400/15 text-violet-100"
+                                    : "border-white/10 bg-black/30 text-white/30"
+                                }`}
+                              >
+                                {isActive ? (
+                                  <CheckCircle2 className="h-4 w-4" />
+                                ) : (
+                                  <span className="h-2 w-2 rounded-full bg-white/25" />
+                                )}
+                              </div>
+
+                              <div
+                                className={`text-xs font-medium ${
+                                  isActive ? "text-white/75" : "text-white/35"
+                                }`}
+                              >
+                                {label}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <aside className="border-t border-white/10 bg-white/[0.025] p-6 xl:border-l xl:border-t-0">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/35">
+                        Roadmap confidence
+                      </div>
+
+                      <div className="mt-3 flex items-end gap-1">
+                        <span className="text-5xl font-bold tracking-tight text-white">
+                          {confidence}
+                        </span>
+                        <span className="pb-1 text-2xl text-white/45">%</span>
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl bg-violet-400/[0.10] p-3 text-violet-200">
+                      <TrendingUp className="h-5 w-5" />
+                    </div>
+                  </div>
+
+                  <div className="mt-5 h-2 overflow-hidden rounded-full bg-white/10">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-violet-400 to-cyan-300"
+                      style={{ width: `${confidence}%` }}
+                    />
+                  </div>
+
+                  <div className="mt-6 space-y-3">
+                    <div className="flex items-center justify-between rounded-2xl bg-black/20 px-4 py-3">
+                      <span className="text-xs text-white/40">
+                        Time horizon
+                      </span>
+                      <span className="text-sm font-medium text-white/75">
+                        {careerPath.timeframe_months ?? 6} months
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between rounded-2xl bg-black/20 px-4 py-3">
+                      <span className="text-xs text-white/40">
+                        Current level
+                      </span>
+                      <span className="text-sm font-medium text-white/75">
+                        {careerPath.current_level || "Not specified"}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between rounded-2xl bg-black/20 px-4 py-3">
+                      <span className="text-xs text-white/40">
+                        Target role
+                      </span>
+                      <span className="max-w-[160px] truncate text-sm font-medium text-white/75">
+                        {careerPath.target_role}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between rounded-2xl bg-black/20 px-4 py-3">
+                      <span className="text-xs text-white/40">
+                        Role fit
+                      </span>
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-medium ${roleFitClassName}`}
+                      >
+                        {roleFitLabel}
+                      </span>
+                    </div>
+                  </div>
+
+                  {careerPath.role_fit_summary && (
+                    <div className="mt-4 rounded-2xl bg-white/[0.025] p-4">
+                      <div className="mb-1 text-xs font-medium uppercase tracking-[0.16em] text-white/30">
+                        Fit analysis
+                      </div>
+
+                      <p className="text-sm leading-6 text-white/50">
+                        {careerPath.role_fit_summary}
+                      </p>
+                    </div>
+                  )}
+                </aside>
+              </div>
+            </section>
+
+            <CareerPathTimeline roadmap={careerPath.roadmap} />
+
+            <CareerPathSkillGaps skillGaps={careerPath.skill_gaps} />
+
+            <CareerPathLearningPlan
+                learningPlan={careerPath.learning_plan}
+            />
+
+            <CareerPathProjects projectPlan={careerPath.project_plan} />
+
+            <CareerPathApplicationStrategy
+              applicationStrategy={careerPath.application_strategy}
+            />
+          </>
+        ) : (
+          <div className="rounded-3xl border border-dashed border-white/10 bg-black/20 p-12 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border border-violet-400/20 bg-violet-400/10 text-violet-200">
+              <Sparkles className="h-7 w-7" />
+            </div>
+
+            <h2 className="mt-5 text-xl font-semibold text-white">
+              No profile-based roadmap yet
+            </h2>
+
+            <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-white/55">
+              Generate your first roadmap from your saved Launchly profile.
+              Launchly will use your resume, applications, interview results,
+              LinkedIn analysis, portfolio insights and dashboard signals.
+            </p>
+          </div>
+        )}
       </div>
     </AppShell>
   );

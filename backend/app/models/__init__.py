@@ -13,3 +13,4 @@ from backend.app.models.dashboard.dashboard_review import DashboardReview
 from backend.app.models.interview.interview_session import InterviewSession
 from backend.app.models.interview.interview_message import InterviewMessage
 from backend.app.models.interview.interview_result import InterviewResult
+from backend.app.models.career_path.career_path import CareerPath
