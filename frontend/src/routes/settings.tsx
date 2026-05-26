@@ -3,13 +3,21 @@ import { useEffect, useState } from "react";
 import { AppShell, Card } from "@/components/launchly/AppShell";
 import { useAuth } from "@/context/AuthContext";
 import {
-  User,
-  CreditCard,
+  AlertTriangle,
   Bell,
-  Shield,
-  Sparkles,
+  CheckCircle2,
+  CreditCard,
+  Globe2,
   Loader2,
+  Lock,
+  Shield,
+  Trash2,
+  User,
 } from "lucide-react";
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://127.0.0.1:8000";
 
 async function updateProfile(
   token: string,
@@ -20,7 +28,7 @@ async function updateProfile(
   },
 ) {
   const response = await fetch(
-    "http://127.0.0.1:8000/users/me",
+    `${API_BASE_URL}/users/me`,
     {
       method: "PUT",
       headers: {
@@ -44,15 +52,19 @@ async function updateProfile(
 }
 
 export const Route = createFileRoute("/settings")({
-  head: () => ({ meta: [{ title: "Settings — Launchly" }] }),
+  head: () => ({
+    meta: [
+      {
+        title: "Settings — Launchly",
+      },
+    ],
+  }),
   component: Settings,
 });
 
 function Settings() {
-  const { user, loading } = useAuth();
+  const { user, loading, refreshUser } = useAuth();
   const navigate = useNavigate();
-
-  const { refreshUser } = useAuth();
 
   const [firstName, setFirstName] =
     useState("");
@@ -60,9 +72,19 @@ function Settings() {
   const [lastName, setLastName] =
     useState("");
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] =
+    useState("");
 
-  const [saving, setSaving] =
+  const [language, setLanguage] =
+    useState(() =>
+      localStorage.getItem("launchly_language") ||
+      "english",
+    );
+
+  const [savingProfile, setSavingProfile] =
+    useState(false);
+
+  const [savingPreferences, setSavingPreferences] =
     useState(false);
 
   const [success, setSuccess] =
@@ -72,6 +94,12 @@ function Settings() {
     useState("");
 
   useEffect(() => {
+    if (!loading && !user) {
+      navigate({ to: "/login" });
+    }
+  }, [user, loading, navigate]);
+
+  useEffect(() => {
     if (user) {
       setFirstName(user.first_name || "");
       setLastName(user.last_name || "");
@@ -79,9 +107,9 @@ function Settings() {
     }
   }, [user]);
 
-  async function handleSave() {
+  async function handleSaveProfile() {
     try {
-      setSaving(true);
+      setSavingProfile(true);
       setError("");
       setSuccess("");
 
@@ -113,108 +141,343 @@ function Settings() {
           "Failed to save changes.",
       );
     } finally {
-      setSaving(false);
+      setSavingProfile(false);
     }
+  }
+
+  function handleSavePreferences() {
+    setSavingPreferences(true);
+    setError("");
+    setSuccess("");
+
+    localStorage.setItem(
+      "launchly_language",
+      language,
+    );
+
+    window.setTimeout(() => {
+      setSavingPreferences(false);
+      setSuccess(
+        "Preferences saved successfully.",
+      );
+    }, 350);
   }
 
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[oklch(0.145_0.02_270)] text-white">
-        <div className="text-sm text-white/60">
+        <div className="flex items-center gap-2 text-sm text-white/60">
+          <Loader2 className="size-4 animate-spin text-cyan-300" />
           Loading settings...
         </div>
       </div>
     );
   }
 
-  useEffect(() => {
-      if (!loading && !user) {
-          navigate({ to: "/login" });
-      }
-  }, [user, loading, navigate]);
-
-  if (loading || !user) {
-      return null;
+  if (!user) {
+    return null;
   }
 
+  const username =
+    user.username || "Not set";
+
   return (
-    <AppShell title="Settings" subtitle="Account, plan and preferences.">
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <div className="mb-4 flex items-center gap-2 text-sm font-semibold"><User className="size-4"/> Profile</div>
-          <div className="grid gap-3 md:grid-cols-2 text-sm">
-            <Field
-              label="First name"
-              value={firstName}
-              onChange={setFirstName}
-            />
-
-            <Field
-              label="Last name"
-              value={lastName}
-              onChange={setLastName}
-            />
-
-            <Field
-              label="Email"
-              value={email}
-              onChange={setEmail}
-            />
-            <Field label="Target role" value="placeholder"/>
-          </div>
-          <div className="mt-4 flex items-center gap-2 rounded-xl bg-white/5 p-3 ring-1 ring-white/10 text-sm">
-            <Sparkles className="size-4 text-[oklch(0.85_0.14_250)]"/> AI persona: <strong>Confident & specific</strong> — adjust tone in Coach.
-          </div>
-          {error && (
-            <div className="mt-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
-              {error}
-            </div>
-          )}
-
-          {success && (
-            <div className="mt-4 rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200">
-              {success}
-            </div>
-          )}
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-sm font-semibold text-primary-foreground glow disabled:cursor-not-allowed disabled:opacity-60"
+    <AppShell
+      title="Settings"
+      subtitle="Manage your account, preferences and security."
+    >
+      <div className="space-y-4">
+        {(error || success) && (
+          <div
+            className={`flex items-start gap-3 rounded-3xl border px-5 py-4 text-sm ${
+              error
+                ? "border-red-400/20 bg-red-400/10 text-red-100"
+                : "border-emerald-400/20 bg-emerald-400/10 text-emerald-100"
+            }`}
           >
-            {saving ? (
-              <>
-                <Loader2 className="size-4 animate-spin" />
-                Saving...
-              </>
+            {error ? (
+              <AlertTriangle className="mt-0.5 size-4 shrink-0" />
             ) : (
-              "Save changes"
+              <CheckCircle2 className="mt-0.5 size-4 shrink-0" />
             )}
-          </button>
-        </Card>
 
-        <div className="space-y-4">
-          <Card>
-            <div className="mb-2 flex items-center gap-2 text-sm font-semibold"><CreditCard className="size-4"/> Plan</div>
-            <div className="text-2xl font-semibold">Launch <span className="text-sm text-muted-foreground">$19/mo</span></div>
-            <div className="mt-1 text-xs text-muted-foreground">12 days left in trial</div>
-            <button className="mt-3 inline-flex w-full items-center justify-center rounded-xl bg-gradient-brand px-3 py-2 text-sm font-semibold text-primary-foreground glow">Upgrade to Pro</button>
-          </Card>
-          <Card>
-            <div className="mb-2 flex items-center gap-2 text-sm font-semibold"><Bell className="size-4"/> Notifications</div>
-            {["Recruiter signal alerts","Weekly career digest","Interview reminders"].map(n => (
-              <label key={n} className="flex items-center justify-between py-2 text-sm">
-                <span>{n}</span>
-                <span className="relative inline-block h-5 w-9 rounded-full bg-gradient-brand"><span className="absolute right-0.5 top-0.5 size-4 rounded-full bg-white"/></span>
-              </label>
-            ))}
-          </Card>
-          <Card>
-            <div className="mb-2 flex items-center gap-2 text-sm font-semibold"><Shield className="size-4"/> Privacy</div>
-            <p className="text-sm text-muted-foreground">Your data is yours. Export or delete any time.</p>
-          </Card>
+            <div>
+              {error || success}
+            </div>
+          </div>
+        )}
+
+        <div className="grid gap-4 xl:grid-cols-[1.4fr_0.8fr]">
+          <div className="space-y-4">
+            <Card className="relative overflow-hidden p-6">
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/35 to-transparent" />
+
+              <SectionHeader
+                icon={User}
+                title="Profile"
+                description="Update the core identity details used across Launchly."
+              />
+
+              <div className="mt-6 grid gap-4 md:grid-cols-2">
+                <Field
+                  label="First name"
+                  value={firstName}
+                  onChange={setFirstName}
+                />
+
+                <Field
+                  label="Last name"
+                  value={lastName}
+                  onChange={setLastName}
+                />
+
+                <Field
+                  label="Username"
+                  value={username}
+                  disabled
+                  helper="Username editing can be added later if needed."
+                />
+
+                <Field
+                  label="Email"
+                  value={email}
+                  onChange={setEmail}
+                  type="email"
+                />
+              </div>
+
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                <button
+                  onClick={handleSaveProfile}
+                  disabled={savingProfile}
+                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-brand px-4 py-2 text-sm font-semibold text-primary-foreground glow disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {savingProfile ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save profile"
+                  )}
+                </button>
+
+                <p className="text-xs text-muted-foreground">
+                  Your email is used for login and account recovery.
+                </p>
+              </div>
+            </Card>
+
+            <Card className="relative overflow-hidden p-6">
+              <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-violet-400/[0.08] blur-3xl" />
+
+              <SectionHeader
+                icon={Lock}
+                title="Security"
+                description="Password changes will be available once the backend endpoint is connected."
+              />
+
+              <div className="relative mt-6 grid gap-4 md:grid-cols-3">
+                <Field
+                  label="Current password"
+                  value=""
+                  onChange={() => {}}
+                  type="password"
+                  disabled
+                />
+
+                <Field
+                  label="New password"
+                  value=""
+                  onChange={() => {}}
+                  type="password"
+                  disabled
+                />
+
+                <Field
+                  label="Confirm password"
+                  value=""
+                  onChange={() => {}}
+                  type="password"
+                  disabled
+                />
+              </div>
+
+              <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-white/55">
+                Prepared for a future release.
+              </div>
+            </Card>
+
+            <Card className="relative overflow-hidden p-6">
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-300/30 to-transparent" />
+
+              <SectionHeader
+                icon={Globe2}
+                title="Preferences"
+                description="Choose the default language Launchly should use for AI workflows."
+              />
+
+              <div className="mt-6 grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
+                <SelectField
+                  label="App language"
+                  value={language}
+                  onChange={setLanguage}
+                  options={[
+                    {
+                      label: "English",
+                      value: "english",
+                    },
+                    {
+                      label: "German",
+                      value: "german",
+                    },
+                  ]}
+                />
+
+                <button
+                  onClick={handleSavePreferences}
+                  disabled={savingPreferences}
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-4 text-sm font-semibold text-white transition hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {savingPreferences ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save preferences"
+                  )}
+                </button>
+              </div>
+
+              <p className="mt-4 text-sm leading-6 text-white/45">
+                Next step: connect this preference to the backend user profile and use it as the default language in Resume Builder, Cover Letters, Career Path and other AI features.
+              </p>
+            </Card>
+          </div>
+
+          <div className="space-y-4">
+            <Card className="relative overflow-hidden p-6">
+              <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-cyan-400/[0.08] blur-3xl" />
+
+              <SectionHeader
+                icon={CreditCard}
+                title="Plan"
+                description="Current workspace plan."
+              />
+
+              <div className="relative mt-5 rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+                <div className="flex items-end justify-between gap-4">
+                  <div>
+                    <div className="text-2xl font-semibold text-white">
+                      Launch
+                    </div>
+
+                    <div className="mt-1 text-sm text-muted-foreground">
+                      Early access plan
+                    </div>
+                  </div>
+
+                  <div className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-200">
+                    Active
+                  </div>
+                </div>
+
+                <button className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-gradient-brand px-3 py-2 text-sm font-semibold text-primary-foreground glow">
+                  Upgrade options coming soon
+                </button>
+              </div>
+            </Card>
+
+            <Card className="p-6">
+              <SectionHeader
+                icon={Bell}
+                title="Notifications"
+                description="Notification controls are prepared for a future release."
+              />
+
+              <div className="mt-5 space-y-3">
+                {[
+                  "Recruiter signal alerts",
+                  "Weekly career digest",
+                  "Interview reminders",
+                ].map((item) => (
+                  <div
+                    key={item}
+                    className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm"
+                  >
+                    <span className="text-white/75">
+                      {item}
+                    </span>
+
+                    <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs text-white/40">
+                      Soon
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <Card className="p-6">
+              <SectionHeader
+                icon={Shield}
+                title="Privacy"
+                description="Your data remains connected to your authenticated account."
+              />
+
+              <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-6 text-white/50">
+                Prepared for a future release.
+              </div>
+            </Card>
+
+            <Card className="border-red-400/15 bg-red-400/[0.045] p-6">
+              <SectionHeader
+                icon={Trash2}
+                title="Danger zone"
+                description="Prepared for a future release."
+              />
+
+              <button
+                disabled
+                className="mt-5 inline-flex w-full cursor-not-allowed items-center justify-center rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-2 text-sm font-semibold text-red-100/60"
+              >
+                Delete account unavailable
+              </button>
+            </Card>
+          </div>
         </div>
       </div>
     </AppShell>
+  );
+}
+
+function SectionHeader({
+  icon: Icon,
+  title,
+  description,
+}: {
+  icon: React.ComponentType<{
+    className?: string;
+  }>;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-cyan-200">
+        <Icon className="size-4" />
+      </div>
+
+      <div>
+        <h2 className="text-base font-semibold text-white">
+          {title}
+        </h2>
+
+        <p className="mt-1 text-sm leading-6 text-muted-foreground">
+          {description}
+        </p>
+      </div>
+    </div>
   );
 }
 
@@ -222,26 +485,83 @@ function Field({
   label,
   value,
   onChange,
+  type = "text",
+  disabled = false,
+  helper,
+}: {
+  label: string;
+  value: string;
+  onChange?: (
+    value: string,
+  ) => void;
+  type?: string;
+  disabled?: boolean;
+  helper?: string;
+}) {
+  return (
+    <label className="block">
+      <div className="mb-1.5 text-xs font-medium text-muted-foreground">
+        {label}
+      </div>
+
+      <input
+        type={type}
+        value={value}
+        disabled={disabled}
+        onChange={(event) =>
+          onChange?.(event.target.value)
+        }
+        className="h-11 w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-cyan-300/30 focus:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-55"
+      />
+
+      {helper && (
+        <p className="mt-1.5 text-xs leading-5 text-white/35">
+          {helper}
+        </p>
+      )}
+    </label>
+  );
+}
+
+function SelectField({
+  label,
+  value,
+  onChange,
+  options,
 }: {
   label: string;
   value: string;
   onChange: (
     value: string,
   ) => void;
+  options: {
+    label: string;
+    value: string;
+  }[];
 }) {
   return (
     <label className="block">
-      <div className="mb-1 text-xs text-muted-foreground">
+      <div className="mb-1.5 text-xs font-medium text-muted-foreground">
         {label}
       </div>
 
-      <input
+      <select
         value={value}
-        onChange={(e) =>
-          onChange(e.target.value)
+        onChange={(event) =>
+          onChange(event.target.value)
         }
-        className="w-full rounded-lg bg-white/5 px-3 py-2 text-sm ring-1 ring-white/10 outline-none focus:ring-[oklch(0.72_0.20_295)]/60"
-      />
+        className="h-11 w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 text-sm text-white outline-none transition focus:border-cyan-300/30 focus:bg-white/[0.06]"
+      >
+        {options.map((option) => (
+          <option
+            key={option.value}
+            value={option.value}
+            className="bg-[#0b1020] text-white"
+          >
+            {option.label}
+          </option>
+        ))}
+      </select>
     </label>
   );
 }

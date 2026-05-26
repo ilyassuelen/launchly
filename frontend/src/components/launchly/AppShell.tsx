@@ -138,19 +138,13 @@ export function AppShell({
           <header className="sticky top-0 z-40 flex h-16 items-center gap-3 border-b border-white/5 bg-background/70 px-4 backdrop-blur md:px-6">
             <SidebarTrigger className="text-muted-foreground" />
             <div className="hidden flex-1 md:block">
-              <div className="flex items-center gap-2 rounded-xl glass px-3 py-2 text-sm text-muted-foreground max-w-md">
-                <Search className="size-4" />
-                <input className="w-full bg-transparent outline-none placeholder:text-muted-foreground" placeholder="Search resumes, jobs, prompts…" />
-                <kbd className="rounded bg-white/10 px-1.5 py-0.5 text-[10px]">⌘K</kbd>
-              </div>
+
             </div>
             <div className="ml-auto flex items-center gap-2">
               <button className="grid size-9 place-items-center rounded-lg glass hover:bg-white/10">
                 <Bell className="size-4" />
               </button>
-              <button className="hidden items-center gap-1.5 rounded-lg bg-gradient-brand px-3 py-2 text-xs font-semibold text-primary-foreground glow md:inline-flex">
-                <Plus className="size-4" /> New
-              </button>
+
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setMenuOpen(!menuOpen)}
