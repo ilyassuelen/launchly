@@ -24,6 +24,7 @@ async function updateProfile(
   data: {
     first_name: string;
     last_name: string;
+    username: string;
     email: string;
   },
 ) {
@@ -75,6 +76,18 @@ function Settings() {
   const [email, setEmail] =
     useState("");
 
+  const [username, setUsername] =
+    useState("");
+
+  const [currentPassword, setCurrentPassword] =
+    useState("");
+
+  const [newPassword, setNewPassword] =
+    useState("");
+
+  const [confirmPassword, setConfirmPassword] =
+    useState("");
+
   const [language, setLanguage] =
     useState(() =>
       localStorage.getItem("launchly_language") ||
@@ -104,6 +117,7 @@ function Settings() {
       setFirstName(user.first_name || "");
       setLastName(user.last_name || "");
       setEmail(user.email || "");
+      setUsername(user.username || "");
     }
   }, [user]);
 
@@ -127,6 +141,7 @@ function Settings() {
       await updateProfile(token, {
         first_name: firstName,
         last_name: lastName,
+        username,
         email,
       });
 
@@ -163,6 +178,77 @@ function Settings() {
     }, 350);
   }
 
+  async function handleChangePassword() {
+    try {
+      setError("");
+      setSuccess("");
+
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        throw new Error("Please fill out all password fields.");
+      }
+
+      if (newPassword.length < 8) {
+        throw new Error(
+          "New password must contain at least 8 characters.",
+        );
+      }
+
+      if (newPassword !== confirmPassword) {
+        throw new Error(
+          "New passwords do not match.",
+        );
+      }
+
+      const token =
+        localStorage.getItem(
+          "access_token",
+        );
+
+      if (!token) {
+        throw new Error(
+          "Authentication expired.",
+        );
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/users/me/password`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            current_password: currentPassword,
+            new_password: newPassword,
+          }),
+        },
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result?.detail ||
+            "Failed to update password.",
+        );
+      }
+
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+
+      setSuccess(
+        "Password updated successfully.",
+      );
+    } catch (err: any) {
+      setError(
+        err?.message ||
+          "Failed to update password.",
+      );
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[oklch(0.145_0.02_270)] text-white">
@@ -178,8 +264,7 @@ function Settings() {
     return null;
   }
 
-  const username =
-    user.username || "Not set";
+  // username state is now managed above and editable
 
   return (
     <AppShell
@@ -234,8 +319,7 @@ function Settings() {
                 <Field
                   label="Username"
                   value={username}
-                  disabled
-                  helper="Username editing can be added later if needed."
+                  onChange={setUsername}
                 />
 
                 <Field
@@ -274,37 +358,43 @@ function Settings() {
               <SectionHeader
                 icon={Lock}
                 title="Security"
-                description="Password changes will be available once the backend endpoint is connected."
+                description="Update your account password securely."
               />
 
               <div className="relative mt-6 grid gap-4 md:grid-cols-3">
                 <Field
                   label="Current password"
-                  value=""
-                  onChange={() => {}}
+                  value={currentPassword}
+                  onChange={setCurrentPassword}
                   type="password"
-                  disabled
                 />
 
                 <Field
                   label="New password"
-                  value=""
-                  onChange={() => {}}
+                  value={newPassword}
+                  onChange={setNewPassword}
                   type="password"
-                  disabled
                 />
 
                 <Field
                   label="Confirm password"
-                  value=""
-                  onChange={() => {}}
+                  value={confirmPassword}
+                  onChange={setConfirmPassword}
                   type="password"
-                  disabled
                 />
               </div>
 
-              <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-white/55">
-                Prepared for a future release.
+              <div className="mt-5 flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <div className="text-sm text-white/55">
+                  Use a secure password with at least 8 characters.
+                </div>
+
+                <button
+                  onClick={handleChangePassword}
+                  className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+                >
+                  Update password
+                </button>
               </div>
             </Card>
 
@@ -350,9 +440,6 @@ function Settings() {
                 </button>
               </div>
 
-              <p className="mt-4 text-sm leading-6 text-white/45">
-                Next step: connect this preference to the backend user profile and use it as the default language in Resume Builder, Cover Letters, Career Path and other AI features.
-              </p>
             </Card>
           </div>
 
