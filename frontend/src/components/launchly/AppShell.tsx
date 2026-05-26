@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, FileText, Mail, Mic, Linkedin, Github, Map,
-  Briefcase, Brain, Settings, Search, Bell, Sparkles, Plus,
+  Briefcase, Settings, Search, Bell, Sparkles, Plus,
   User, LogOut, ChevronDown,
 } from "lucide-react";
 import logo from "../../../static/logo.png";
@@ -24,7 +24,6 @@ const items = [
   { title: "Portfolio Analyzer", url: "/portfolio", icon: Github },
   { title: "Career Path", url: "/career-path", icon: Map },
   { title: "Applications", url: "/applications", icon: Briefcase },
-  { title: "AI Coach", url: "/coach", icon: Brain },
 ];
 
 function AppSidebar({

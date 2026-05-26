@@ -18,7 +18,6 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as LinkedinRouteImport } from './routes/linkedin'
 import { Route as InterviewRouteImport } from './routes/interview'
 import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as CoachRouteImport } from './routes/coach'
 import { Route as CareerPathRouteImport } from './routes/career-path'
 import { Route as ApplicationsRouteImport } from './routes/applications'
 import { Route as IndexRouteImport } from './routes/index'
@@ -72,11 +71,6 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CoachRoute = CoachRouteImport.update({
-  id: '/coach',
-  path: '/coach',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CareerPathRoute = CareerPathRouteImport.update({
   id: '/career-path',
   path: '/career-path',
@@ -118,7 +112,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/applications': typeof ApplicationsRoute
   '/career-path': typeof CareerPathRoute
-  '/coach': typeof CoachRoute
   '/dashboard': typeof DashboardRoute
   '/interview': typeof InterviewRoute
   '/linkedin': typeof LinkedinRoute
@@ -137,7 +130,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/applications': typeof ApplicationsRoute
   '/career-path': typeof CareerPathRoute
-  '/coach': typeof CoachRoute
   '/dashboard': typeof DashboardRoute
   '/interview': typeof InterviewRoute
   '/linkedin': typeof LinkedinRoute
@@ -157,7 +149,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/applications': typeof ApplicationsRoute
   '/career-path': typeof CareerPathRoute
-  '/coach': typeof CoachRoute
   '/dashboard': typeof DashboardRoute
   '/interview': typeof InterviewRoute
   '/linkedin': typeof LinkedinRoute
@@ -178,7 +169,6 @@ export interface FileRouteTypes {
     | '/'
     | '/applications'
     | '/career-path'
-    | '/coach'
     | '/dashboard'
     | '/interview'
     | '/linkedin'
@@ -197,7 +187,6 @@ export interface FileRouteTypes {
     | '/'
     | '/applications'
     | '/career-path'
-    | '/coach'
     | '/dashboard'
     | '/interview'
     | '/linkedin'
@@ -216,7 +205,6 @@ export interface FileRouteTypes {
     | '/'
     | '/applications'
     | '/career-path'
-    | '/coach'
     | '/dashboard'
     | '/interview'
     | '/linkedin'
@@ -236,7 +224,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApplicationsRoute: typeof ApplicationsRoute
   CareerPathRoute: typeof CareerPathRoute
-  CoachRoute: typeof CoachRoute
   DashboardRoute: typeof DashboardRoute
   InterviewRoute: typeof InterviewRoute
   LinkedinRoute: typeof LinkedinRoute
@@ -317,13 +304,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/coach': {
-      id: '/coach'
-      path: '/coach'
-      fullPath: '/coach'
-      preLoaderRoute: typeof CoachRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/career-path': {
       id: '/career-path'
       path: '/career-path'
@@ -380,7 +360,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApplicationsRoute: ApplicationsRoute,
   CareerPathRoute: CareerPathRoute,
-  CoachRoute: CoachRoute,
   DashboardRoute: DashboardRoute,
   InterviewRoute: InterviewRoute,
   LinkedinRoute: LinkedinRoute,
