@@ -2,8 +2,6 @@
   <img src="frontend/static/logo.png" alt="Launchly Logo" width="300"/>
 </p>
 
-<h1 align="center">Launchly</h1>
-
 <p align="center">
   AI-powered career acceleration platform for students, juniors, graduates and early-career professionals.
 </p>
@@ -29,7 +27,7 @@
 
 The platform combines recruiter-style evaluations, resume-aware AI systems and realistic interview simulations to help users improve how they present themselves professionally.
 
-Launchly focuses on practical career preparation rather than generic AI coaching.
+Launchly focuses on realistic, profile-aware career preparation rather than generic AI coaching by grounding its recommendations in actual user data, recruiter-style evaluations and practical hiring signals.
 
 ---
 
@@ -119,6 +117,41 @@ Additional AI-powered career preparation workflows.
 
 ---
 
+## 🧭 AI Career Path Intelligence
+
+Launchly includes an AI-powered career roadmap system that generates personalized career paths based on the user's real profile data.
+
+Launchly analyzes actual resume content, projects, recruiter evaluations, interview results, portfolio signals and application history to determine how realistically a target role aligns with the user's current profile.
+
+### Features
+
+- Profile-aware AI roadmap generation
+- Role-fit validation
+- Career readiness scoring
+- Personalized milestone planning
+- AI-generated learning plans
+- Portfolio project recommendations
+- Recruiter-aligned improvement strategies
+- Skill gap analysis
+- Resume + portfolio + interview signal aggregation
+- Realistic target-role alignment analysis
+
+### Intelligent Role Alignment
+
+Launchly does not blindly generate unrealistic roadmaps.
+
+If a selected target role has little overlap with the user's existing profile data, the system:
+
+- lowers roadmap confidence
+- explains missing qualifications
+- highlights critical skill gaps
+- suggests realistic transition paths
+- avoids generating irrelevant recommendations
+
+This creates a significantly more realistic and trustworthy career planning experience.
+
+---
+
 ## 🎨 Modern SaaS Experience
 
 Launchly was designed with a premium modern SaaS experience in mind.
@@ -172,6 +205,11 @@ Launchly uses multiple structured AI workflows rather than relying on generic pr
 - Resume parsing & analysis pipelines
 - Role-aware question generation
 - AI-assisted recruiter simulations
+- Career-context aggregation pipelines
+- Profile-aware roadmap generation
+- Role-fit validation systems
+- Multi-source career signal analysis
+- Career readiness scoring
 
 ---
 
@@ -245,7 +283,7 @@ source .venv/bin/activate
 
 pip install -r requirements.txt
 
-uvicorn backend.main:app --reload
+python -m uvicorn backend.app.main:app --reload
 ```
 
 Backend runs on:
@@ -322,6 +360,17 @@ Create a `.env` file in the backend directory.
 - Job application tracking
 - Application workflow management
 
+## Career Path Intelligence
+
+- AI-generated personalized career roadmaps
+- Resume-aware role alignment analysis
+- Profile-fit validation
+- AI learning plan generation
+- Portfolio project recommendations
+- Skill gap intelligence
+- Career readiness evaluation
+- Recruiter-aligned application strategies
+
 ---
 
 # 🧭 Roadmap
@@ -332,8 +381,6 @@ Create a `.env` file in the backend directory.
 - Real-time speech & communication analysis
 - Live conversational interview mode
 - Advanced recruiter analytics & heatmaps
-- Personalized AI career roadmaps
-- AI-powered learning recommendations
 - Enhanced portfolio intelligence
 - Advanced hiring-readiness scoring
 
