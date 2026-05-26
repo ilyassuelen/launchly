@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 
 from backend.app.core.config import settings
 from backend.app.routers import health
@@ -23,12 +22,6 @@ from backend.app.routers.career_path.career_path import router as career_router
 app = FastAPI(
     title="Launchly API",
     version="1.0.0",
-)
-
-app.mount(
-    "/uploads",
-    StaticFiles(directory="uploads"),
-    name="uploads",
 )
 
 app.add_middleware(

@@ -21,3 +21,5 @@ Pillow
 playwright
 
 openai
+
+boto3

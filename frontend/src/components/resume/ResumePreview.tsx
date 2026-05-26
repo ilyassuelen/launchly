@@ -9,6 +9,18 @@ interface Props {
   resume: Resume;
 }
 
+function resolvePhotoUrl(photo?: string | null) {
+  if (!photo) {
+    return "";
+  }
+
+  if (photo.startsWith("http")) {
+    return photo;
+  }
+
+  return `${import.meta.env.VITE_API_URL || "http://127.0.0.1:8000"}${photo}`;
+}
+
 export function ResumePreview({
   resume,
 }: Props) {
@@ -31,11 +43,15 @@ export function ResumePreview({
     resume.hiddenProfiles || [];
 
   const typography =
-      resume.typography || {
-        fontFamily: "Inter",
-        fontSize: 13,
-        lineHeight: 1.7,
-      };
+    resume.typography || {
+      fontFamily: "Inter",
+      fontSize: 13,
+      lineHeight: 1.7,
+    };
+
+  const photoUrl = resolvePhotoUrl(
+    resume.basics?.photo,
+  );
 
   const templateProps = {
     resume,
@@ -46,6 +62,7 @@ export function ResumePreview({
     githubLabel,
     hiddenProfiles,
     typography,
+    photoUrl,
   };
 
   switch (resume.template) {

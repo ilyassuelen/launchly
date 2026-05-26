@@ -26,6 +26,69 @@ router = APIRouter(
 )
 
 
+def _get_resume_photo(data: dict | None) -> str | None:
+    if not isinstance(data, dict):
+        return None
+
+    basics = data.get("basics")
+
+    if not isinstance(basics, dict):
+        return None
+
+    photo = basics.get("photo")
+
+    if isinstance(photo, str) and photo.strip():
+        return photo
+
+    return None
+
+
+def _is_photo_used_by_other_resume(
+    db: Session,
+    user_id: int,
+    photo_url: str,
+    exclude_resume_id: int | None = None,
+) -> bool:
+    if not photo_url:
+        return False
+
+    query = db.query(Resume).filter(
+        Resume.user_id == user_id,
+    )
+
+    if exclude_resume_id is not None:
+        query = query.filter(
+            Resume.id != exclude_resume_id,
+        )
+
+    resumes = query.all()
+
+    return any(
+        _get_resume_photo(resume.data) == photo_url
+        for resume in resumes
+    )
+
+
+def _delete_photo_if_unused(
+    db: Session,
+    user_id: int,
+    photo_url: str | None,
+    exclude_resume_id: int | None = None,
+):
+    if not photo_url:
+        return
+
+    if _is_photo_used_by_other_resume(
+        db=db,
+        user_id=user_id,
+        photo_url=photo_url,
+        exclude_resume_id=exclude_resume_id,
+    ):
+        return
+
+    delete_resume_photo(photo_url)
+
+
 def serialize_resume(resume: Resume):
     return {
         "id": resume.id,
@@ -43,8 +106,7 @@ def serialize_resume(resume: Resume):
 @router.post("/upload-photo")
 async def upload_resume_photo(
     file: UploadFile = File(...),
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     allowed_types = [
         "image/jpeg",
@@ -175,8 +237,20 @@ def update_resume(
             detail="Resume not found",
         )
 
+    old_photo = _get_resume_photo(resume.data)
+
     if "data" in payload:
+        new_photo = _get_resume_photo(payload["data"])
+
         resume.data = payload["data"]
+
+        if old_photo and old_photo != new_photo:
+            _delete_photo_if_unused(
+                db=db,
+                user_id=current_user.id,
+                photo_url=old_photo,
+                exclude_resume_id=resume.id,
+            )
 
     if "title" in payload:
         resume.title = payload["title"]
@@ -250,18 +324,17 @@ def delete_resume(
             detail="Resume not found",
         )
 
-    current_photo = (
-        resume.data.get("basics", {}).get("photo")
-        if resume.data
-        else None
-    )
-
-    if current_photo:
-        delete_resume_photo(current_photo)
+    current_photo = _get_resume_photo(resume.data)
 
     db.delete(resume)
-
     db.commit()
+
+    if current_photo:
+        _delete_photo_if_unused(
+            db=db,
+            user_id=current_user.id,
+            photo_url=current_photo,
+        )
 
     return {
         "success": True,

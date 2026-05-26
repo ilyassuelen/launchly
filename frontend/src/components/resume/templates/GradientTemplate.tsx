@@ -28,8 +28,9 @@ interface Props {
 
   websiteLabel?: string;
   linkedinLabel?: string;
- githubLabel?: string;
+  githubLabel?: string;
   hiddenProfiles?: string[];
+  photoUrl?: string;
 }
 
 
@@ -51,6 +52,7 @@ export function GradientTemplate({
   linkedinLabel,
   githubLabel,
   hiddenProfiles = [],
+  photoUrl,
 }: Props) {
   const hasProfiles =
     (!!resume.basics.linkedin &&
@@ -503,13 +505,8 @@ export function GradientTemplate({
 
             <img
               src={
-                resume.basics.photo
-                  ? `${
-                      import.meta.env
-                        .VITE_API_URL ||
-                      "http://127.0.0.1:8000"
-                    }${resume.basics.photo}`
-                  : "https://ui-avatars.com/api/?name=User"
+                photoUrl ||
+                "https://ui-avatars.com/api/?name=User"
               }
               alt={resume.basics.fullName}
               className="size-36 rounded-3xl object-cover shadow-2xl"

@@ -63,13 +63,12 @@ export function PersonalInfoEditor({
           <img
             src={
               resume.basics.photo
-                ? `${
-                    import.meta.env
-                      .VITE_API_URL ||
-                    "http://127.0.0.1:8000"
-                  }${
-                    resume.basics.photo
-                  }`
+                ? resume.basics.photo.startsWith("http")
+                  ? resume.basics.photo
+                  : `${
+                      import.meta.env.VITE_API_URL ||
+                      "http://127.0.0.1:8000"
+                    }${resume.basics.photo}`
                 : "https://ui-avatars.com/api/?name=User"
             }
             alt="Profile"

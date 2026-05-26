@@ -12,6 +12,12 @@ class Settings(BaseSettings):
 
     OPENAI_API_KEY: str
 
+    R2_ACCOUNT_ID: str | None = None
+    R2_ACCESS_KEY_ID: str | None = None
+    R2_SECRET_ACCESS_KEY: str | None = None
+    R2_BUCKET_NAME: str | None = None
+    R2_PUBLIC_URL: str | None = None
+
     model_config = SettingsConfigDict(
         env_file="backend/.env",
     )
