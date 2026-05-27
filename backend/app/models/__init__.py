@@ -4,9 +4,6 @@ from backend.app.models.portfolio.portfolio_profile import PortfolioProfile
 from backend.app.models.applications.application import Application
 from backend.app.models.cover_letter.cover_letter import CoverLetter
 from backend.app.models.resume.resume import Resume
-from backend.app.models.resume.resume_education import ResumeEducation
-from backend.app.models.resume.resume_experience import ResumeExperience
-from backend.app.models.resume.resume_project import ResumeProject
 from backend.app.models.recruiter.recruiter import RecruiterViewAnalysis
 from backend.app.models.dashboard.dashboard_snapshot import DashboardSnapshot
 from backend.app.models.dashboard.dashboard_review import DashboardReview

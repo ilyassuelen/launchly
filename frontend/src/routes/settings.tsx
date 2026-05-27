@@ -65,7 +65,7 @@ export const Route = createFileRoute("/settings")({
 });
 
 function Settings() {
-  const { user, loading, refreshUser } = useAuth();
+  const { user, loading, refreshUser, logoutUser } = useAuth();
   const navigate = useNavigate();
 
   const [firstName, setFirstName] =
@@ -103,6 +103,12 @@ function Settings() {
 
   const [error, setError] =
     useState("");
+
+  const [deleteConfirmation, setDeleteConfirmation] =
+    useState("");
+
+  const [isDeletingAccount, setIsDeletingAccount] =
+    useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -268,6 +274,57 @@ function Settings() {
         err?.message ||
           "Failed to update password.",
       );
+    }
+  }
+
+  async function handleDeleteAccount() {
+    try {
+      setIsDeletingAccount(true);
+      setError("");
+      setSuccess("");
+
+      if (deleteConfirmation !== "DELETE") {
+        throw new Error(
+          "Please type DELETE to confirm account deletion.",
+        );
+      }
+
+      const token =
+        localStorage.getItem(
+          "access_token",
+        );
+
+      if (!token) {
+        throw new Error(
+          "Authentication expired.",
+        );
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/users/me`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "Failed to delete account.",
+        );
+      }
+
+      logoutUser();
+      navigate({ to: "/" });
+    } catch (err: any) {
+      setError(
+        err?.message ||
+          "Failed to delete account.",
+      );
+    } finally {
+      setIsDeletingAccount(false);
     }
   }
 
@@ -543,15 +600,44 @@ function Settings() {
               <SectionHeader
                 icon={Trash2}
                 title="Danger zone"
-                description="Prepared for a future release."
+                description="Permanently delete your account and all connected Launchly data."
               />
 
-              <button
-                disabled
-                className="mt-5 inline-flex w-full cursor-not-allowed items-center justify-center rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-2 text-sm font-semibold text-red-100/60"
-              >
-                Delete account unavailable
-              </button>
+              <div className="mt-5 rounded-2xl border border-red-400/15 bg-red-400/[0.06] p-4">
+                <p className="text-sm leading-6 text-red-100/70">
+                  This action cannot be undone. Type{" "}
+                  <span className="font-mono font-semibold text-red-100">
+                    DELETE
+                  </span>{" "}
+                  to confirm.
+                </p>
+
+                <div className="mt-4">
+                  <Field
+                    label="Confirmation"
+                    value={deleteConfirmation}
+                    onChange={setDeleteConfirmation}
+                  />
+                </div>
+
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={
+                    isDeletingAccount ||
+                    deleteConfirmation !== "DELETE"
+                  }
+                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-red-400/25 bg-red-400/15 px-4 py-2 text-sm font-semibold text-red-100 transition hover:bg-red-400/20 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isDeletingAccount ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" />
+                      Deleting account...
+                    </>
+                  ) : (
+                    "Delete account permanently"
+                  )}
+                </button>
+              </div>
             </Card>
           </div>
         </div>
