@@ -89,22 +89,22 @@ export function MonoTemplate({
     resume.education.length > 0;
 
   const getTextItems = (
-      value?: string | string[],
-    ) => {
-      if (Array.isArray(value)) {
-        return value.filter((text) =>
-          text?.trim(),
-        );
-      }
+    value?: string | string[],
+  ) => {
+    if (Array.isArray(value)) {
+      return value.filter((text) =>
+        text?.trim(),
+      );
+    }
 
-      if (
-        typeof value === "string" &&
-        value.trim()
-      ) {
-        return [value.trim()];
-      }
+    if (
+      typeof value === "string" &&
+      value.trim()
+    ) {
+      return [value.trim()];
+    }
 
-      return [];
+    return [];
   };
 
   const sidebarSectionMap = {
@@ -121,7 +121,7 @@ export function MonoTemplate({
         </div>
 
         <div
-          className="mt-4 flex flex-col gap-2"
+          className="mt-2 flex flex-col gap-1.5"
           style={{
             fontSize: scaleFont(13, typography),
           }}
@@ -204,7 +204,7 @@ export function MonoTemplate({
           {sidebarSectionTitles.skills}
         </div>
 
-        <div className="mt-4 space-y-4">
+        <div className="mt-2 space-y-2.5">
           {resume.skills.map(
             (group: SkillGroup) => (
               <div key={group.id}>
@@ -214,7 +214,7 @@ export function MonoTemplate({
                 </div>
 
                 <div
-                  className="mt-2 text-black/70"
+                  className="mt-1 text-black/70"
                   style={{
                     fontSize: scaleFont(13, typography),
                   }}
@@ -242,7 +242,7 @@ export function MonoTemplate({
           {sidebarSectionTitles.languages}
         </div>
 
-        <div className="mt-3 space-y-2">
+        <div className="mt-2 space-y-1.5">
           {resume.languages.map((lang: ResumeLanguage) => (
             <div
               key={lang.id}
@@ -275,7 +275,7 @@ export function MonoTemplate({
           {sidebarSectionTitles.softskills}
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-2 flex flex-wrap gap-1.5">
           {(resume.softSkills || []).map(
             (skill: ResumeSoftSkill) => (
               <span
@@ -308,7 +308,7 @@ export function MonoTemplate({
           {mainSectionTitles.projects}
         </div>
 
-        <div className="mt-5 space-y-6">
+        <div className="mt-3 space-y-3.5">
           {resume.projects.map(
             (project: ProjectItem) => (
               <div key={project.id}>
@@ -316,14 +316,14 @@ export function MonoTemplate({
                 <div
                   className="font-bold leading-tight"
                   style={{
-                    fontSize: scaleFont(22, typography),
+                    fontSize: scaleFont(18, typography),
                   }}
                 >
                   {project.title}
                 </div>
 
                 <div
-                  className="mt-2 text-black/50"
+                  className="mt-1 text-black/50"
                   style={{
                     fontSize: scaleFont(12, typography),
                   }}
@@ -332,7 +332,7 @@ export function MonoTemplate({
                 </div>
 
                 <p
-                  className="mt-3 text-black/75"
+                  className="mt-1.5 text-black/75"
                   style={{
                     fontSize: scaleFont(13, typography),
                     lineHeight: typography.lineHeight,
@@ -341,20 +341,22 @@ export function MonoTemplate({
                   {project.description}
                 </p>
 
-                <ul className="mt-3 space-y-1.5">
+                <ul className="mt-2 space-y-1">
                   {project.bullets
                       ?.filter((bullet) => bullet?.trim())
                       .map((bullet) => (
                     <li
                       key={bullet}
-                      className="flex gap-2 text-black/75"
+                      className="grid grid-cols-[7px_1fr] gap-2 text-black/75"
                       style={{
                         fontSize: scaleFont(13, typography),
                         lineHeight: typography.lineHeight,
                       }}
                     >
-                      <span>•</span>
-
+                      <span
+                        className="mt-[0.55em] block size-1 rounded-full bg-black/70"
+                        aria-hidden="true"
+                      />
                       <span>{bullet}</span>
                     </li>
                   ))}
@@ -380,7 +382,7 @@ export function MonoTemplate({
           {mainSectionTitles.experience}
         </div>
 
-        <div className="mt-5 space-y-6">
+        <div className="mt-3 space-y-3.5">
           {resume.experience.map(
             (item: ExperienceItem) => (
               <div key={item.id}>
@@ -391,14 +393,14 @@ export function MonoTemplate({
                     <div
                       className="font-bold leading-tight"
                       style={{
-                        fontSize: scaleFont(18, typography),
+                        fontSize: scaleFont(16, typography),
                       }}
                     >
                       {item.role}
                     </div>
 
                     <div
-                      className="mt-1 text-black/55"
+                      className="mt-0.5 text-black/55"
                       style={{
                         fontSize: scaleFont(12, typography),
                       }}
@@ -417,20 +419,22 @@ export function MonoTemplate({
                   </div>
                 </div>
 
-                <ul className="mt-3 space-y-1.5">
+                <ul className="mt-2 space-y-1">
                   {(item.bullets || [])
                       .filter((bullet) => bullet?.trim())
                       .map((bullet) => (
                     <li
                       key={bullet}
-                      className="flex gap-2 text-black/75"
+                      className="grid grid-cols-[7px_1fr] gap-2 text-black/75"
                       style={{
                         fontSize: scaleFont(13, typography),
                         lineHeight: typography.lineHeight,
                       }}
                     >
-                      <span>•</span>
-
+                      <span
+                        className="mt-[0.55em] block size-1 rounded-full bg-black/70"
+                        aria-hidden="true"
+                      />
                       <span>{bullet}</span>
                     </li>
                   ))}
@@ -456,7 +460,7 @@ export function MonoTemplate({
           {mainSectionTitles.education}
         </div>
 
-        <div className="mt-5 space-y-5">
+        <div className="mt-3 space-y-3">
           {resume.education.map(
             (item: EducationItem) => (
               <div key={item.id}>
@@ -467,14 +471,14 @@ export function MonoTemplate({
                     <div
                       className="font-bold leading-tight"
                       style={{
-                        fontSize: scaleFont(18, typography),
+                        fontSize: scaleFont(16, typography),
                       }}
                     >
                       {item.degree}
                     </div>
 
                     <div
-                      className="mt-1 text-black/55"
+                      className="mt-0.5 text-black/55"
                       style={{
                         fontSize: scaleFont(12, typography),
                       }}
@@ -494,7 +498,7 @@ export function MonoTemplate({
                 </div>
 
                 {getTextItems(item.description).length > 0 ? (
-                      <ul className="mt-3 space-y-1.5">
+                      <ul className="mt-2 space-y-1">
                         {getTextItems(item.description).map((text) => (
                           <li
                             key={text}
@@ -505,7 +509,7 @@ export function MonoTemplate({
                             }}
                           >
                             <span
-                              className="mt-[0.55em] block size-1.5 rounded-full bg-black/70"
+                              className="mt-[0.55em] block size-1 rounded-full bg-black/70"
                               aria-hidden="true"
                             />
 
@@ -533,8 +537,8 @@ export function MonoTemplate({
         h-auto
         overflow-visible
         bg-white
-        px-12
-        py-10
+        px-9
+        py-7
         text-black
         shadow-[0_20px_70px_rgba(0,0,0,0.15)]
       "
@@ -547,7 +551,7 @@ export function MonoTemplate({
 
       {/* HEADER */}
 
-      <div className="border-b border-black/80 pb-6">
+      <div className="border-b border-black/80 pb-4">
 
         <div className="flex items-start justify-between">
 
@@ -556,23 +560,23 @@ export function MonoTemplate({
             <div
               className="font-black tracking-tight leading-none"
               style={{
-                fontSize: scaleFont(42, typography),
+                fontSize: scaleFont(34, typography),
               }}
             >
               {resume.basics.fullName}
             </div>
 
             <div
-              className="mt-2 font-medium"
+              className="mt-1 font-medium"
               style={{
-                fontSize: scaleFont(16, typography),
+                fontSize: scaleFont(13, typography),
               }}
             >
               {resume.basics.title}
             </div>
 
             <div
-              className="mt-4 flex flex-wrap gap-4 text-black/60"
+              className="mt-2 flex flex-wrap gap-3 text-black/60"
               style={{
                 fontSize: scaleFont(12, typography),
               }}
@@ -599,18 +603,18 @@ export function MonoTemplate({
                 "https://ui-avatars.com/api/?name=User"
               }
               alt={resume.basics.fullName}
-              className="size-36 rounded-3xl object-cover shadow-2xl"
+              className="size-30 rounded-2xl object-cover shadow-xl"
           />
         </div>
       </div>
 
       {/* BODY */}
 
-      <div className="mt-8 grid grid-cols-[220px_1fr] gap-10">
+      <div className="mt-5 grid grid-cols-[185px_1fr] gap-7">
 
         {/* SIDEBAR */}
 
-        <div className="space-y-8">
+        <div className="space-y-5">
           {sidebarSectionOrder.map(
             (sectionId) =>
               sidebarSectionMap[
@@ -621,7 +625,7 @@ export function MonoTemplate({
 
         {/* MAIN */}
 
-<div className="space-y-10">
+<div className="space-y-5">
 
   {hasSummary && (
     <section
@@ -630,8 +634,8 @@ export function MonoTemplate({
         border
         border-black/10
         bg-black/[0.03]
-        px-6
-        py-5
+        px-4
+        py-3
       "
     >
       <p
