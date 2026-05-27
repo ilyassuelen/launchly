@@ -95,6 +95,25 @@ export function ExecutiveTemplate({
   const hasSummary =
     !!resume.summary.content?.trim();
 
+  const getTextItems = (
+      value?: string | string[],
+    ) => {
+      if (Array.isArray(value)) {
+        return value.filter((text) =>
+          text?.trim(),
+        );
+      }
+
+      if (
+        typeof value === "string" &&
+        value.trim()
+      ) {
+        return [value.trim()];
+      }
+
+      return [];
+  };
+
   const sidebarSectionMap = {
     profiles:
       hasProfiles ? (
@@ -339,16 +358,21 @@ export function ExecutiveTemplate({
                   </p>
 
                   <ul className="mt-3 space-y-1.5">
-                    {project.bullets?.map((bullet) => (
+                    {project.bullets
+                      ?.filter((bullet) => bullet?.trim())
+                      .map((bullet) => (
                       <li
                         key={bullet}
-                        className="flex gap-2 text-[#374151]"
+                        className="grid grid-cols-[8px_1fr] gap-3 text-[#374151]"
                         style={{
                           fontSize: scaleFont(13, typography),
                           lineHeight: typography.lineHeight,
                         }}
                       >
-                        <span className="mt-2 size-2 rounded-full bg-[#8b6b3f]" />
+                        <span
+                          className="mt-[0.55em] block size-1.5 rounded-full bg-[#8b6b3f]"
+                          aria-hidden="true"
+                        />
 
                         <span>{bullet}</span>
                       </li>
@@ -414,10 +438,12 @@ export function ExecutiveTemplate({
                   </div>
 
                   <ul className="mt-4 space-y-2">
-                    {(item.bullets || []).map((bullet) => (
+                    {(item.bullets || [])
+                      .filter((bullet) => bullet?.trim())
+                      .map((bullet) => (
                       <li
                         key={bullet}
-                        className="flex gap-3 text-[#374151]"
+                        className="grid grid-cols-[8px_1fr] gap-3 text-[#374151]"
                         style={{
                           fontSize: scaleFont(13, typography),
                           lineHeight: typography.lineHeight,
@@ -487,6 +513,28 @@ export function ExecutiveTemplate({
                       {item.startDate} — {item.endDate}
                     </div>
                   </div>
+
+                  {getTextItems(item.description).length > 0 ? (
+                      <ul className="mt-3 space-y-1.5">
+                        {getTextItems(item.description).map((text) => (
+                          <li
+                            key={text}
+                            className="grid grid-cols-[8px_1fr] gap-3 text-[#374151]"
+                            style={{
+                              fontSize: scaleFont(13, typography),
+                              lineHeight: typography.lineHeight,
+                            }}
+                          >
+                            <span
+                              className="mt-[0.55em] block size-1.5 rounded-full bg-[#8b6b3f]"
+                              aria-hidden="true"
+                            />
+
+                            <span>{text}</span>
+                          </li>
+                        ))}
+                      </ul>
+                  ) : null}
 
                 </div>
               ),

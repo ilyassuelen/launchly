@@ -89,6 +89,25 @@ export function GradientTemplate({
   const hasExperience =
     resume.experience.length > 0;
 
+  const getTextItems = (
+      value?: string | string[],
+  ) => {
+      if (Array.isArray(value)) {
+        return value.filter((text) =>
+          text?.trim(),
+        );
+      }
+
+      if (
+        typeof value === "string" &&
+        value.trim()
+      ) {
+        return [value.trim()];
+      }
+
+      return [];
+  };
+
   const sidebarSectionMap = {
     profiles: hasProfiles ? (
       <section key="profiles">
@@ -265,6 +284,28 @@ export function GradientTemplate({
               >
                 {item.startDate} — {item.endDate}
               </div>
+
+              {getTextItems(item.description).length > 0 ? (
+                  <ul className="mt-3 space-y-1.5">
+                    {getTextItems(item.description).map((text) => (
+                      <li
+                        key={text}
+                        className="grid grid-cols-[7px_1fr] gap-2 text-white/70"
+                        style={{
+                          fontSize: scaleFont(14 * 0.8, typography),
+                          lineHeight: typography.lineHeight,
+                        }}
+                      >
+                        <span
+                          className="mt-[0.55em] block size-1.5 rounded-full bg-cyan-300"
+                          aria-hidden="true"
+                        />
+
+                        <span>{text}</span>
+                      </li>
+                    ))}
+                  </ul>
+              ) : null}
             </div>
           ))}
         </div>

@@ -88,6 +88,25 @@ export function MonoTemplate({
   const hasEducation =
     resume.education.length > 0;
 
+  const getTextItems = (
+      value?: string | string[],
+    ) => {
+      if (Array.isArray(value)) {
+        return value.filter((text) =>
+          text?.trim(),
+        );
+      }
+
+      if (
+        typeof value === "string" &&
+        value.trim()
+      ) {
+        return [value.trim()];
+      }
+
+      return [];
+  };
+
   const sidebarSectionMap = {
     profiles: hasProfiles ? (
       <section key="profiles">
@@ -323,7 +342,9 @@ export function MonoTemplate({
                 </p>
 
                 <ul className="mt-3 space-y-1.5">
-                  {project.bullets?.map((bullet) => (
+                  {project.bullets
+                      ?.filter((bullet) => bullet?.trim())
+                      .map((bullet) => (
                     <li
                       key={bullet}
                       className="flex gap-2 text-black/75"
@@ -397,7 +418,9 @@ export function MonoTemplate({
                 </div>
 
                 <ul className="mt-3 space-y-1.5">
-                  {(item.bullets || []).map((bullet) => (
+                  {(item.bullets || [])
+                      .filter((bullet) => bullet?.trim())
+                      .map((bullet) => (
                     <li
                       key={bullet}
                       className="flex gap-2 text-black/75"
@@ -469,6 +492,28 @@ export function MonoTemplate({
                     {item.startDate} — {item.endDate}
                   </div>
                 </div>
+
+                {getTextItems(item.description).length > 0 ? (
+                      <ul className="mt-3 space-y-1.5">
+                        {getTextItems(item.description).map((text) => (
+                          <li
+                            key={text}
+                            className="grid grid-cols-[8px_1fr] gap-2 text-black/75"
+                            style={{
+                              fontSize: scaleFont(13, typography),
+                              lineHeight: typography.lineHeight,
+                            }}
+                          >
+                            <span
+                              className="mt-[0.55em] block size-1.5 rounded-full bg-black/70"
+                              aria-hidden="true"
+                            />
+
+                            <span>{text}</span>
+                          </li>
+                        ))}
+                      </ul>
+                ) : null}
 
               </div>
             ),

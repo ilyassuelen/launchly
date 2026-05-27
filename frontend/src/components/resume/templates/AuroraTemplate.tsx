@@ -88,6 +88,25 @@ export function AuroraTemplate({
   const hasSummary =
     !!resume.summary.content?.trim();
 
+  const getTextItems = (
+    value?: string | string[],
+  ) => {
+    if (Array.isArray(value)) {
+      return value.filter((text) =>
+        text?.trim(),
+      );
+    }
+
+    if (
+      typeof value === "string" &&
+      value.trim()
+    ) {
+      return [value.trim()];
+    }
+
+    return [];
+  };
+
   const sidebarSectionMap = {
     profiles:
       hasProfiles ? (
@@ -468,6 +487,28 @@ export function AuroraTemplate({
               >
                 {edu.startDate} — {edu.endDate}
               </div>
+
+              {getTextItems(edu.description).length > 0 ? (
+                <ul className="mt-3 space-y-1.5">
+                  {getTextItems(edu.description).map((text) => (
+                    <li
+                      key={text}
+                      className="grid grid-cols-[8px_1fr] gap-3 text-slate-700"
+                      style={{
+                        fontSize: scaleFont(13, typography),
+                        lineHeight: typography.lineHeight,
+                      }}
+                    >
+                      <span
+                        className="mt-[0.55em] block size-1.5 rounded-full bg-violet-500"
+                        aria-hidden="true"
+                      />
+
+                      <span>{text}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
           ))}
         </div>
