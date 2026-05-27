@@ -324,16 +324,21 @@ export function AuroraTemplate({
                 </p>
 
                 <ul className="mt-3 space-y-1.5">
-                  {project.bullets?.map((bullet) => (
+                  {project.bullets
+                      ?.filter((bullet) => bullet?.trim())
+                      .map((bullet) => (
                     <li
                       key={bullet}
-                      className="flex gap-3 text-slate-700"
+                      className="grid grid-cols-[8px_1fr] gap-3 text-slate-700"
                       style={{
                         fontSize: scaleFont(13, typography),
                         lineHeight: typography.lineHeight,
                       }}
                     >
-                      <span className="mt-2 size-2 rounded-full bg-violet-500" />
+                      <span
+                        className="mt-[0.55em] block size-1.5 rounded-full bg-violet-500"
+                        aria-hidden="true"
+                      />
 
                       <span>{bullet}</span>
                     </li>
@@ -395,16 +400,21 @@ export function AuroraTemplate({
                 </div>
 
                 <ul className="mt-3 space-y-1.5">
-                  {(item.bullets || []).map((bullet) => (
+                  {(item.bullets || [])
+                      .filter((bullet) => bullet?.trim())
+                      .map((bullet) => (
                     <li
                       key={bullet}
-                      className="flex gap-3 text-slate-700"
+                      className="grid grid-cols-[8px_1fr] gap-3 text-slate-700"
                       style={{
                         fontSize: scaleFont(13, typography),
                         lineHeight: typography.lineHeight,
                       }}
                     >
-                      <span className="mt-2 size-2 rounded-full bg-violet-500" />
+                      <span
+                        className="mt-[0.55em] block size-1.5 rounded-full bg-violet-500"
+                        aria-hidden="true"
+                      />
 
                       <span>{bullet}</span>
                     </li>
@@ -488,7 +498,7 @@ export function AuroraTemplate({
 
         {/* SIDEBAR */}
 
-        <div className="flex flex-col bg-[#111827] px-6 py-5 text-white">
+        <div className="flex min-h-[297mm] flex-col bg-[#111827] px-6 py-5 text-white">
 
           <div className="flex flex-col items-center text-center">
 
