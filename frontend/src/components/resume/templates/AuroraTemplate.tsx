@@ -299,7 +299,7 @@ export function AuroraTemplate({
   const mainSectionMap = {
     projects:
       hasProjects ? (
-        <section key="projects" className="mt-8">
+        <section key="projects" className="mt-4">
         <div
           className="border-b border-slate-300 pb-1 font-bold uppercase tracking-[0.22em] text-violet-600"
           style={{
@@ -535,7 +535,7 @@ export function AuroraTemplate({
       }}
     >
 
-      <div className="grid grid-cols-[245px_1fr]">
+      <div className="grid grid-cols-[235px_1fr]">
 
         {/* SIDEBAR */}
 
@@ -632,7 +632,7 @@ export function AuroraTemplate({
                 via-white
                 to-cyan-50
                 px-10
-                py-8
+                py-5
               "
             >
               <p
