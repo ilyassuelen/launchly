@@ -31,7 +31,6 @@ export function CareerPathForm({
     event.preventDefault();
 
     await onSubmit({
-      language: "english",
       target_role: targetRole,
       current_level: currentLevel || null,
       timeframe_months: timeframeMonths,

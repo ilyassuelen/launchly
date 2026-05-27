@@ -12,7 +12,6 @@ import {
 import type {
   InterviewAnswerResponse,
   InterviewDifficulty,
-  InterviewLanguage,
   InterviewMessage,
   InterviewMode,
   InterviewResult,
@@ -25,7 +24,6 @@ export function useInterview() {
   const [mode, setMode] = useState<InterviewMode>("behavioral");
   const [role, setRole] = useState("AI Engineer");
   const [difficulty, setDifficulty] = useState<InterviewDifficulty>("Junior");
-  const [language, setLanguage] = useState<InterviewLanguage>("en");
   const [maxQuestions, setMaxQuestions] = useState(5);
 
   const [session, setSession] = useState<InterviewSession | null>(null);
@@ -111,7 +109,6 @@ export function useInterview() {
         mode,
         role: cleanRole,
         difficulty,
-        language,
         max_questions: maxQuestions,
       };
 
@@ -264,7 +261,6 @@ export function useInterview() {
     mode,
     role,
     difficulty,
-    language,
     maxQuestions,
 
     session,
@@ -284,7 +280,6 @@ export function useInterview() {
     setMode,
     setRole,
     setDifficulty,
-    setLanguage,
     setMaxQuestions,
     setAnswer,
 

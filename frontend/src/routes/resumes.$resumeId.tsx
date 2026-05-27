@@ -664,8 +664,7 @@ ${(p.bullets || []).join(" ")}
           await analyzeResume({
             resume_id: resume.id,
 
-            language:
-              resume?.language || "english",
+            language: "english",
 
             tone:
               "professional",

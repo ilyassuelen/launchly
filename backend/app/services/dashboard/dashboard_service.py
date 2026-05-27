@@ -23,6 +23,7 @@ async def get_latest_dashboard_summary(
     *,
     db: Session,
     user_id: int,
+    language: str,
 ) -> DashboardSummaryResponse:
     latest_snapshot = (
         db.query(DashboardSnapshot)
@@ -35,6 +36,7 @@ async def get_latest_dashboard_summary(
         return await build_dashboard_review(
             db=db,
             user_id=user_id,
+            language=language,
             persist=True,
         )
 
@@ -108,9 +110,11 @@ async def refresh_dashboard_summary(
     *,
     db: Session,
     user_id: int,
+    language: str,
 ) -> DashboardSummaryResponse:
     return await build_dashboard_review(
         db=db,
         user_id=user_id,
+        language=language,
         persist=True,
     )

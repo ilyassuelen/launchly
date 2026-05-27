@@ -144,7 +144,7 @@ export function PastInterviewSessions({
                     </div>
 
                     <div className="mt-1 text-xs text-muted-foreground">
-                      {session.mode} · {session.difficulty} · {session.language.toUpperCase()}
+                      {session.mode} · {session.difficulty}
                     </div>
                   </div>
 

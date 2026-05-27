@@ -22,4 +22,5 @@ export interface User {
   last_name: string;
   username: string;
   email: string;
+  ai_response_language: "english" | "german";
 }

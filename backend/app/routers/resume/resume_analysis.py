@@ -25,6 +25,8 @@ async def analyze_resume_route(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    payload.language = current_user.ai_response_language or "english"
+
     return await analyze_resume(
         payload=payload,
         db=db,

@@ -54,8 +54,16 @@ def build_dashboard_review_prompt(
     *,
     data: dict,
     scores: dict,
+    language: str,
 ) -> str:
+    language_instruction = (
+        "Respond ONLY in German."
+        if language == "german"
+        else "Respond ONLY in English."
+    )
     return f"""
+{language_instruction}
+
 Analyze this career dashboard data and return JSON only.
 
 DATA:

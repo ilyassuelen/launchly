@@ -26,6 +26,7 @@ async def get_dashboard_summary(
     return await get_latest_dashboard_summary(
         db=db,
         user_id=current_user.id,
+        language=current_user.ai_response_language,
     )
 
 
@@ -37,4 +38,5 @@ async def run_dashboard_review(
     return await refresh_dashboard_summary(
         db=db,
         user_id=current_user.id,
+        language=current_user.ai_response_language,
     )

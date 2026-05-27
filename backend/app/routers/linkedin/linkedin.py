@@ -39,6 +39,8 @@ async def analyze_linkedin(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    payload.language = current_user.ai_response_language or "english"
+
     return await analyze_linkedin_profile(
         payload=payload,
         db=db,

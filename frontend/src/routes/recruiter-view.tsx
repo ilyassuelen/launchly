@@ -37,8 +37,6 @@ function RecruiterView() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
-  const [language, setLanguage] =
-      useState("english");
 
   const {
       analysis,
@@ -199,7 +197,7 @@ ${(p.bullets || []).join(" ")}
           await analyze({
             resume_id: selectedResumeId || resume.id,
 
-            language,
+            language: "english",
 
             resume_content:
               buildResumeContext(),
@@ -607,43 +605,6 @@ ${(p.bullets || []).join(" ")}
 
         <div className="lg:col-span-4 space-y-4">
 
-          <Card>
-
-            <div className="mb-4 flex items-center gap-2 text-sm font-semibold">
-              <Sparkles className="size-4 text-violet-300" />
-              Language
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-
-              {[
-                {
-                  value: "english",
-                  label: "English",
-                },
-                {
-                  value: "german",
-                  label: "German",
-                },
-              ].map((lang) => (
-                <button
-                  key={lang.value}
-                  onClick={() => {
-                    setLanguage(lang.value);
-                  }}
-                  className={`rounded-2xl border px-4 py-3 text-sm font-medium transition ${
-                    language === lang.value
-                      ? "border-violet-400/30 bg-violet-500/10"
-                      : "border-white/5 bg-white/[0.03]"
-                  }`}
-                >
-                  {lang.label}
-                </button>
-              ))}
-
-            </div>
-
-          </Card>
 
           <Card>
             <div className="text-xs text-muted-foreground">Recruiter Score</div>

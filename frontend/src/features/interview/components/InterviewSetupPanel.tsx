@@ -1,7 +1,6 @@
 import {
   Briefcase,
   Code2,
-  Languages,
   MessageSquare,
   Play,
   Sparkles,
@@ -13,7 +12,6 @@ import {
 
 import type {
   InterviewDifficulty,
-  InterviewLanguage,
   InterviewMode,
 } from "@/features/interview/types/interview";
 
@@ -21,14 +19,12 @@ type InterviewSetupPanelProps = {
   mode: InterviewMode;
   role: string;
   difficulty: InterviewDifficulty;
-  language: InterviewLanguage;
   maxQuestions: number;
   isStarting: boolean;
   disabled?: boolean;
   onModeChange: (mode: InterviewMode) => void;
   onRoleChange: (role: string) => void;
   onDifficultyChange: (difficulty: InterviewDifficulty) => void;
-  onLanguageChange: (language: InterviewLanguage) => void;
   onMaxQuestionsChange: (maxQuestions: number) => void;
   onStart: () => void;
 };
@@ -65,32 +61,16 @@ const difficulties: InterviewDifficulty[] = [
   "Senior",
 ];
 
-const languages: {
-  value: InterviewLanguage;
-  label: string;
-}[] = [
-  {
-    value: "en",
-    label: "English",
-  },
-  {
-    value: "de",
-    label: "German",
-  },
-];
-
 export function InterviewSetupPanel({
   mode,
   role,
   difficulty,
-  language,
   maxQuestions,
   isStarting,
   disabled = false,
   onModeChange,
   onRoleChange,
   onDifficultyChange,
-  onLanguageChange,
   onMaxQuestionsChange,
   onStart,
 }: InterviewSetupPanelProps) {
@@ -198,33 +178,6 @@ export function InterviewSetupPanel({
                   }`}
                 >
                   {item}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="mt-5 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            <Languages className="size-3.5" />
-            Language
-          </div>
-
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            {languages.map((item) => {
-              const active = language === item.value;
-
-              return (
-                <button
-                  key={item.value}
-                  type="button"
-                  disabled={disabled || isStarting}
-                  onClick={() => onLanguageChange(item.value)}
-                  className={`rounded-xl px-3 py-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
-                    active
-                      ? "border border-cyan-300/20 bg-cyan-300/10 text-cyan-100"
-                      : "border border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/[0.05]"
-                  }`}
-                >
-                  {item.label}
                 </button>
               );
             })}

@@ -97,7 +97,6 @@ function LinkedInPage() {
 
   const hasLoadedProfileRef = useRef(false);
 
-  const [language, setLanguage] = useState("english");
   const [headline, setHeadline] = useState("");
   const [about, setAbout] = useState("");
   const [skillsInput, setSkillsInput] = useState("");
@@ -128,7 +127,7 @@ function LinkedInPage() {
         return;
       }
 
-      setLanguage(savedProfile.language || "english");
+
       setHeadline(savedProfile.headline || "");
       setAbout(savedProfile.about || "");
       setSkillsInput((savedProfile.skills || []).join(", "));
@@ -216,7 +215,7 @@ function LinkedInPage() {
     }
 
     await analyze({
-      language,
+      language: "english",
       headline,
       about,
       skills,
@@ -237,7 +236,7 @@ function LinkedInPage() {
     }
 
     await saveProfile({
-      language,
+      language: "english",
       headline,
       about,
       skills,
@@ -367,36 +366,6 @@ function LinkedInPage() {
       subtitle="Headline, About and keyword strategy tuned for the recruiters in your niche."
       action={
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1 rounded-xl border border-white/10 bg-white/[0.04] p-1">
-            {[
-              {
-                value: "english",
-                label: "EN",
-              },
-              {
-                value: "german",
-                label: "DE",
-              },
-            ].map((item) => (
-              <button
-                key={item.value}
-                type="button"
-                onClick={() => {
-                  setLanguage(item.value);
-                  resetAnalysis();
-                  setSaveStatus("idle");
-                }}
-                className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-                  language === item.value
-                    ? "bg-violet-500/20 text-violet-100 shadow-[0_0_20px_rgba(168,85,247,0.18)]"
-                    : "text-white/55 hover:bg-white/[0.06] hover:text-white/80"
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-
           <button
             onClick={handleSaveLinkedInProfile}
             disabled={isSavingProfile || isLoadingProfile}

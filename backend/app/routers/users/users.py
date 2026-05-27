@@ -18,6 +18,15 @@ router = APIRouter(
 )
 
 
+def _normalize_ai_response_language(language: str | None) -> str:
+    normalized = (language or "english").lower().strip()
+
+    if normalized in ["german", "de", "deutsch"]:
+        return "german"
+
+    return "english"
+
+
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(get_current_user)):
     """Return the currently authenticated user."""
@@ -64,6 +73,7 @@ def update_me(
     current_user.last_name = data.last_name
     current_user.username = data.username
     current_user.email = data.email
+    current_user.ai_response_language = _normalize_ai_response_language(data.ai_response_language)
 
     db.commit()
     db.refresh(current_user)

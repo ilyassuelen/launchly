@@ -31,6 +31,8 @@ async def analyze_recruiter(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    payload.language = current_user.ai_response_language or "english"
+
     return await analyze_recruiter_view(
         payload=payload,
         db=db,

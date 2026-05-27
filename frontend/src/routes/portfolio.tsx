@@ -128,7 +128,6 @@ function Portfolio() {
   const hasLoadedProfileRef = useRef(false);
 
   const [githubUsername, setGithubUsername] = useState("");
-  const [language, setLanguage] = useState("english");
 
   useEffect(() => {
     if (!loading && !user) {
@@ -149,7 +148,6 @@ function Portfolio() {
         }
 
         setGithubUsername(savedProfile.github_username || "");
-        setLanguage(savedProfile.language || "english");
       });
   }, [user, loading]);
 
@@ -162,7 +160,7 @@ function Portfolio() {
 
     await analyze({
       github_username: githubUsername.trim(),
-      language,
+      language: "english",
     });
   };
 
@@ -195,35 +193,6 @@ function Portfolio() {
       subtitle="An honest review of your public GitHub repos — through a senior engineer's eyes."
       action={
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1 rounded-xl border border-white/10 bg-white/[0.04] p-1">
-            {[
-              {
-                value: "english",
-                label: "EN",
-              },
-              {
-                value: "german",
-                label: "DE",
-              },
-            ].map((item) => (
-              <button
-                key={item.value}
-                type="button"
-                onClick={() => {
-                  setLanguage(item.value);
-                  resetAnalysis();
-                }}
-                className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-                  language === item.value
-                    ? "bg-violet-500/20 text-violet-100 shadow-[0_0_20px_rgba(168,85,247,0.18)]"
-                    : "text-white/55 hover:bg-white/[0.06] hover:text-white/80"
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-
           <button
             onClick={handleAnalyzePortfolio}
             disabled={!canAnalyze || isAnalyzing || isLoadingProfile}

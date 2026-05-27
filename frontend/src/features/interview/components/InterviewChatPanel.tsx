@@ -137,7 +137,7 @@ export function InterviewChatPanel({
 
             {session && (
               <span>
-                {session.mode} · {session.difficulty} · {session.language.toUpperCase()}
+                {session.mode} · {session.difficulty}
               </span>
             )}
           </div>
@@ -155,7 +155,7 @@ export function InterviewChatPanel({
                   </div>
 
                   <div className="mt-2 text-sm leading-6 text-muted-foreground">
-                    Choose your mode, role, difficulty and language on the left.
+                    Choose your mode, role and difficulty on the left.
                     Then start the interview to receive resume-aware questions.
                   </div>
                 </div>

@@ -40,6 +40,8 @@ async def create_interview_session(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    payload.language = current_user.ai_response_language or "english"
+
     return await start_interview_session(
         db=db,
         user_id=current_user.id,

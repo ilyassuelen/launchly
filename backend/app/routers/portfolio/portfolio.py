@@ -54,6 +54,8 @@ async def analyze_github_portfolio(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    payload.language = current_user.ai_response_language or "english"
+
     analysis = await analyze_portfolio(
         payload,
     )

@@ -297,9 +297,7 @@ const textareaClassName =
 
           const response =
             await generateAICoverLetter({
-              language:
-                coverLetter.language ||
-                "english",
+              language: "english",
 
               tone:
                 coverLetter.tone,
@@ -357,8 +355,7 @@ const textareaClassName =
               tone:
                 coverLetter.tone,
 
-              language:
-                coverLetter.language || "english",
+              language: "english",
 
               job_posting:
                 coverLetter.jobPosting,

@@ -31,6 +31,8 @@ async def generate_user_career_path(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    request.language = current_user.ai_response_language or "english"
+
     return await generate_career_path(
         db=db,
         user_id=current_user.id,

@@ -46,7 +46,6 @@ function Interview() {
     mode,
     role,
     difficulty,
-    language,
     maxQuestions,
 
     session,
@@ -64,7 +63,6 @@ function Interview() {
     setMode,
     setRole,
     setDifficulty,
-    setLanguage,
     setMaxQuestions,
     setAnswer,
 
@@ -130,14 +128,12 @@ function Interview() {
               mode={mode}
               role={role}
               difficulty={difficulty}
-              language={language}
               maxQuestions={maxQuestions}
               isStarting={isStarting}
               disabled={isSessionActive || isSubmitting}
               onModeChange={setMode}
               onRoleChange={setRole}
               onDifficultyChange={setDifficulty}
-              onLanguageChange={setLanguage}
               onMaxQuestionsChange={setMaxQuestions}
               onStart={startInterview}
             />

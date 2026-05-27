@@ -26,6 +26,7 @@ async function updateProfile(
     last_name: string;
     username: string;
     email: string;
+    ai_response_language: string;
   },
 ) {
   const response = await fetch(
@@ -89,10 +90,7 @@ function Settings() {
     useState("");
 
   const [language, setLanguage] =
-    useState(() =>
-      localStorage.getItem("launchly_language") ||
-      "english",
-    );
+    useState("english");
 
   const [savingProfile, setSavingProfile] =
     useState(false);
@@ -118,6 +116,7 @@ function Settings() {
       setLastName(user.last_name || "");
       setEmail(user.email || "");
       setUsername(user.username || "");
+      setLanguage(user.ai_response_language || "english");
     }
   }, [user]);
 
@@ -143,6 +142,7 @@ function Settings() {
         last_name: lastName,
         username,
         email,
+        ai_response_language: language,
       });
 
       await refreshUser();
@@ -160,22 +160,44 @@ function Settings() {
     }
   }
 
-  function handleSavePreferences() {
-    setSavingPreferences(true);
-    setError("");
-    setSuccess("");
+  async function handleSavePreferences() {
+    try {
+      setSavingPreferences(true);
+      setError("");
+      setSuccess("");
 
-    localStorage.setItem(
-      "launchly_language",
-      language,
-    );
+      const token =
+        localStorage.getItem(
+          "access_token",
+        );
 
-    window.setTimeout(() => {
-      setSavingPreferences(false);
+      if (!token) {
+        throw new Error(
+          "Authentication expired.",
+        );
+      }
+
+      await updateProfile(token, {
+        first_name: firstName,
+        last_name: lastName,
+        username,
+        email,
+        ai_response_language: language,
+      });
+
+      await refreshUser();
+
       setSuccess(
         "Preferences saved successfully.",
       );
-    }, 350);
+    } catch (err: any) {
+      setError(
+        err?.message ||
+          "Failed to save preferences.",
+      );
+    } finally {
+      setSavingPreferences(false);
+    }
   }
 
   async function handleChangePassword() {
@@ -404,12 +426,12 @@ function Settings() {
               <SectionHeader
                 icon={Globe2}
                 title="Preferences"
-                description="Choose the default language Launchly should use for AI workflows."
+                description="Choose the default language for AI-generated responses."
               />
 
               <div className="mt-6 grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
                 <SelectField
-                  label="App language"
+                  label="AI response language"
                   value={language}
                   onChange={setLanguage}
                   options={[

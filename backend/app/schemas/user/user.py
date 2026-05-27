@@ -8,6 +8,7 @@ class UserBase(BaseModel):
     last_name: str
     username: str
     email: EmailStr
+    ai_response_language: str = "english"
 
 
 class UpdateUserRequest(BaseModel):
@@ -15,6 +16,7 @@ class UpdateUserRequest(BaseModel):
     last_name: str = Field(..., min_length=1, max_length=80)
     username: str = Field(..., min_length=2, max_length=80)
     email: EmailStr
+    ai_response_language: str = Field(default="english", max_length=20)
 
 
 class UpdatePasswordRequest(BaseModel):

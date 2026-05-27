@@ -1,5 +1,4 @@
 import {
-  Sparkles,
   LayoutTemplate,
 } from "lucide-react";
 
@@ -111,54 +110,12 @@ export function CoverLetterRightPanel({
 
       </Card>
 
-      {/* LANGUAGE */}
-      <Card>
-
-        <div className="mb-4 flex items-center gap-2 text-sm font-semibold">
-          <Sparkles className="size-4 text-violet-300" />
-          Language
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-
-          {[
-            {
-              value: "english",
-              label: "English",
-            },
-            {
-              value: "german",
-              label: "German",
-            },
-          ].map((language) => (
-            <button
-              key={language.value}
-              onClick={() =>
-                setCoverLetter((prev: CoverLetter) => ({
-                  ...prev,
-                  language: language.value,
-                }))
-              }
-              className={`rounded-2xl border px-4 py-3 text-sm font-medium transition ${
-                coverLetter.language === language.value
-                  ? "border-violet-400/30 bg-violet-500/10"
-                  : "border-white/5 bg-white/[0.03]"
-              }`}
-            >
-              {language.label}
-            </button>
-          ))}
-
-        </div>
-
-      </Card>
-
       {/* TYPOGRAPHY */}
       <Card>
 
         <div className="mb-4 flex items-center gap-2 text-sm font-semibold">
 
-          <Sparkles className="size-4 text-violet-300" />
+          <LayoutTemplate className="size-4 text-violet-300" />
 
           Typography
 

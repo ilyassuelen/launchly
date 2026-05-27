@@ -51,6 +51,7 @@ async def _run_llm_review(
     *,
     data: dict,
     scores: dict,
+    language: str,
 ) -> dict:
     if not settings.OPENAI_API_KEY:
         return {}
@@ -58,6 +59,7 @@ async def _run_llm_review(
     prompt = build_dashboard_review_prompt(
         data=data,
         scores=scores,
+        language=language,
     )
 
     response = await client.chat.completions.create(
@@ -99,6 +101,7 @@ async def build_dashboard_review(
     *,
     db: Session,
     user_id: int,
+    language: str,
     persist: bool = True,
 ) -> DashboardSummaryResponse:
     data = collect_dashboard_data(
@@ -136,6 +139,7 @@ async def build_dashboard_review(
     llm_result = await _run_llm_review(
         data=data,
         scores=scores,
+        language=language,
     )
 
     insights = (
