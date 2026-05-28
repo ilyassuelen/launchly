@@ -25,10 +25,14 @@ export function ResumePreview({
   resume,
 }: Props) {
   const sidebarSectionOrder =
-    resume.sidebarSectionOrder || [];
+      resume.sidebarSectionOrder?.length
+        ? resume.sidebarSectionOrder
+        : undefined;
 
   const mainSectionOrder =
-    resume.mainSectionOrder || [];
+      resume.mainSectionOrder?.length
+        ? resume.mainSectionOrder
+        : undefined;
 
   const websiteLabel =
     resume?.basics?.websiteLabel || "Website";
