@@ -3,6 +3,7 @@ from typing import Any
 from sqlalchemy.orm import Session
 
 from backend.app.models.resume.resume import Resume
+from backend.app.services.privacy.llm_privacy import prepare_data
 
 
 MAX_ITEMS_PER_CATEGORY = 18
@@ -575,7 +576,9 @@ def collect_interview_resume_context(
     candidate_levels = []
 
     for resume in resumes[:MAX_RESUMES_IN_CONTEXT]:
-        analysis = _extract_resume_analysis(resume)
+        analysis = prepare_data(
+            _extract_resume_analysis(resume),
+        )
 
         skills = _extract_skills(
             resume=resume,
@@ -630,21 +633,21 @@ def collect_interview_resume_context(
 
         resume_items.append({
             "id": getattr(resume, "id", None),
-            "title": _extract_resume_title(resume),
+            "title": prepare_data(_extract_resume_title(resume)),
             "ats_score": getattr(resume, "latest_ats_score", None),
-            "summary": summary,
-            "skills": _unique_strings(skills),
-            "tools": _unique_strings(tools),
-            "projects": _unique_strings(projects),
-            "experience": _unique_strings(experience),
-            "responsibilities": _unique_strings(responsibilities),
-            "education": _unique_strings(education),
-            "certifications": _unique_strings(certifications),
-            "achievements": _unique_strings(achievements),
-            "industries": _unique_strings(industries),
-            "keywords": _unique_strings(keywords),
-            "target_roles": _unique_strings(target_roles),
-            "candidate_level": candidate_level,
+            "summary": prepare_data(summary),
+            "skills": prepare_data(_unique_strings(skills)),
+            "tools": prepare_data(_unique_strings(tools)),
+            "projects": prepare_data(_unique_strings(projects)),
+            "experience": prepare_data(_unique_strings(experience)),
+            "responsibilities": prepare_data(_unique_strings(responsibilities)),
+            "education": prepare_data(_unique_strings(education)),
+            "certifications": prepare_data(_unique_strings(certifications)),
+            "achievements": prepare_data(_unique_strings(achievements)),
+            "industries": prepare_data(_unique_strings(industries)),
+            "keywords": prepare_data(_unique_strings(keywords)),
+            "target_roles": prepare_data(_unique_strings(target_roles)),
+            "candidate_level": prepare_data(candidate_level),
         })
 
         all_skills.extend(skills)
@@ -666,16 +669,16 @@ def collect_interview_resume_context(
         "resume_count": len(resumes),
         "used_resume_count": min(len(resumes), MAX_RESUMES_IN_CONTEXT),
         "resumes": resume_items,
-        "skills": _unique_strings(all_skills),
-        "tools": _unique_strings(all_tools),
-        "projects": _unique_strings(all_projects),
-        "experience": _unique_strings(all_experience),
-        "responsibilities": _unique_strings(all_responsibilities),
-        "education": _unique_strings(all_education),
-        "certifications": _unique_strings(all_certifications),
-        "achievements": _unique_strings(all_achievements),
-        "industries": _unique_strings(all_industries),
-        "keywords": _unique_strings(all_keywords),
-        "target_roles": _unique_strings(all_target_roles),
-        "candidate_levels": _unique_strings(candidate_levels),
+        "skills": prepare_data(_unique_strings(all_skills)),
+        "tools": prepare_data(_unique_strings(all_tools)),
+        "projects": prepare_data(_unique_strings(all_projects)),
+        "experience": prepare_data(_unique_strings(all_experience)),
+        "responsibilities": prepare_data(_unique_strings(all_responsibilities)),
+        "education": prepare_data(_unique_strings(all_education)),
+        "certifications": prepare_data(_unique_strings(all_certifications)),
+        "achievements": prepare_data(_unique_strings(all_achievements)),
+        "industries": prepare_data(_unique_strings(all_industries)),
+        "keywords": prepare_data(_unique_strings(all_keywords)),
+        "target_roles": prepare_data(_unique_strings(all_target_roles)),
+        "candidate_levels": prepare_data(_unique_strings(candidate_levels)),
     }

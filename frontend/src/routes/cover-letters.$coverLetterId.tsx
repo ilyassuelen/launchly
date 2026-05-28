@@ -318,6 +318,9 @@ const textareaClassName =
 
               job_posting:
                 coverLetter.jobPosting,
+
+              hiring_contact:
+                coverLetter.recipient?.contactName || "",
             });
 
           setCoverLetter(
@@ -739,9 +742,6 @@ const textareaClassName =
         }
 
         const resumeContext = `
-Name:
-${resume.personalInfo?.fullName || ""}
-
 Headline:
 ${resume.personalInfo?.headline || ""}
 

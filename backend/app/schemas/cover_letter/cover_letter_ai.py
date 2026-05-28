@@ -10,6 +10,7 @@ class CoverLetterGenerateRequest(BaseModel):
     skills: List[str] = []
     resume_context: str = ""
     job_posting: str
+    hiring_contact: str = ""
 
 
 class CoverLetterGenerateResponse(BaseModel):

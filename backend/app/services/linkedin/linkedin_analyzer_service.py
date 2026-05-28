@@ -25,6 +25,7 @@ from backend.app.schemas.linkedin.linkedin_analyzer import (
 from backend.app.services.linkedin.linkedin_profile_service import (
     save_linkedin_analysis,
 )
+from backend.app.services.privacy.llm_privacy import prepare_data
 
 logger = logging.getLogger(__name__)
 
@@ -216,13 +217,19 @@ async def analyze_linkedin_profile(
         ) / 4
     )
 
+    clean_headline = prepare_data(payload.headline)
+    clean_about = prepare_data(payload.about)
+    clean_skills = prepare_data(payload.skills)
+    clean_projects = prepare_data(payload.projects)
+    clean_target_role = prepare_data(payload.target_role)
+
     prompt = build_linkedin_analyzer_prompt(
         language=payload.language,
-        headline=payload.headline,
-        about=payload.about,
-        skills=payload.skills,
-        projects=payload.projects,
-        target_role=payload.target_role,
+        headline=clean_headline,
+        about=clean_about,
+        skills=clean_skills,
+        projects=clean_projects,
+        target_role=clean_target_role,
     )
 
     try:

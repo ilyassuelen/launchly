@@ -16,6 +16,8 @@ from backend.app.schemas.cover_letter.cover_letter_ai import (
     CoverLetterGenerateResponse,
 )
 
+from backend.app.services.privacy.llm_privacy import prepare_data
+
 client = AsyncOpenAI(
     api_key=settings.OPENAI_API_KEY,
 )
@@ -27,14 +29,27 @@ async def generate_cover_letter(
     payload: CoverLetterGenerateRequest,
 ) -> CoverLetterGenerateResponse:
 
+    clean_sender_name = prepare_data(payload.sender_name)
+    clean_current_role = prepare_data(payload.current_role)
+    clean_skills = prepare_data(payload.skills)
+    clean_resume_context = prepare_data(payload.resume_context)
+    clean_job_posting = prepare_data(payload.job_posting)
+
+    hiring_contact = getattr(
+        payload,
+        "hiring_contact",
+        "",
+    )
+
     prompt = build_cover_letter_prompt(
         language=payload.language,
         tone=payload.tone,
-        sender_name=payload.sender_name,
-        current_role=payload.current_role,
-        skills=payload.skills,
-        resume_context=payload.resume_context,
-        job_posting=payload.job_posting,
+        sender_name=clean_sender_name,
+        current_role=clean_current_role,
+        skills=clean_skills,
+        resume_context=clean_resume_context,
+        job_posting=clean_job_posting,
+        hiring_contact=hiring_contact,
     )
 
     try:

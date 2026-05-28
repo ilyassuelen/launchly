@@ -25,6 +25,7 @@ from backend.app.schemas.resume.resume_analysis import (
 from backend.app.services.resume.ats_score_service import (
     calculate_ats_score,
 )
+from backend.app.services.privacy.llm_privacy import prepare_data
 
 
 client = AsyncOpenAI(
@@ -274,11 +275,14 @@ async def analyze_resume(
     db: Session | None = None,
     user_id: int | None = None,
 ) -> ResumeAnalysisResponse:
+    clean_resume_content = prepare_data(payload.resume_content)
+    clean_target_role = prepare_data(payload.target_role or "")
+
     prompt = build_resume_analysis_prompt(
         tone=payload.tone,
         language=payload.language,
-        resume_content=payload.resume_content,
-        target_role=payload.target_role or "",
+        resume_content=clean_resume_content,
+        target_role=clean_target_role,
     )
 
     try:
@@ -333,8 +337,8 @@ async def analyze_resume(
     )
 
     ats_score = calculate_ats_score(
-        resume_content=payload.resume_content,
-        target_role=payload.target_role or "",
+        resume_content=clean_resume_content,
+        target_role=clean_target_role,
     )
 
     analysis = ResumeAnalysisResponse(

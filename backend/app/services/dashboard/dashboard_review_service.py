@@ -43,6 +43,8 @@ from backend.app.services.dashboard.dashboard_scoring_service import (
     score_to_grade,
 )
 
+from backend.app.services.privacy.llm_privacy import prepare_data
+
 client = AsyncOpenAI(
     api_key=settings.OPENAI_API_KEY,
 )
@@ -63,8 +65,10 @@ async def _run_llm_review(
         )
         return {}
 
+    clean_data = prepare_data(data)
+
     prompt = build_dashboard_review_prompt(
-        data=data,
+        data=clean_data,
         scores=scores,
         language=language,
     )

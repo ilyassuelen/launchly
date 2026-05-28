@@ -132,6 +132,7 @@ def build_cover_letter_prompt(
     skills: list[str],
     resume_context: str,
     job_posting: str,
+    hiring_contact: str = "",
 ):
     return f"""
 Generate a professional cover letter.
@@ -156,6 +157,9 @@ Resume information:
 
 Job posting:
 {job_posting}
+
+Hiring contact:
+{hiring_contact or "Not provided"}
 
 IMPORTANT:
 - Use the resume information to personalize the letter
@@ -184,6 +188,7 @@ IMPORTANT:
   - Kubeflow
 unless explicitly present in the provided candidate information
 - Include a professional greeting at the beginning
+- If a hiring contact is provided, use an appropriate direct greeting for that person. If no hiring contact is provided, use a neutral professional greeting.
 - Do NOT generate sign-offs
 - Do NOT include the candidate name at the end
 - Generate only the actual cover letter content

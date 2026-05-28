@@ -11,6 +11,7 @@ from backend.app.models.applications.application import Application
 from backend.app.models.interview.interview_result import InterviewResult
 from backend.app.models.dashboard.dashboard_snapshot import DashboardSnapshot
 from backend.app.models.dashboard.dashboard_review import DashboardReview
+from backend.app.services.privacy.llm_privacy import prepare_data
 
 
 MAX_ITEMS = 8
@@ -140,8 +141,12 @@ def _collect_latest_resume(
     if not resume:
         return {}
 
-    resume_data = _safe_dict(resume.data)
-    analysis = _safe_dict(resume.latest_resume_analysis)
+    resume_data = prepare_data(
+        _safe_dict(resume.data),
+    )
+    analysis = prepare_data(
+        _safe_dict(resume.latest_resume_analysis),
+    )
 
     return {
         "id": resume.id,
@@ -200,12 +205,16 @@ def _collect_recruiter_view(
     return {
         "count": len(analyses),
         "latest_score": latest.recruiter_score if latest else None,
-        "latest_analysis": _safe_dict(latest.analysis) if latest else {},
+        "latest_analysis": prepare_data(
+            _safe_dict(latest.analysis),
+        ) if latest else {},
         "recent": [
             {
                 "resume_id": item.resume_id,
                 "recruiter_score": item.recruiter_score,
-                "analysis": _safe_dict(item.analysis),
+                "analysis": prepare_data(
+                    _safe_dict(item.analysis),
+                ),
                 "analyzed_at": _serialize_date(item.analyzed_at),
             }
             for item in analyses
@@ -228,13 +237,15 @@ def _collect_linkedin(
         return {}
 
     return {
-        "headline": profile.headline,
-        "about": profile.about,
-        "skills": profile.skills or [],
-        "projects": profile.projects or [],
-        "target_role": profile.target_role,
+        "headline": prepare_data(profile.headline),
+        "about": prepare_data(profile.about),
+        "skills": prepare_data(profile.skills or []),
+        "projects": prepare_data(profile.projects or []),
+        "target_role": prepare_data(profile.target_role),
         "latest_profile_score": profile.latest_profile_score,
-        "analysis": _safe_dict(profile.analysis),
+        "analysis": prepare_data(
+            _safe_dict(profile.analysis),
+        ),
         "analyzed_at": _serialize_date(profile.analyzed_at),
     }
 
@@ -254,9 +265,11 @@ def _collect_portfolio(
         return {}
 
     return {
-        "github_username": profile.github_username,
+        "github_username": prepare_data(profile.github_username),
         "language": profile.language,
-        "analysis": _safe_dict(profile.analysis),
+        "analysis": prepare_data(
+            _safe_dict(profile.analysis),
+        ),
     }
 
 
@@ -284,12 +297,12 @@ def _collect_applications(
         "status_counts": status_counts,
         "recent": [
             {
-                "company_name": application.company_name,
-                "job_title": application.job_title,
+                "company_name": prepare_data(application.company_name),
+                "job_title": prepare_data(application.job_title),
                 "status": application.status,
                 "applied_date": _serialize_date(application.applied_date),
                 "follow_up_date": _serialize_date(application.follow_up_date),
-                "notes": _safe_text(application.notes),
+                "notes": prepare_data(_safe_text(application.notes)),
             }
             for application in applications
         ],
@@ -314,7 +327,7 @@ def _collect_interviews(
     return {
         "count": len(results),
         "latest": {
-            "role": latest.role,
+            "role": prepare_data(latest.role),
             "mode": latest.mode,
             "difficulty": latest.difficulty,
             "overall_score": latest.overall_score,
@@ -322,17 +335,17 @@ def _collect_interviews(
             "communication_score": latest.communication_score,
             "structure_score": latest.structure_score,
             "specificity_score": latest.specificity_score,
-            "strengths": latest.strengths or [],
-            "weaknesses": latest.weaknesses or [],
-            "recruiter_insights": latest.recruiter_insights or [],
-            "coaching_tips": latest.coaching_tips or [],
+            "strengths": prepare_data(latest.strengths or []),
+            "weaknesses": prepare_data(latest.weaknesses or []),
+            "recruiter_insights": prepare_data(latest.recruiter_insights or []),
+            "coaching_tips": prepare_data(latest.coaching_tips or []),
             "created_at": _serialize_date(latest.created_at),
         }
         if latest
         else {},
         "recent": [
             {
-                "role": item.role,
+                "role": prepare_data(item.role),
                 "mode": item.mode,
                 "difficulty": item.difficulty,
                 "overall_score": item.overall_score,
@@ -340,9 +353,9 @@ def _collect_interviews(
                 "communication_score": item.communication_score,
                 "structure_score": item.structure_score,
                 "specificity_score": item.specificity_score,
-                "strengths": item.strengths or [],
-                "weaknesses": item.weaknesses or [],
-                "coaching_tips": item.coaching_tips or [],
+                "strengths": prepare_data(item.strengths or []),
+                "weaknesses": prepare_data(item.weaknesses or []),
+                "coaching_tips": prepare_data(item.coaching_tips or []),
                 "created_at": _serialize_date(item.created_at),
             }
             for item in results
@@ -378,21 +391,21 @@ def _collect_dashboard(
             "portfolio_score": snapshot.portfolio_score,
             "applications_score": snapshot.applications_score,
             "interview_readiness_score": snapshot.interview_readiness_score,
-            "summary": snapshot.summary or {},
+            "summary": prepare_data(snapshot.summary or {}),
             "profile_strength": snapshot.profile_strength or {},
             "career_growth": snapshot.career_growth or [],
-            "missing_skills": snapshot.missing_skills or [],
-            "skill_gaps": snapshot.skill_gaps or [],
-            "next_best_actions": snapshot.next_best_actions or [],
-            "weekly_plan": snapshot.weekly_plan or [],
+            "missing_skills": prepare_data(snapshot.missing_skills or []),
+            "skill_gaps": prepare_data(snapshot.skill_gaps or []),
+            "next_best_actions": prepare_data(snapshot.next_best_actions or []),
+            "weekly_plan": prepare_data(snapshot.weekly_plan or []),
             "created_at": _serialize_date(snapshot.created_at),
         }
         if snapshot
         else {},
         "latest_review": {
             "status": review.status,
-            "input_data": review.input_data or {},
-            "result": review.result or {},
+            "input_data": prepare_data(review.input_data or {}),
+            "result": prepare_data(review.result or {}),
             "created_at": _serialize_date(review.created_at),
         }
         if review

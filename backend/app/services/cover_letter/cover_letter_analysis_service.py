@@ -18,6 +18,7 @@ from backend.app.schemas.cover_letter.cover_letter_analysis import (
     SmartSuggestion,
     RecruiterAnalysis,
 )
+from backend.app.services.privacy.llm_privacy import prepare_data
 
 logger = logging.getLogger(__name__)
 
@@ -29,13 +30,15 @@ client = AsyncOpenAI(
 async def analyze_cover_letter(
     payload: CoverLetterAnalysisRequest,
 ) -> CoverLetterAnalysisResponse:
-
+    clean_job_posting = prepare_data(payload.job_posting)
+    clean_subject = prepare_data(payload.subject)
+    clean_body = prepare_data(payload.body)
     prompt = build_cover_letter_analysis_prompt(
         tone=payload.tone,
         language=payload.language,
-        job_posting=payload.job_posting,
-        subject=payload.subject,
-        body=payload.body,
+        job_posting=clean_job_posting,
+        subject=clean_subject,
+        body=clean_body,
     )
 
     try:

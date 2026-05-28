@@ -65,6 +65,7 @@ export async function generateAICoverLetter(
     skills: string[];
     resume_context: string;
     job_posting: string;
+    hiring_contact?: string;
   },
 ) {
   return apiFetch(

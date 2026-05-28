@@ -24,6 +24,8 @@ from backend.app.schemas.recruiter.recruiter_view import (
     RecruiterFeedbackCard,
 )
 
+from backend.app.services.privacy.llm_privacy import prepare_data
+
 client = AsyncOpenAI(
     api_key=settings.OPENAI_API_KEY,
 )
@@ -164,10 +166,13 @@ async def analyze_recruiter_view(
     db: Session | None = None,
     user_id: int | None = None,
 ) -> RecruiterViewResponse:
+    clean_resume_content = prepare_data(payload.resume_content)
+    clean_target_role = prepare_data(payload.target_role or "")
+
     prompt = build_recruiter_view_prompt(
         language=payload.language,
-        resume_content=payload.resume_content,
-        target_role=payload.target_role or "",
+        resume_content=clean_resume_content,
+        target_role=clean_target_role,
     )
 
     try:
@@ -218,7 +223,7 @@ async def analyze_recruiter_view(
         ) from exc
 
     signals = calculate_recruiter_signals(
-        payload.resume_content,
+        clean_resume_content,
     )
 
     recruiter_score = int(
