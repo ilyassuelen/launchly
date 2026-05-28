@@ -103,6 +103,25 @@ def delete_resume_photo(
         return
 
 
+def delete_resume_photos(
+    photo_urls: list[str],
+):
+    """
+    Delete multiple resume photos from Cloudflare R2.
+    Used when an account is deleted and all saved resume photos
+    should be cleaned up before the user row is removed.
+    """
+
+    seen_photo_urls = set()
+
+    for photo_url in photo_urls:
+        if not photo_url or photo_url in seen_photo_urls:
+            continue
+
+        seen_photo_urls.add(photo_url)
+        delete_resume_photo(photo_url)
+
+
 async def save_resume_photo(
     file: UploadFile,
     user_id: int,

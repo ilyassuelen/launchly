@@ -5,6 +5,8 @@ from backend.app.core.database import get_db
 from backend.app.core.deps import get_current_user
 from backend.app.core.security import hash_password, verify_password
 from backend.app.models.user.user import User
+from backend.app.models.resume.resume import Resume
+from backend.app.services.storage.resume_photo_storage import delete_resume_photos
 from backend.app.schemas.user.user import (
     UpdatePasswordRequest,
     UpdateUserRequest,
@@ -125,6 +127,24 @@ def delete_me(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    resumes = (
+        db.query(Resume)
+        .filter(Resume.user_id == current_user.id)
+        .all()
+    )
+
+    photo_urls = []
+
+    for resume in resumes:
+        resume_data = resume.data or {}
+        basics = resume_data.get("basics") or {}
+        photo_url = basics.get("photo")
+
+        if photo_url:
+            photo_urls.append(photo_url)
+
+    delete_resume_photos(photo_urls)
+
     db.delete(current_user)
     db.commit()
 
