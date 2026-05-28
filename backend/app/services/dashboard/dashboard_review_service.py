@@ -1,4 +1,5 @@
 import json
+import logging
 
 from openai import AsyncOpenAI
 from sqlalchemy.orm import Session
@@ -46,6 +47,8 @@ client = AsyncOpenAI(
     api_key=settings.OPENAI_API_KEY,
 )
 
+logger = logging.getLogger(__name__)
+
 
 async def _run_llm_review(
     *,
@@ -54,6 +57,10 @@ async def _run_llm_review(
     language: str,
 ) -> dict:
     if not settings.OPENAI_API_KEY:
+        logger.warning(
+            "Dashboard review using fallback because OPENAI_API_KEY is missing language=%s",
+            language,
+        )
         return {}
 
     prompt = build_dashboard_review_prompt(
@@ -61,31 +68,53 @@ async def _run_llm_review(
         scores=scores,
         language=language,
     )
-
-    response = await client.chat.completions.create(
-        model="gpt-4o-mini",
-        temperature=0.4,
-        response_format={
-            "type": "json_object",
-        },
-        messages=[
-            {
-                "role": "system",
-                "content": DASHBOARD_REVIEW_SYSTEM_PROMPT,
+    try:
+        response = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            temperature=0.4,
+            response_format={
+                "type": "json_object",
             },
-            {
-                "role": "user",
-                "content": prompt,
-            },
-        ],
-    )
+            messages=[
+                {
+                    "role": "system",
+                    "content": DASHBOARD_REVIEW_SYSTEM_PROMPT,
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ],
+        )
+    except Exception:
+        logger.exception(
+            "Dashboard review AI request failed language=%s career_score=%s",
+            language,
+            scores.get("career_score"),
+        )
+        return {}
 
-    content = response.choices[0].message.content
+    content = response.choices[0].message.content or "{}"
 
     try:
-        return json.loads(content)
+        parsed = json.loads(content)
     except Exception:
+        logger.exception(
+            "Dashboard review JSON parsing failed language=%s response_preview=%s",
+            language,
+            content[:500],
+        )
         return {}
+
+    if not isinstance(parsed, dict):
+        logger.error(
+            "Dashboard review AI response is not a dictionary language=%s response_type=%s",
+            language,
+            type(parsed).__name__,
+        )
+        return {}
+
+    return parsed
 
 
 def _normalize_list(
@@ -183,47 +212,57 @@ async def build_dashboard_review(
     snapshot = None
 
     if persist:
-        snapshot = DashboardSnapshot(
-            user_id=user_id,
-            language=language,
-            career_score=scores["career_score"],
-            recruiter_impression_score=scores["recruiter_score"],
-            resume_health_score=scores["resume_score"],
-            linkedin_score=scores["linkedin_score"],
-            portfolio_score=scores["portfolio_score"],
-            applications_score=scores["applications_score"],
-            interview_readiness_score=scores["interview_score"],
-            summary={
-                **scores,
-                "market_fit": market_fit,
-            },
-            profile_strength=profile_strength,
-            career_growth=career_growth,
-            application_pipeline=application_pipeline,
-            insights=insights,
-            missing_skills=missing_skills,
-            activity=activity,
-            market_fit=market_fit,
-            next_best_actions=next_best_actions,
-            system_health=system_health,
-            weekly_plan=weekly_plan,
-            skill_gaps=missing_skills,
-            review_payload=review_payload,
-        )
+        try:
+            snapshot = DashboardSnapshot(
+                user_id=user_id,
+                language=language,
+                career_score=scores["career_score"],
+                recruiter_impression_score=scores["recruiter_score"],
+                resume_health_score=scores["resume_score"],
+                linkedin_score=scores["linkedin_score"],
+                portfolio_score=scores["portfolio_score"],
+                applications_score=scores["applications_score"],
+                interview_readiness_score=scores["interview_score"],
+                summary={
+                    **scores,
+                    "market_fit": market_fit,
+                },
+                profile_strength=profile_strength,
+                career_growth=career_growth,
+                application_pipeline=application_pipeline,
+                insights=insights,
+                missing_skills=missing_skills,
+                activity=activity,
+                market_fit=market_fit,
+                next_best_actions=next_best_actions,
+                system_health=system_health,
+                weekly_plan=weekly_plan,
+                skill_gaps=missing_skills,
+                review_payload=review_payload,
+            )
 
-        db.add(snapshot)
-        db.commit()
-        db.refresh(snapshot)
+            db.add(snapshot)
+            db.commit()
+            db.refresh(snapshot)
 
-        review = DashboardReview(
-            user_id=user_id,
-            status="completed",
-            input_data=data,
-            result=review_payload,
-        )
+            review = DashboardReview(
+                user_id=user_id,
+                status="completed",
+                input_data=data,
+                result=review_payload,
+            )
 
-        db.add(review)
-        db.commit()
+            db.add(review)
+            db.commit()
+        except Exception:
+            db.rollback()
+            logger.exception(
+                "Failed to persist dashboard review user_id=%s language=%s career_score=%s",
+                user_id,
+                language,
+                scores.get("career_score"),
+            )
+            raise
 
     return DashboardSummaryResponse(
         id=snapshot.id if snapshot else None,

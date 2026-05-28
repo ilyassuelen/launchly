@@ -1,4 +1,5 @@
 from io import BytesIO
+import logging
 from uuid import uuid4
 
 import boto3
@@ -7,6 +8,8 @@ from fastapi import HTTPException, UploadFile
 from PIL import Image
 
 from backend.app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 MAX_FILE_SIZE = 5 * 1024 * 1024
 MAX_IMAGE_SIZE = (512, 512)
@@ -28,6 +31,9 @@ def _get_r2_client():
     ]
 
     if not all(required_values):
+        logger.error(
+            "Cloudflare R2 storage configuration is incomplete",
+        )
         raise HTTPException(
             status_code=500,
             detail="Cloudflare R2 storage is not configured",
@@ -89,7 +95,16 @@ def delete_resume_photo(
 
     object_key = _extract_object_key(photo_url)
 
+    logger.info(
+        "Attempting to delete resume photo object_key=%s",
+        object_key,
+    )
+
     if not object_key:
+        logger.warning(
+            "Skipping resume photo deletion because object key could not be extracted photo_url=%s",
+            photo_url,
+        )
         return
 
     client = _get_r2_client()
@@ -99,7 +114,15 @@ def delete_resume_photo(
             Bucket=settings.R2_BUCKET_NAME,
             Key=object_key,
         )
+        logger.info(
+            "Deleted resume photo object_key=%s",
+            object_key,
+        )
     except (BotoCoreError, ClientError):
+        logger.exception(
+            "Failed to delete resume photo object_key=%s",
+            object_key,
+        )
         return
 
 
@@ -116,10 +139,19 @@ def delete_resume_photos(
 
     for photo_url in photo_urls:
         if not photo_url or photo_url in seen_photo_urls:
+            logger.info(
+                "Skipping duplicate or empty resume photo during cleanup photo_url=%s",
+                photo_url,
+            )
             continue
 
         seen_photo_urls.add(photo_url)
         delete_resume_photo(photo_url)
+
+    logger.info(
+        "Completed bulk resume photo cleanup total_unique_photos=%s",
+        len(seen_photo_urls),
+    )
 
 
 async def save_resume_photo(
@@ -133,7 +165,20 @@ async def save_resume_photo(
 
     contents = await file.read()
 
+    logger.info(
+        "Received resume photo upload user_id=%s filename=%s size_bytes=%s",
+        user_id,
+        file.filename,
+        len(contents),
+    )
+
     if len(contents) > MAX_FILE_SIZE:
+        logger.warning(
+            "Resume photo exceeds size limit user_id=%s filename=%s size_bytes=%s",
+            user_id,
+            file.filename,
+            len(contents),
+        )
         raise HTTPException(
             status_code=400,
             detail="Image exceeds 5MB limit",
@@ -144,6 +189,11 @@ async def save_resume_photo(
         image = image.convert("RGB")
         image.thumbnail(MAX_IMAGE_SIZE)
     except Exception as exc:
+        logger.exception(
+            "Invalid resume image upload user_id=%s filename=%s",
+            user_id,
+            file.filename,
+        )
         raise HTTPException(
             status_code=400,
             detail="Invalid image file",
@@ -162,6 +212,11 @@ async def save_resume_photo(
 
     filename = f"user_{user_id}_{uuid4()}.jpg"
     object_key = f"{R2_FOLDER}/{filename}"
+    logger.info(
+        "Uploading optimized resume photo user_id=%s object_key=%s",
+        user_id,
+        object_key,
+    )
 
     client = _get_r2_client()
 
@@ -174,9 +229,20 @@ async def save_resume_photo(
             CacheControl="public, max-age=31536000, immutable",
         )
     except (BotoCoreError, ClientError) as exc:
+        logger.exception(
+            "Failed to upload resume photo user_id=%s object_key=%s",
+            user_id,
+            object_key,
+        )
         raise HTTPException(
             status_code=500,
             detail="Failed to upload resume photo",
         ) from exc
+
+    logger.info(
+        "Successfully uploaded resume photo user_id=%s object_key=%s",
+        user_id,
+        object_key,
+    )
 
     return _build_public_url(object_key)

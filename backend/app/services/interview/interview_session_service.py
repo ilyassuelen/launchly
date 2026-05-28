@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 from fastapi import HTTPException
@@ -35,9 +36,14 @@ from backend.app.services.interview.interview_evaluation_service import (
     evaluate_interview_session,
 )
 
+logger = logging.getLogger(__name__)
+
 
 def _get_client() -> AsyncOpenAI:
     if not settings.OPENAI_API_KEY:
+        logger.error(
+            "Interview session failed because OPENAI_API_KEY is missing",
+        )
         raise HTTPException(
             status_code=500,
             detail="OpenAI API key is not configured.",
@@ -55,25 +61,42 @@ async def _generate_ai_message(
 ) -> str:
     client = _get_client()
 
-    response = await client.chat.completions.create(
-        model="gpt-4o-mini",
-        temperature=0.55,
-        messages=[
-            {
-                "role": "system",
-                "content": system_prompt,
-            },
-            {
-                "role": "user",
-                "content": user_prompt,
-            },
-        ],
-    )
+    try:
+        response = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            temperature=0.55,
+            messages=[
+                {
+                    "role": "system",
+                    "content": system_prompt,
+                },
+                {
+                    "role": "user",
+                    "content": user_prompt,
+                },
+            ],
+        )
+    except Exception:
+        logger.exception(
+            "Failed to generate interview message",
+        )
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to generate interview message.",
+        )
 
-    return (
+    content = (
         response.choices[0].message.content
-        or "Tell me more about your experience."
+        or ""
     ).strip()
+
+    if not content:
+        logger.warning(
+            "Interview AI returned empty message",
+        )
+        return "Tell me more about your experience."
+
+    return content
 
 
 def _message_to_response(
@@ -186,9 +209,28 @@ async def start_interview_session(
         session_context=session_context,
     )
 
-    db.add(session)
-    db.commit()
-    db.refresh(session)
+    try:
+        db.add(session)
+        db.commit()
+        db.refresh(session)
+    except Exception:
+        db.rollback()
+        logger.exception(
+            "Failed to create interview session user_id=%s role=%s mode=%s",
+            user_id,
+            payload.role,
+            payload.mode,
+        )
+        raise
+
+    logger.info(
+        "Started interview session user_id=%s session_id=%s role=%s mode=%s difficulty=%s",
+        user_id,
+        session.id,
+        payload.role,
+        payload.mode,
+        payload.difficulty,
+    )
 
     system_prompt = build_interview_system_prompt(
         language=payload.language,
@@ -212,9 +254,18 @@ async def start_interview_session(
         meta={},
     )
 
-    db.add(first_message)
-    db.commit()
-    db.refresh(first_message)
+    try:
+        db.add(first_message)
+        db.commit()
+        db.refresh(first_message)
+    except Exception:
+        db.rollback()
+        logger.exception(
+            "Failed to save first interview message user_id=%s session_id=%s",
+            user_id,
+            session.id,
+        )
+        raise
 
     return InterviewStartResponse(
         session=_session_to_response(session),
@@ -291,6 +342,13 @@ async def submit_interview_answer(
             detail="Interview session is already completed.",
         )
 
+    logger.info(
+        "Interview answer submitted user_id=%s session_id=%s question_index=%s",
+        user_id,
+        session.id,
+        session.current_question_index,
+    )
+
     user_message = InterviewMessage(
         session_id=session.id,
         user_id=user_id,
@@ -301,9 +359,19 @@ async def submit_interview_answer(
         meta={},
     )
 
-    db.add(user_message)
-    db.commit()
-    db.refresh(user_message)
+    try:
+        db.add(user_message)
+        db.commit()
+        db.refresh(user_message)
+    except Exception:
+        db.rollback()
+        logger.exception(
+            "Failed to save interview user message user_id=%s session_id=%s question_index=%s",
+            user_id,
+            session.id,
+            session.current_question_index,
+        )
+        raise
 
     if session.current_question_index >= session.max_questions:
         closing_message = InterviewMessage(
@@ -321,16 +389,39 @@ async def submit_interview_answer(
         session.status = "completed"
         session.ended_at = datetime.utcnow()
 
-        db.add(closing_message)
-        db.commit()
-        db.refresh(session)
-        db.refresh(closing_message)
+        try:
+            db.add(closing_message)
+            db.commit()
+            db.refresh(session)
+            db.refresh(closing_message)
+        except Exception:
+            db.rollback()
+            logger.exception(
+                "Failed to complete interview session user_id=%s session_id=%s",
+                user_id,
+                session.id,
+            )
+            raise
 
-        result = await evaluate_interview_session(
-            db=db,
-            user_id=user_id,
-            session_id=session.id,
+        logger.info(
+            "Completed interview session user_id=%s session_id=%s",
+            user_id,
+            session.id,
         )
+
+        try:
+            result = await evaluate_interview_session(
+                db=db,
+                user_id=user_id,
+                session_id=session.id,
+            )
+        except Exception:
+            logger.exception(
+                "Failed to evaluate completed interview session user_id=%s session_id=%s",
+                user_id,
+                session.id,
+            )
+            result = None
 
         return InterviewAnswerResponse(
             session=_session_to_response(session),
@@ -373,10 +464,20 @@ async def submit_interview_answer(
 
     session.current_question_index = next_question_index
 
-    db.add(ai_message)
-    db.commit()
-    db.refresh(session)
-    db.refresh(ai_message)
+    try:
+        db.add(ai_message)
+        db.commit()
+        db.refresh(session)
+        db.refresh(ai_message)
+    except Exception:
+        db.rollback()
+        logger.exception(
+            "Failed to save next interview question user_id=%s session_id=%s question_index=%s",
+            user_id,
+            session.id,
+            next_question_index,
+        )
+        raise
 
     return InterviewAnswerResponse(
         session=_session_to_response(session),
@@ -402,10 +503,23 @@ def delete_all_interview_sessions(
     for session in sessions:
         db.delete(session)
 
-    db.commit()
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        logger.exception(
+            "Failed to delete interview sessions user_id=%s",
+            user_id,
+        )
+        raise
+
+    logger.info(
+        "Deleted interview sessions user_id=%s deleted_count=%s",
+        user_id,
+        deleted_count,
+    )
 
     return {
         "success": True,
         "deleted_sessions": deleted_count,
     }
-

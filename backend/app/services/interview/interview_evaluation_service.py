@@ -1,4 +1,5 @@
 import json
+import logging
 
 from fastapi import HTTPException
 from openai import AsyncOpenAI
@@ -17,6 +18,8 @@ from backend.app.prompts.interview.interview_prompts import (
     build_interview_evaluation_prompt,
 )
 
+
+logger = logging.getLogger(__name__)
 
 
 def _score_from_label(value) -> int | None:
@@ -218,6 +221,9 @@ def _safe_string(value) -> str | None:
 
 def _get_client() -> AsyncOpenAI:
     if not settings.OPENAI_API_KEY:
+        logger.error(
+            "Interview evaluation failed because OPENAI_API_KEY is missing",
+        )
         raise HTTPException(
             status_code=500,
             detail="OpenAI API key is not configured.",
@@ -266,30 +272,56 @@ async def _run_interview_evaluation(
         ],
     )
 
-    response = await client.chat.completions.create(
-        model="gpt-4o-mini",
-        temperature=0.25,
-        response_format={
-            "type": "json_object",
-        },
-        messages=[
-            {
-                "role": "system",
-                "content": INTERVIEW_EVALUATION_SYSTEM_PROMPT,
+    try:
+        response = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            temperature=0.3,
+            response_format={
+                "type": "json_object",
             },
-            {
-                "role": "user",
-                "content": prompt,
-            },
-        ],
-    )
+            messages=[
+                {
+                    "role": "system",
+                    "content": INTERVIEW_EVALUATION_SYSTEM_PROMPT,
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ],
+        )
+
+    except Exception:
+        logger.exception(
+            "Interview evaluation AI request failed session_id=%s role=%s difficulty=%s",
+            session.id,
+            session.role,
+            session.difficulty,
+        )
+        return {}
 
     content = response.choices[0].message.content or "{}"
 
     try:
-        return json.loads(content)
+        parsed = json.loads(content)
+
     except Exception:
+        logger.exception(
+            "Interview evaluation JSON parsing failed session_id=%s response_preview=%s",
+            session.id,
+            content[:500],
+        )
         return {}
+
+    if not isinstance(parsed, dict):
+        logger.error(
+            "Interview evaluation response is not a dictionary session_id=%s response_type=%s",
+            session.id,
+            type(parsed).__name__,
+        )
+        return {}
+
+    return parsed
 
 
 def _build_fallback_evaluation(
@@ -428,6 +460,13 @@ async def evaluate_interview_session(
         .all()
     )
 
+    logger.info(
+        "Starting interview evaluation session_id=%s user_id=%s message_count=%s",
+        session.id,
+        user_id,
+        len(messages),
+    )
+
     llm_evaluation = await _run_interview_evaluation(
         session=session,
         messages=messages,
@@ -485,8 +524,26 @@ async def evaluate_interview_session(
         raw_evaluation=evaluation,
     )
 
-    db.add(result)
-    db.commit()
-    db.refresh(result)
+    try:
+        db.add(result)
+        db.commit()
+        db.refresh(result)
+
+    except Exception:
+        db.rollback()
+
+        logger.exception(
+            "Failed to persist interview evaluation session_id=%s user_id=%s",
+            session.id,
+            user_id,
+        )
+
+        raise
+
+    logger.info(
+        "Interview evaluation completed session_id=%s overall_score=%s",
+        session.id,
+        result.overall_score,
+    )
 
     return _result_to_response(result)

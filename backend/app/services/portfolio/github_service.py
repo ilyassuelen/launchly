@@ -1,4 +1,5 @@
 import base64
+import logging
 from typing import List
 
 import httpx
@@ -10,6 +11,8 @@ from backend.app.schemas.portfolio.portfolio_analyzer import (
     GitHubRepository,
 )
 
+
+logger = logging.getLogger(__name__)
 
 GITHUB_API_BASE = "https://api.github.com"
 
@@ -40,10 +43,20 @@ async def fetch_github_profile(
         )
 
     async with httpx.AsyncClient(timeout=20) as client:
-        response = await client.get(
-            f"{GITHUB_API_BASE}/users/{username}",
-            headers=_get_github_headers(),
-        )
+        try:
+            response = await client.get(
+                f"{GITHUB_API_BASE}/users/{username}",
+                headers=_get_github_headers(),
+            )
+        except Exception:
+            logger.exception(
+                "Failed to fetch GitHub profile username=%s",
+                username,
+            )
+            raise HTTPException(
+                status_code=502,
+                detail="Failed to fetch GitHub profile",
+            )
 
         if response.status_code == 404:
             raise HTTPException(
@@ -52,12 +65,23 @@ async def fetch_github_profile(
             )
 
         if response.status_code >= 400:
+            logger.warning(
+                "GitHub profile request failed username=%s status_code=%s",
+                username,
+                response.status_code,
+            )
             raise HTTPException(
                 status_code=502,
                 detail="Failed to fetch GitHub profile",
             )
 
         data = response.json()
+        logger.info(
+            "Fetched GitHub profile username=%s followers=%s following=%s",
+            username,
+            data.get("followers", 0),
+            data.get("following", 0),
+        )
 
         return GitHubProfile(
             username=data.get("login", username),
@@ -77,15 +101,29 @@ async def _fetch_readme(
 ) -> str:
     url = f"{GITHUB_API_BASE}/repos/{username}/{repo_name}/readme"
 
-    response = await client.get(
-        url,
-        headers=_get_github_headers(),
-    )
+    try:
+        response = await client.get(
+            url,
+            headers=_get_github_headers(),
+        )
+    except Exception:
+        logger.exception(
+            "Failed to fetch GitHub README username=%s repo=%s",
+            username,
+            repo_name,
+        )
+        return ""
 
     if response.status_code == 404:
         return ""
 
     if response.status_code >= 400:
+        logger.warning(
+            "GitHub README request failed username=%s repo=%s status_code=%s",
+            username,
+            repo_name,
+            response.status_code,
+        )
         return ""
 
     data = response.json()
@@ -102,6 +140,11 @@ async def _fetch_readme(
         return decoded[:8000]
 
     except Exception:
+        logger.exception(
+            "Failed to decode GitHub README username=%s repo=%s",
+            username,
+            repo_name,
+        )
         return ""
 
 
@@ -117,15 +160,25 @@ async def fetch_github_repositories(
         )
 
     async with httpx.AsyncClient(timeout=20) as client:
-        repos_response = await client.get(
-            f"{GITHUB_API_BASE}/users/{username}/repos",
-            headers=_get_github_headers(),
-            params={
-                "sort": "updated",
-                "direction": "desc",
-                "per_page": 20,
-            },
-        )
+        try:
+            repos_response = await client.get(
+                f"{GITHUB_API_BASE}/users/{username}/repos",
+                headers=_get_github_headers(),
+                params={
+                    "sort": "updated",
+                    "direction": "desc",
+                    "per_page": 20,
+                },
+            )
+        except Exception:
+            logger.exception(
+                "Failed to fetch GitHub repositories username=%s",
+                username,
+            )
+            raise HTTPException(
+                status_code=502,
+                detail="Failed to fetch GitHub repositories",
+            )
 
         if repos_response.status_code == 404:
             raise HTTPException(
@@ -134,17 +187,32 @@ async def fetch_github_repositories(
             )
 
         if repos_response.status_code >= 400:
+            logger.warning(
+                "GitHub repositories request failed username=%s status_code=%s",
+                username,
+                repos_response.status_code,
+            )
             raise HTTPException(
                 status_code=502,
                 detail="Failed to fetch GitHub repositories",
             )
 
         repos_data = repos_response.json()
+        logger.info(
+            "Fetched GitHub repositories username=%s repository_count=%s",
+            username,
+            len(repos_data),
+        )
 
         repositories: List[GitHubRepository] = []
 
         for repo in repos_data:
             if repo.get("fork"):
+                logger.info(
+                    "Skipped forked repository username=%s repo=%s",
+                    username,
+                    repo.get("name", ""),
+                )
                 continue
 
             repo_name = repo.get("name", "")
@@ -170,5 +238,16 @@ async def fetch_github_repositories(
                     readme=readme,
                 )
             )
+            logger.info(
+                "Processed GitHub repository username=%s repo=%s stars=%s",
+                username,
+                repo_name,
+                repo.get("stargazers_count", 0),
+            )
 
+        logger.info(
+            "Completed GitHub repository sync username=%s processed_count=%s",
+            username,
+            len(repositories),
+        )
         return repositories

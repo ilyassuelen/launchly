@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import datetime
 from typing import Any
 
@@ -25,9 +26,12 @@ from backend.app.services.resume.ats_score_service import (
     calculate_ats_score,
 )
 
+
 client = AsyncOpenAI(
     api_key=settings.OPENAI_API_KEY,
 )
+
+logger = logging.getLogger(__name__)
 
 
 STRUCTURED_RESUME_KEYS = [
@@ -277,33 +281,51 @@ async def analyze_resume(
         target_role=payload.target_role or "",
     )
 
-    response = await client.chat.completions.create(
-        model="gpt-4o-mini",
-        temperature=0.35,
-        response_format={
-            "type": "json_object",
-        },
-        messages=[
-            {
-                "role": "system",
-                "content": RESUME_ANALYSIS_SYSTEM_PROMPT,
+    try:
+        response = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            temperature=0.35,
+            response_format={
+                "type": "json_object",
             },
-            {
-                "role": "user",
-                "content": prompt,
-            },
-        ],
-    )
+            messages=[
+                {
+                    "role": "system",
+                    "content": RESUME_ANALYSIS_SYSTEM_PROMPT,
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ],
+        )
+    except Exception as exc:
+        logger.exception(
+            "Resume analysis AI request failed for user_id=%s resume_id=%s target_role=%s",
+            user_id,
+            payload.resume_id,
+            payload.target_role,
+        )
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to analyze resume",
+        ) from exc
 
     content = response.choices[0].message.content or "{}"
 
     try:
         parsed = json.loads(content)
-    except Exception:
+    except Exception as exc:
+        logger.exception(
+            "Resume analysis JSON parsing failed for user_id=%s resume_id=%s response_preview=%s",
+            user_id,
+            payload.resume_id,
+            content[:500],
+        )
         raise HTTPException(
             status_code=500,
-            detail="Invalid AI response format",
-        )
+            detail="Invalid response format",
+        ) from exc
 
     parsed = _safe_dict(parsed)
     parsed["smart_suggestions"] = _normalize_smart_suggestions(
@@ -332,13 +354,26 @@ async def analyze_resume(
     )
 
     if payload.resume_id and db and user_id:
-        _save_resume_analysis(
-            db=db,
-            user_id=user_id,
-            resume_id=payload.resume_id,
-            analysis=analysis,
-            raw_analysis=parsed,
-            structured_resume_data=structured_resume_data,
-        )
+        try:
+            _save_resume_analysis(
+                db=db,
+                user_id=user_id,
+                resume_id=payload.resume_id,
+                analysis=analysis,
+                raw_analysis=parsed,
+                structured_resume_data=structured_resume_data,
+            )
+        except HTTPException:
+            raise
+        except Exception as exc:
+            logger.exception(
+                "Failed to persist resume analysis for user_id=%s resume_id=%s",
+                user_id,
+                payload.resume_id,
+            )
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to save resume analysis",
+            ) from exc
 
     return analysis

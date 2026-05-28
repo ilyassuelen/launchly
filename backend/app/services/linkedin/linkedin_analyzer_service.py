@@ -1,4 +1,5 @@
 import json
+import logging
 import re
 
 from fastapi import HTTPException
@@ -24,6 +25,8 @@ from backend.app.schemas.linkedin.linkedin_analyzer import (
 from backend.app.services.linkedin.linkedin_profile_service import (
     save_linkedin_analysis,
 )
+
+logger = logging.getLogger(__name__)
 
 client = AsyncOpenAI(
     api_key=settings.OPENAI_API_KEY,
@@ -222,39 +225,89 @@ async def analyze_linkedin_profile(
         target_role=payload.target_role,
     )
 
-    response = await client.chat.completions.create(
-        model="gpt-4o-mini",
-        temperature=0.4,
-        response_format={
-            "type": "json_object",
-        },
-        messages=[
-            {
-                "role": "system",
-                "content": LINKEDIN_ANALYZER_SYSTEM_PROMPT,
+    try:
+        response = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            temperature=0.4,
+            response_format={
+                "type": "json_object",
             },
-            {
-                "role": "user",
-                "content": prompt,
-            },
-        ],
-    )
+            messages=[
+                {
+                    "role": "system",
+                    "content": LINKEDIN_ANALYZER_SYSTEM_PROMPT,
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ],
+        )
 
-    content = response.choices[0].message.content
+        content = response.choices[0].message.content
+
+    except Exception as exc:
+        logger.exception(
+            "LinkedIn analyzer request failed",
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to analyze LinkedIn profile",
+        ) from exc
 
     try:
         parsed = json.loads(content)
 
-    except Exception:
+    except Exception as exc:
+        logger.exception(
+            "Failed to parse LinkedIn analyzer response",
+        )
+
+        logger.error(
+            "Invalid LinkedIn analyzer response content: %s",
+            content,
+        )
+
         raise HTTPException(
             status_code=500,
             detail="Invalid LinkedIn analyzer response",
+        ) from exc
+
+    if not isinstance(parsed, dict):
+        logger.error(
+            "LinkedIn analyzer response is not a dictionary: %s",
+            parsed,
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Invalid LinkedIn analyzer response structure",
         )
 
     match_breakdown_data = parsed.get(
         "match_breakdown",
         {},
     )
+
+    required_fields = [
+        "headline_rewrite",
+        "about_rewrite",
+        "ai_conclusion",
+    ]
+
+    missing_fields = [
+        field
+        for field in required_fields
+        if field not in parsed
+    ]
+
+    if missing_fields:
+        logger.error(
+            "Missing LinkedIn analyzer response fields: %s | Response: %s",
+            missing_fields,
+            parsed,
+        )
 
     analysis = LinkedInAnalyzerResponse(
         profile_score=profile_score,

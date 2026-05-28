@@ -1,4 +1,5 @@
 import json
+import logging
 import re
 from datetime import datetime
 
@@ -26,6 +27,8 @@ from backend.app.schemas.recruiter.recruiter_view import (
 client = AsyncOpenAI(
     api_key=settings.OPENAI_API_KEY,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def _serialize_recruiter_view_analysis(
@@ -167,34 +170,52 @@ async def analyze_recruiter_view(
         target_role=payload.target_role or "",
     )
 
-    response = await client.chat.completions.create(
-        model="gpt-4o-mini",
-        temperature=0.4,
-        response_format={
-            "type": "json_object",
-        },
-        messages=[
-            {
-                "role": "system",
-                "content": RECRUITER_VIEW_SYSTEM_PROMPT,
+    try:
+        response = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            temperature=0.4,
+            response_format={
+                "type": "json_object",
             },
-            {
-                "role": "user",
-                "content": prompt,
-            },
-        ],
-    )
+            messages=[
+                {
+                    "role": "system",
+                    "content": RECRUITER_VIEW_SYSTEM_PROMPT,
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ],
+        )
+    except Exception as exc:
+        logger.exception(
+            "Recruiter view AI request failed for user_id=%s resume_id=%s target_role=%s",
+            user_id,
+            payload.resume_id,
+            payload.target_role,
+        )
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to analyze recruiter view",
+        ) from exc
 
     content = response.choices[0].message.content
 
     try:
         parsed = json.loads(content)
 
-    except Exception:
+    except Exception as exc:
+        logger.exception(
+            "Recruiter view JSON parsing failed for user_id=%s resume_id=%s response_preview=%s",
+            user_id,
+            payload.resume_id,
+            content[:500] if content else "",
+        )
         raise HTTPException(
             status_code=500,
             detail="Invalid recruiter analysis response",
-        )
+        ) from exc
 
     signals = calculate_recruiter_signals(
         payload.resume_content,
@@ -222,11 +243,24 @@ async def analyze_recruiter_view(
     )
 
     if payload.resume_id and db and user_id:
-        save_recruiter_view_analysis(
-            db=db,
-            user_id=user_id,
-            resume_id=payload.resume_id,
-            analysis=analysis,
-        )
+        try:
+            save_recruiter_view_analysis(
+                db=db,
+                user_id=user_id,
+                resume_id=payload.resume_id,
+                analysis=analysis,
+            )
+        except HTTPException:
+            raise
+        except Exception as exc:
+            logger.exception(
+                "Failed to persist recruiter view analysis for user_id=%s resume_id=%s",
+                user_id,
+                payload.resume_id,
+            )
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to save recruiter analysis",
+            ) from exc
 
     return analysis

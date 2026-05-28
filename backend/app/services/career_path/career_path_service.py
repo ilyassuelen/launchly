@@ -1,4 +1,5 @@
 import json
+import logging
 from typing import Any, Optional
 
 from openai import AsyncOpenAI
@@ -11,9 +12,12 @@ from backend.app.prompts.career_path.career_path_prompts import (
     CAREER_PATH_SYSTEM_PROMPT,
     build_career_path_prompt,
 )
+
 from backend.app.services.career_path.career_path_data_collector import (
     collect_career_path_context,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def _safe_list(value: Any) -> list[dict[str, Any]]:
@@ -216,6 +220,10 @@ async def _generate_ai_payload(
     career_context: dict[str, Any],
 ) -> dict[str, Any]:
     if not settings.OPENAI_API_KEY:
+        logger.warning(
+            "Career path generation using fallback because OPENAI_API_KEY is missing target_role=%s",
+            request.target_role,
+        )
         return _fallback_payload(request)
 
     client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
@@ -248,14 +256,34 @@ async def _generate_ai_payload(
         )
 
         content = response.choices[0].message.content or "{}"
-        parsed = json.loads(content)
+
+        try:
+            parsed = json.loads(content)
+        except Exception:
+            logger.exception(
+                "Career path JSON parsing failed target_role=%s response_preview=%s",
+                request.target_role,
+                content[:500],
+            )
+            return _fallback_payload(request)
 
         if not isinstance(parsed, dict):
+            logger.error(
+                "Career path response is not a dictionary target_role=%s response_type=%s",
+                request.target_role,
+                type(parsed).__name__,
+            )
             return _fallback_payload(request)
 
         return _normalize_payload(parsed, request)
 
     except Exception:
+        logger.exception(
+            "Career path AI request failed target_role=%s current_level=%s timeframe_months=%s",
+            request.target_role,
+            request.current_level,
+            request.timeframe_months,
+        )
         return _fallback_payload(request)
 
 
@@ -302,9 +330,18 @@ async def generate_career_path(
         status="completed",
     )
 
-    db.add(career_path)
-    db.commit()
-    db.refresh(career_path)
+    try:
+        db.add(career_path)
+        db.commit()
+        db.refresh(career_path)
+    except Exception:
+        db.rollback()
+        logger.exception(
+            "Failed to persist career path user_id=%s target_role=%s",
+            user_id,
+            request.target_role,
+        )
+        raise
 
     return career_path
 

@@ -1,4 +1,5 @@
 import json
+import logging
 
 from openai import AsyncOpenAI
 from fastapi import HTTPException
@@ -19,6 +20,8 @@ client = AsyncOpenAI(
     api_key=settings.OPENAI_API_KEY,
 )
 
+logger = logging.getLogger(__name__)
+
 
 async def generate_cover_letter(
     payload: CoverLetterGenerateRequest,
@@ -34,32 +37,67 @@ async def generate_cover_letter(
         job_posting=payload.job_posting,
     )
 
-    response = await client.chat.completions.create(
-        model="gpt-4o-mini",
-        temperature=0.7,
-        response_format={
-            "type": "json_object",
-        },
-        messages=[
-            {
-                "role": "system",
-                "content": COVER_LETTER_SYSTEM_PROMPT,
+    try:
+        response = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            temperature=0.7,
+            response_format={
+                "type": "json_object",
             },
-            {
-                "role": "user",
-                "content": prompt,
-            },
-        ],
-    )
+            messages=[
+                {
+                    "role": "system",
+                    "content": COVER_LETTER_SYSTEM_PROMPT,
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ],
+        )
+    except Exception as exc:
+        logger.exception(
+            "Cover letter AI request failed for sender_name=%s current_role=%s",
+            payload.sender_name,
+            payload.current_role,
+        )
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to generate cover letter",
+        ) from exc
 
     content = response.choices[0].message.content
 
     try:
         parsed = json.loads(content)
-    except Exception:
+    except Exception as exc:
+        logger.exception(
+            "Cover letter JSON parsing failed response_preview=%s",
+            content[:500] if content else "",
+        )
         raise HTTPException(
             status_code=500,
             detail="Invalid AI response format",
+        ) from exc
+
+    if not isinstance(parsed, dict):
+        logger.error(
+            "Cover letter AI returned non-dict response type=%s",
+            type(parsed).__name__,
+        )
+        raise HTTPException(
+            status_code=500,
+            detail="Invalid AI response structure",
+        )
+
+    if "subject" not in parsed or "body" not in parsed:
+        logger.error(
+            "Cover letter AI response missing required fields keys=%s",
+            list(parsed.keys()),
+        )
+        raise HTTPException(
+            status_code=500,
+            detail="Incomplete response",
         )
 
     return CoverLetterGenerateResponse(

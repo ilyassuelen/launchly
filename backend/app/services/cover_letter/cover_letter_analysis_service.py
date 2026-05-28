@@ -1,4 +1,5 @@
 import json
+import logging
 
 from openai import AsyncOpenAI
 
@@ -18,6 +19,8 @@ from backend.app.schemas.cover_letter.cover_letter_analysis import (
     RecruiterAnalysis,
 )
 
+logger = logging.getLogger(__name__)
+
 client = AsyncOpenAI(
     api_key=settings.OPENAI_API_KEY,
 )
@@ -35,34 +38,55 @@ async def analyze_cover_letter(
         body=payload.body,
     )
 
-    response = await client.chat.completions.create(
-        model="gpt-4o-mini",
-        temperature=0.5,
-        response_format={
-            "type": "json_object",
-        },
-        messages=[
-            {
-                "role": "system",
-                "content":
-                    COVER_LETTER_ANALYSIS_SYSTEM_PROMPT,
+    try:
+        response = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            temperature=0.5,
+            response_format={
+                "type": "json_object",
             },
-            {
-                "role": "user",
-                "content": prompt,
-            },
-        ],
-    )
+            messages=[
+                {
+                    "role": "system",
+                    "content":
+                        COVER_LETTER_ANALYSIS_SYSTEM_PROMPT,
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ],
+        )
 
-    content = response.choices[0].message.content
+        content = response.choices[0].message.content
+
+    except Exception as exc:
+        logger.exception(
+            "Cover letter analysis request failed",
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to analyze cover letter",
+        ) from exc
 
     try:
         parsed = json.loads(content)
-    except Exception:
+
+    except Exception as exc:
+        logger.exception(
+            "Failed to parse cover letter analysis response",
+        )
+
+        logger.error(
+            "Invalid cover letter analysis response content: %s",
+            content,
+        )
+
         raise HTTPException(
             status_code=500,
-            detail="Invalid AI response format",
-        )
+            detail="Invalid response format",
+        ) from exc
 
     priority_order = {
         "high": 0,
@@ -77,6 +101,28 @@ async def analyze_cover_letter(
             2,
         ),
     )[:3]
+
+    if not isinstance(parsed, dict):
+        logger.error(
+            "Cover letter analysis response is not a dictionary: %s",
+            parsed,
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Invalid response structure",
+        )
+
+    if "recruiter_analysis" not in parsed:
+        logger.error(
+            "Missing recruiter_analysis in cover letter analysis response: %s",
+            parsed,
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Incomplete response",
+        )
 
     return CoverLetterAnalysisResponse(
         smart_suggestions=[

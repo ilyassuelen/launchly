@@ -1,4 +1,5 @@
 import json
+import logging
 from typing import Any, Dict, List
 
 from fastapi import HTTPException
@@ -22,6 +23,8 @@ from backend.app.services.portfolio.github_service import (
     fetch_github_profile,
     fetch_github_repositories,
 )
+
+logger = logging.getLogger(__name__)
 
 
 client = AsyncOpenAI(
@@ -165,33 +168,64 @@ async def analyze_portfolio(
         repos=compact_repos,
     )
 
-    response = await client.chat.completions.create(
-        model="gpt-4o-mini",
-        temperature=0.4,
-        response_format={
-            "type": "json_object",
-        },
-        messages=[
-            {
-                "role": "system",
-                "content": PORTFOLIO_ANALYZER_SYSTEM_PROMPT,
+    try:
+        response = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            temperature=0.4,
+            response_format={
+                "type": "json_object",
             },
-            {
-                "role": "user",
-                "content": prompt,
-            },
-        ],
-    )
+            messages=[
+                {
+                    "role": "system",
+                    "content": PORTFOLIO_ANALYZER_SYSTEM_PROMPT,
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ],
+        )
 
-    content = response.choices[0].message.content
+        content = response.choices[0].message.content
+
+    except Exception as exc:
+        logger.exception(
+            "Portfolio analyzer request failed",
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to analyze portfolio",
+        ) from exc
 
     try:
         parsed = json.loads(content)
 
-    except Exception:
+    except Exception as exc:
+        logger.exception(
+            "Failed to parse portfolio analyzer response",
+        )
+
+        logger.error(
+            "Invalid portfolio analyzer response content: %s",
+            content,
+        )
+
         raise HTTPException(
             status_code=500,
             detail="Invalid portfolio analyzer response",
+        ) from exc
+
+    if not isinstance(parsed, dict):
+        logger.error(
+            "Portfolio analyzer response is not a dictionary: %s",
+            parsed,
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Invalid portfolio analyzer response structure",
         )
 
     repo_lookup = {
@@ -285,6 +319,24 @@ async def analyze_portfolio(
     )
 
     signals_data = parsed.get("signals", {})
+
+    required_fields = [
+        "portfolio_score",
+        "ai_conclusion",
+    ]
+
+    missing_fields = [
+        field
+        for field in required_fields
+        if field not in parsed
+    ]
+
+    if missing_fields:
+        logger.error(
+            "Missing portfolio analyzer response fields: %s | Response: %s",
+            missing_fields,
+            parsed,
+        )
 
     return PortfolioAnalyzerResponse(
         github_username=payload.github_username,
