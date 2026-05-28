@@ -6,6 +6,7 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     JSON,
+    String,
 )
 
 from backend.app.core.database import Base
@@ -20,6 +21,13 @@ class DashboardSnapshot(Base):
         Integer,
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
+        index=True,
+    )
+
+    language = Column(
+        String,
+        nullable=False,
+        server_default="english",
         index=True,
     )
 

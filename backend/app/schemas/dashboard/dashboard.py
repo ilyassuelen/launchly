@@ -68,6 +68,8 @@ class DashboardWeeklyPlanItem(BaseModel):
 class DashboardSummaryResponse(BaseModel):
     id: Optional[int] = None
 
+    language: str = "english"
+
     career_score: DashboardMetric
     recruiter_impression: DashboardMetric
     resume_health: DashboardMetric

@@ -27,7 +27,10 @@ async def get_latest_dashboard_summary(
 ) -> DashboardSummaryResponse:
     latest_snapshot = (
         db.query(DashboardSnapshot)
-        .filter(DashboardSnapshot.user_id == user_id)
+        .filter(
+            DashboardSnapshot.user_id == user_id,
+            DashboardSnapshot.language == language,
+        )
         .order_by(DashboardSnapshot.created_at.desc())
         .first()
     )
@@ -42,6 +45,7 @@ async def get_latest_dashboard_summary(
 
     return DashboardSummaryResponse(
         id=latest_snapshot.id,
+        language=latest_snapshot.language,
         career_score=DashboardMetric(
             value=latest_snapshot.career_score,
             delta="latest review",

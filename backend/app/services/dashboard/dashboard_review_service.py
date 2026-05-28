@@ -184,6 +184,7 @@ async def build_dashboard_review(
     if persist:
         snapshot = DashboardSnapshot(
             user_id=user_id,
+            language=language,
             career_score=scores["career_score"],
             recruiter_impression_score=scores["recruiter_score"],
             resume_health_score=scores["resume_score"],
@@ -225,6 +226,7 @@ async def build_dashboard_review(
 
     return DashboardSummaryResponse(
         id=snapshot.id if snapshot else None,
+        language=language,
         career_score=DashboardMetric(
             value=scores["career_score"],
             delta="latest review",
