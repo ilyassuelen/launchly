@@ -9,7 +9,9 @@ import {
   FileText,
   Github,
   Linkedin,
+  Menu,
   Mic,
+  PlayCircle,
   Rocket,
   ShieldCheck,
   Sparkles,
@@ -105,83 +107,87 @@ function Landing() {
 function Nav() {
   const { user, logoutUser } = useAuth();
   return (
-    <header className="sticky top-0 z-50 px-4 pt-5">
-      <div className="mx-auto flex max-w-7xl items-center justify-between rounded-2xl border border-white/6 bg-[rgba(7,10,18,0.72)] px-6 py-4 shadow-[0_20px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
-        <div className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_top_right,rgba(124,58,237,0.16),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.10),transparent_25%)]" />
+    <header className="sticky top-0 z-50 px-4 pt-4">
+      <div className="mx-auto max-w-7xl">
+        <div className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[#070a12]/75 shadow-[0_18px_70px_rgba(0,0,0,0.42)] backdrop-blur-2xl">
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.075),transparent_55%),radial-gradient(circle_at_top_left,rgba(139,92,246,0.18),transparent_34%),radial-gradient(circle_at_top_right,rgba(34,211,238,0.12),transparent_30%)]" />
+          <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/50 to-transparent" />
 
-        <Link to="/" className="relative z-10 flex items-center gap-3">
-          <div className="relative flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full bg-violet-500/20 blur-xl" />
+          <div className="relative flex items-center justify-between px-4 py-3 md:px-5">
+            <Link
+              to="/"
+              className="group flex items-center gap-3"
+            >
+              <div className="relative flex items-center justify-center">
+                <div className="absolute -inset-3 rounded-2xl bg-violet-500/12 blur-2xl transition group-hover:bg-cyan-400/10" />
 
-            <img
-              src={logo}
-              alt="Launchly logo"
-              className="relative h-9 w-auto object-contain"
-            />
+                <img
+                  src={logo}
+                  alt="Launchly logo"
+                  className="relative h-10 w-auto object-contain drop-shadow-[0_8px_24px_rgba(124,58,237,0.28)]"
+                />
+              </div>
+
+            </Link>
+
+            <nav className="hidden items-center rounded-2xl border border-white/8 bg-white/[0.035] p-1 lg:flex">
+              {[
+                ["Product", "#features"],
+                ["Dashboard", "#dashboard"],
+                ["Recruiter AI", "#recruiter"],
+              ].map(([label, href]) => (
+                <a
+                  key={label}
+                  href={href}
+                  className="rounded-xl px-4 py-2 text-sm font-medium text-white/50 transition duration-200 hover:bg-white/[0.055] hover:text-white"
+                >
+                  {label}
+                </a>
+              ))}
+            </nav>
+
+            <div className="flex items-center gap-2">
+              {user ? (
+                <>
+                  <Link
+                    to="/dashboard"
+                    className="hidden rounded-xl px-4 py-2 text-sm font-medium text-white/60 transition hover:bg-white/[0.05] hover:text-white md:inline-flex"
+                  >
+                    Dashboard
+                  </Link>
+
+                  <button
+                    onClick={logoutUser}
+                    className="inline-flex items-center justify-center rounded-xl border border-red-400/15 bg-red-500/10 px-4 py-2.5 text-sm font-semibold text-red-100/80 transition duration-300 hover:border-red-300/30 hover:bg-red-500/15 hover:text-red-50"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="hidden rounded-xl px-4 py-2 text-sm font-medium text-white/55 transition hover:bg-white/[0.05] hover:text-white md:inline-flex"
+                  >
+                    Sign in
+                  </Link>
+
+                  <Link
+                    to="/register"
+                    className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-cyan-300/20 bg-white text-[#0b1020] px-4 py-2.5 text-sm font-semibold shadow-[0_12px_40px_rgba(34,211,238,0.18)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_46px_rgba(124,58,237,0.24)]"
+                  >
+                    <span className="absolute inset-0 bg-gradient-to-r from-white via-cyan-50 to-violet-100 opacity-90" />
+                    <span className="relative">Get started</span>
+                    <ArrowRight className="relative size-4 transition group-hover:translate-x-0.5" />
+                  </Link>
+
+                  <button className="inline-flex size-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-white/60 transition hover:bg-white/[0.08] hover:text-white lg:hidden">
+                    <Menu className="size-4" />
+                  </button>
+                </>
+              )}
+            </div>
           </div>
-        </Link>
-
-        <nav className="relative z-10 hidden items-center gap-8 lg:flex">
-          <a
-            href="#features"
-            className="text-sm text-white/50 transition duration-200 hover:text-white"
-          >
-            Features
-          </a>
-
-          <a
-            href="#dashboard"
-            className="text-sm text-white/50 transition duration-200 hover:text-white"
-          >
-            Dashboard
-          </a>
-
-          <a
-            href="#recruiter"
-            className="text-sm text-white/50 transition duration-200 hover:text-white"
-          >
-            Recruiter AI
-          </a>
-        </nav>
-
-        <div className="relative z-10 flex items-center gap-3">
-          {user ? (
-            <>
-              <Link
-                to="/dashboard"
-                className="hidden text-sm text-white/70 transition hover:text-white md:inline-flex"
-              >
-                Dashboard
-              </Link>
-
-              <button
-                onClick={logoutUser}
-                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-red-400/20 bg-red-500/10 px-5 py-2.5 text-sm font-semibold text-red-200 transition duration-300 hover:bg-red-500/20"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/login"
-                className="hidden text-sm text-white/55 transition hover:text-white md:inline-flex"
-              >
-                Sign in
-              </Link>
-
-              <Link
-                to="/register"
-                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-violet-400/20 bg-[linear-gradient(135deg,rgba(139,92,246,1)_0%,rgba(99,102,241,1)_45%,rgba(34,211,238,1)_100%)] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(124,58,237,0.35)] transition duration-300 hover:scale-[1.03]"
-              >
-                <div className="absolute inset-0 bg-[linear-gradient(120deg,transparent_20%,rgba(255,255,255,0.16)_50%,transparent_80%)] opacity-0 transition duration-700 group-hover:translate-x-[180%] group-hover:opacity-100 -translate-x-[180%]" />
-
-                <span className="relative">Launch app</span>
-
-                <ArrowRight className="relative size-4 transition group-hover:translate-x-0.5" />
-              </Link>
-            </>
-          )}
         </div>
       </div>
     </header>
@@ -198,9 +204,9 @@ function Hero() {
 
       <div className="relative mx-auto grid max-w-7xl gap-14 px-4 pb-24 pt-24 lg:grid-cols-2 lg:items-center">
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/60 backdrop-blur-xl">
-            <span className="size-2 rounded-full bg-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.8)]" />
-            Modern career tools for students & junior developers
+          <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/15 bg-cyan-300/[0.06] px-4 py-2 text-xs font-medium text-cyan-100/80 backdrop-blur-xl">
+            <span className="size-2 rounded-full bg-cyan-300 shadow-[0_0_20px_rgba(34,211,238,0.9)]" />
+            AI career intelligence for students & junior developers
           </div>
 
           <h1 className="mt-7 text-6xl font-semibold leading-[1.05] tracking-tight lg:text-7xl">
@@ -217,48 +223,50 @@ function Hero() {
             and what actually improves your chances of getting interviews.
           </p>
 
-          <div className="mt-10 flex flex-wrap gap-4">
+          <div className="mt-10 flex flex-wrap items-center gap-4">
             {user ? (
               <Link
                 to="/dashboard"
-                className="group inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-violet-500 to-cyan-400 px-7 py-4 text-sm font-semibold text-white shadow-2xl shadow-violet-500/30 transition hover:scale-[1.02]"
+                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-2xl bg-white px-7 py-4 text-sm font-semibold text-[#0b1020] shadow-[0_18px_60px_rgba(34,211,238,0.20)] transition duration-300 hover:-translate-y-0.5"
               >
-                Go to dashboard
-                <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
+                <span className="absolute inset-0 bg-gradient-to-r from-white via-cyan-50 to-violet-100" />
+                <span className="relative">Open dashboard</span>
+                <ArrowRight className="relative size-4 transition group-hover:translate-x-0.5" />
               </Link>
             ) : (
               <Link
                 to="/register"
-                className="group inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-violet-500 to-cyan-400 px-7 py-4 text-sm font-semibold text-white shadow-2xl shadow-violet-500/30 transition hover:scale-[1.02]"
+                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-2xl bg-white px-7 py-4 text-sm font-semibold text-[#0b1020] shadow-[0_18px_60px_rgba(34,211,238,0.20)] transition duration-300 hover:-translate-y-0.5"
               >
-                Start for free
-                <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
+                <span className="absolute inset-0 bg-gradient-to-r from-white via-cyan-50 to-violet-100" />
+                <span className="relative">Start building your profile</span>
+                <ArrowRight className="relative size-4 transition group-hover:translate-x-0.5" />
               </Link>
             )}
 
             <a
               href="#features"
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-7 py-4 text-sm text-white/70 backdrop-blur-xl transition hover:bg-white/10"
+              className="group inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.045] px-6 py-4 text-sm font-medium text-white/70 backdrop-blur-xl transition duration-300 hover:border-cyan-300/25 hover:bg-white/[0.075] hover:text-white"
             >
-              Explore features
+              <PlayCircle className="size-4 text-cyan-300/80" />
+              See how it works
             </a>
           </div>
 
-          <div className="mt-8 flex flex-wrap gap-6 text-sm text-white/45">
-            <span className="inline-flex items-center gap-2">
-              <ShieldCheck className="size-4" />
-              Privacy-first
-            </span>
-
-            <span className="inline-flex items-center gap-2">
-              <Zap className="size-4" />
-              Setup in under 60 seconds
-            </span>
-
-            <span className="inline-flex items-center gap-2">
-              <UserCheck className="size-4" />
-              Built for real beginners
-            </span>
+          <div className="mt-8 grid max-w-xl gap-3 text-sm text-white/48 sm:grid-cols-3">
+            {[
+              [ShieldCheck, "Privacy-first"],
+              [Zap, "Fast profile setup"],
+              [UserCheck, "Built for juniors"],
+            ].map(([Icon, label]) => (
+              <div
+                key={label as string}
+                className="flex items-center gap-2 rounded-2xl border border-white/8 bg-white/[0.035] px-3 py-2 backdrop-blur-xl"
+              >
+                <Icon className="size-4 text-cyan-300/75" />
+                <span>{label as string}</span>
+              </div>
+            ))}
           </div>
         </div>
 
