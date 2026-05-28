@@ -70,6 +70,7 @@ def collect_dashboard_data(
     *,
     db: Session,
     user_id: int,
+    language: str,
 ) -> dict:
     today = datetime.utcnow().date()
     week_start = today - timedelta(days=7)
@@ -77,12 +78,18 @@ def collect_dashboard_data(
     resumes = (
         db.query(Resume)
         .filter(Resume.user_id == user_id)
+        .order_by(
+            Resume.analyzed_at.desc().nullslast(),
+            Resume.updated_at.desc(),
+            Resume.created_at.desc(),
+        )
         .all()
     )
 
     recruiter_analyses = (
         db.query(RecruiterViewAnalysis)
         .filter(RecruiterViewAnalysis.user_id == user_id)
+        .order_by(RecruiterViewAnalysis.id.desc())
         .all()
     )
 
@@ -105,7 +112,10 @@ def collect_dashboard_data(
 
     latest_snapshot = (
         db.query(DashboardSnapshot)
-        .filter(DashboardSnapshot.user_id == user_id)
+        .filter(
+            DashboardSnapshot.user_id == user_id,
+            DashboardSnapshot.language == language,
+        )
         .order_by(DashboardSnapshot.created_at.desc())
         .first()
     )
@@ -180,12 +190,12 @@ def collect_dashboard_data(
         "resume": {
             "count": len(resumes),
             "scores": resume_scores,
-            "latest_score": resume_scores[-1] if resume_scores else 0,
+            "latest_score": resume_scores[0] if resume_scores else 0,
         },
         "recruiter_view": {
             "count": len(recruiter_analyses),
             "scores": recruiter_scores,
-            "latest_score": recruiter_scores[-1] if recruiter_scores else 0,
+            "latest_score": recruiter_scores[0] if recruiter_scores else 0,
         },
         "linkedin": {
             "score": linkedin_score,

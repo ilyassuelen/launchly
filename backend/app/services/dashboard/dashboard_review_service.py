@@ -107,6 +107,7 @@ async def build_dashboard_review(
     data = collect_dashboard_data(
         db=db,
         user_id=user_id,
+        language=language,
     )
 
     scores = calculate_core_scores(
