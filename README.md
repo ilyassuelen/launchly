@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  Practice realistic interviews, improve resumes, optimize recruiter perception and prepare for real hiring processes using modern AI workflows.
+  Build stronger resumes, simulate realistic interviews, improve recruiter perception and plan career growth with profile-aware AI workflows.
 </p>
 
 <p align="center">
@@ -23,156 +23,147 @@
 
 # 🚀 Overview
 
-**Launchly** is an AI-powered career growth platform designed to help users bridge the gap between learning technical skills and succeeding in real-world hiring processes.
+**Launchly** is an AI-powered career growth platform that helps users prepare for real hiring processes with realistic, recruiter-style feedback.
 
-The platform combines recruiter-style evaluations, resume-aware AI systems and realistic interview simulations to help users improve how they present themselves professionally.
+Instead of giving generic AI coaching, Launchly grounds its recommendations in the user's actual career profile: resume content, structured skills, projects, recruiter evaluations, interview results, portfolio signals and application activity.
 
-Launchly focuses on realistic, profile-aware career preparation rather than generic AI coaching by grounding its recommendations in actual user data, recruiter-style evaluations and practical hiring signals.
+The goal is to help students, juniors, graduates and early-career professionals understand where they stand, improve their profile and move toward stronger job readiness.
 
 ---
 
 # ✨ Core Features
 
+## 📄 AI Resume Builder
+
+A modern resume editor with persistent AI analysis, ATS-style scoring and recruiter-focused feedback.
+
+### Features
+
+- Modern resume editor with multiple templates
+- AI resume analysis and ATS-style scoring
+- Recruiter-style feedback and smart suggestions
+- Structured skill, project and experience extraction
+- Persistent analysis results after saving and page refresh
+- Reusable resume intelligence for other features
+- Resume photo upload and live preview
+- PDF/export-ready resume preview
+
+---
+
+## 🧠 Structured Resume Intelligence
+
+Launchly converts resume data into reusable structured career intelligence.
+
+It extracts and stores signals such as:
+
+- technical skills
+- tools and technologies
+- projects and implementation evidence
+- experience signals
+- seniority and candidate level
+- ATS keywords
+- role alignment indicators
+- recruiter-facing strengths and proof gaps
+
+This shared resume intelligence is reused by the Dashboard, Recruiter View, Career Path and Interview Simulator so the AI can reason from real profile data instead of isolated prompts.
+
+---
+
 ## 🤖 AI Interview Simulator
 
-A realistic AI-powered mock interview system with adaptive follow-up questions and recruiter-style evaluations.
+A realistic AI mock interview system with adaptive follow-up questions and recruiter-style evaluations.
 
 ### Features
 
 - Resume-aware interview generation
-- Behavioral, Technical and System Design interview modes
+- Behavioral, Technical and System Design modes
+- Junior / Mid / Senior difficulty levels
 - Adaptive follow-up questioning
-- Recruiter-style AI evaluations
 - STAR-method analysis
-- Communication & confidence analysis
-- Interview scoring & telemetry
-- Session history with persistent results
-- Resume-context-aware questioning
-- Difficulty levels (Junior / Mid / Senior)
+- Communication and confidence feedback
+- Persistent interview sessions and scoring
 - Role-aware interview pipelines
-- Realistic recruiter feedback
 
-### Interview Intelligence
-
-The interview system dynamically adapts questions based on:
-
-- visible resume skills
-- projects & work experience
-- selected role
-- interview difficulty
-- previous interview answers
-- demonstrated technical depth
-
-Unlike generic interview bots, Launchly avoids asking unrelated theoretical questions and instead focuses on realistic recruiter-style conversations.
-
----
-
-## 📄 AI Resume Builder
-
-An AI-assisted resume editing and evaluation system focused on recruiter expectations and real hiring workflows.
-
-### Features
-
-- Modern resume editor
-- AI-assisted resume improvements
-- Resume scoring & evaluation
-- Recruiter-style resume feedback
-- Resume parsing & structured extraction
-- Context-aware resume analysis
-- Bullet point improvement suggestions
-- Resume clarity & readability analysis
-- ATS-oriented optimization suggestions
+The interview flow adapts to visible resume skills, projects, selected role, difficulty and previous answers to create a more realistic interview experience.
 
 ---
 
 ## 👀 Recruiter View Analysis
 
-Simulates how recruiters may perceive a candidate profile.
+Recruiter View simulates how a candidate profile may be perceived by hiring teams.
 
 ### Features
 
 - Resume clarity analysis
-- Attention & impact evaluation
-- Weakness detection
-- Recruiter-oriented insights
-- Presentation quality feedback
-- Technical depth perception analysis
+- Attention and impact evaluation
+- Technical depth perception
+- Weakness and proof-gap detection
 - Communication quality signals
-- Practical improvement recommendations
-
----
-
-## 💼 Career Growth Tools
-
-Additional AI-powered career preparation workflows.
-
-### Included
-
-- LinkedIn profile analysis
-- LinkedIn optimization workflows
-- Portfolio analysis
-- Portfolio improvement suggestions
-- Career readiness evaluation
-- AI-powered coaching insights
+- Practical recruiter-oriented improvement suggestions
+- Resume-structured-data support for more grounded analysis
 
 ---
 
 ## 🧭 AI Career Path Intelligence
 
-Launchly includes an AI-powered career roadmap system that generates personalized career paths based on the user's real profile data.
+Career Path generates personalized roadmaps based on the user's real profile data.
 
-Launchly analyzes actual resume content, projects, recruiter evaluations, interview results, portfolio signals and application history to determine how realistically a target role aligns with the user's current profile.
+It uses resume intelligence, projects, recruiter evaluations, portfolio signals, interview results and application activity to estimate how realistic a target role is for the current profile.
 
 ### Features
 
 - Profile-aware AI roadmap generation
 - Role-fit validation
 - Career readiness scoring
-- Personalized milestone planning
-- AI-generated learning plans
-- Portfolio project recommendations
-- Recruiter-aligned improvement strategies
 - Skill gap analysis
-- Resume + portfolio + interview signal aggregation
+- Learning plan generation
+- Portfolio project recommendations
+- Milestone planning
 - Realistic target-role alignment analysis
+- Evidence-based transition guidance
 
 ### Intelligent Role Alignment
 
-Launchly does not blindly generate unrealistic roadmaps.
+Launchly does not blindly generate optimistic roadmaps.
 
-If a selected target role has little overlap with the user's existing profile data, the system:
-
-- lowers roadmap confidence
-- explains missing qualifications
-- highlights critical skill gaps
-- suggests realistic transition paths
-- avoids generating irrelevant recommendations
-
-This creates a significantly more realistic and trustworthy career planning experience.
+If a selected target role has little overlap with the user's existing profile, the system lowers confidence, explains missing qualifications and suggests realistic transition steps instead of giving irrelevant advice.
 
 ---
 
-## 🎨 Modern SaaS Experience
+## 📊 Career Dashboard
 
-Launchly was designed with a premium modern SaaS experience in mind.
+The dashboard combines signals across the platform into a single career readiness view.
 
-### UI Features
+### Features
 
-- Glassmorphism-inspired interface
-- Responsive layouts
-- Smooth animations & transitions
-- Real-time AI interactions
-- Modern dashboard workflows
-- Structured recruiter-style UI patterns
+- Career score overview
+- Resume, recruiter, LinkedIn, portfolio, application and interview signals
+- Profile strength breakdown
+- Market-fit style positioning
+- AI-generated insights and next best actions
+- Weekly improvement plan
+- Application activity heatmap
+- Resume-structured-data-aware recommendations
+
+---
+
+## 💼 Additional Career Tools
+
+Launchly also includes supporting workflows for broader career preparation:
+
+- LinkedIn profile analysis
+- Portfolio analysis
+- Cover letter generation
+- Job application tracking
+- Application workflow management
+- AI coaching-style insights
 
 ---
 
 # 🖥️ Platform Preview
 
-## 🎬 Application Demo
-
 <p align="center">
-  <img src="static/launchly-preview.gif" alt="Launchly Application Demo" width="900"/>
+  <img src="frontend/static/launchly.gif" alt="Launchly Platform Preview" width="600"/>
 </p>
 
 ---
@@ -193,23 +184,23 @@ Launchly is designed for:
 
 # 🧠 AI Architecture
 
-Launchly uses multiple structured AI workflows rather than relying on generic prompting.
+Launchly uses several structured AI workflows that share profile context across features.
 
 ## AI Systems
 
-- Resume-aware prompting
-- Context-aware interview generation
-- Adaptive follow-up pipelines
-- Structured evaluation rubrics
-- Recruiter-style scoring systems
-- Resume parsing & analysis pipelines
-- Role-aware question generation
-- AI-assisted recruiter simulations
-- Career-context aggregation pipelines
-- Profile-aware roadmap generation
-- Role-fit validation systems
-- Multi-source career signal analysis
-- Career readiness scoring
+- Resume analysis and structured extraction
+- Persistent resume intelligence storage
+- Cross-feature candidate profile context
+- Recruiter-style evaluation prompts
+- ATS-style scoring logic
+- Interview question generation
+- Adaptive follow-up generation
+- Career roadmap generation
+- Role-fit validation
+- Dashboard insight generation
+- Multi-source career signal aggregation
+
+This architecture keeps AI outputs more consistent, grounded and reusable across the product.
 
 ---
 
@@ -235,17 +226,19 @@ Launchly uses multiple structured AI workflows rather than relying on generic pr
 ## AI Systems
 
 - OpenAI API
-- Structured prompting pipelines
-- Resume-aware AI systems
+- Structured JSON prompting
+- Resume-aware AI workflows
 - Context-aware evaluation pipelines
 - Recruiter-style scoring logic
+- Cross-feature career signal aggregation
 
 ## Infrastructure
 
-- PostgreSQL
+- PostgreSQL (Neon)
+- Cloudflare R2 Object Storage
+- Cloudflare Pages
+- Render
 - JWT Authentication
-- Vercel (planned deployment)
-- Render (planned deployment)
 
 ---
 
@@ -324,63 +317,14 @@ Create a `.env` file in the backend directory.
 
 ---
 
-# 📊 Current Capabilities
-
-## Interview System
-
-- Resume-aware AI interviews
-- Behavioral interviews
-- Technical interviews
-- System Design interviews
-- Adaptive follow-up logic
-- Recruiter-style evaluations
-- Session history & analytics
-- Structured interview scoring
-
-## Resume System
-
-- AI resume analysis
-- Resume parsing
-- Resume scoring
-- Recruiter-oriented resume feedback
-- Structured resume evaluation
-
-## Recruiter Intelligence
-
-- Recruiter perception analysis
-- Communication analysis
-- Technical depth analysis
-- Clarity & presentation analysis
-
-## Career Tools
-
-- LinkedIn analysis
-- Portfolio analysis
-- AI coaching workflows
-- Job application tracking
-- Application workflow management
-
-## Career Path Intelligence
-
-- AI-generated personalized career roadmaps
-- Resume-aware role alignment analysis
-- Profile-fit validation
-- AI learning plan generation
-- Portfolio project recommendations
-- Skill gap intelligence
-- Career readiness evaluation
-- Recruiter-aligned application strategies
-
----
-
 # 🧭 Roadmap
 
 ## Upcoming Improvements
 
 - Voice-based AI interviews
-- Real-time speech & communication analysis
+- Real-time speech and communication analysis
 - Live conversational interview mode
-- Advanced recruiter analytics & heatmaps
+- Advanced recruiter analytics and heatmaps
 - Enhanced portfolio intelligence
 - Advanced hiring-readiness scoring
 
@@ -391,16 +335,11 @@ Create a `.env` file in the backend directory.
 ```mermaid
 flowchart TD
 
-A[Resume Context] --> B[Interview Setup]
-
+A[Resume Intelligence] --> B[Interview Setup]
 B --> C[AI Interview Generation]
-
 C --> D[Adaptive Follow-up Questions]
-
 D --> E[Recruiter-style Evaluation]
-
 E --> F[Structured Feedback]
-
 F --> G[Interview Analytics & Insights]
 ```
 
