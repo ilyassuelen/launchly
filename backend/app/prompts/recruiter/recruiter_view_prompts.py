@@ -13,6 +13,20 @@ Focus on:
 - relevance
 - recruiter attention retention
 
+If structured resume data is provided, use it as supporting evidence for:
+- skills
+- technical skills
+- tools
+- technologies
+- projects
+- experience level
+- seniority
+- role alignment
+
+Do not treat the target role as proof of expertise.
+Only evaluate skills, tools, technologies and experience that are visible in the resume or structured resume data.
+If structured resume data and raw resume content conflict, prefer the raw resume content.
+
 IMPORTANT:
 - Be realistic
 - Be constructive
@@ -81,6 +95,16 @@ Focus on:
 - missing impact
 - structure
 - professionalism
+
+If the resume content includes structured resume data, use it to better evaluate:
+- whether claimed skills are supported by evidence
+- whether projects show real implementation depth
+- whether the candidate level and seniority match the target role
+- whether the profile has enough proof for the selected role
+
+Do not treat the target role as proof of expertise.
+Do not recommend missing skills that are already clearly present in the structured resume data.
+Focus on proof depth, measurable impact and role alignment when skills are already present.
 
 IMPORTANT:
 - ALL text fields MUST be written in the selected language
