@@ -38,7 +38,13 @@ VERY IMPORTANT:
 - The candidate may only be associated with technologies explicitly present in:
   - provided skills
   - resume information
+  - structured resume data
   - project descriptions
+- If structured resume data is available, treat it as the strongest source for candidate skills, tools, technologies, projects, seniority, experience level and role fit
+- Do not treat the target role or job posting as proof of candidate expertise
+- Use structured resume data to ground the letter in real evidence, not assumptions
+- If a technology is present in structured resume data, it may be referenced naturally when relevant to the job posting
+- If a technology is missing from structured resume data and resume information, do not present it as candidate experience
 - Include a professional greeting at the beginning of the body
 - Use the hiring contact if available
 - Do NOT generate sign-offs
@@ -63,7 +69,9 @@ VERY IMPORTANT:
 - Every paragraph should reference either:
   - a concrete project
   - a concrete technical capability
+  - structured resume evidence
   - or a concrete relevance to the job posting
+- Prefer structured resume evidence such as projects, tools, technologies, technical_skills, candidate_level, seniority and experience_level when available
 - Remove generic filler sentences
 
 - End the cover letter with a concise professional closing paragraph
@@ -132,6 +140,7 @@ def build_cover_letter_prompt(
     skills: list[str],
     resume_context: str,
     job_posting: str,
+    structured_resume_data: dict | None = None,
     hiring_contact: str = "",
 ):
     return f"""
@@ -155,6 +164,9 @@ Skills:
 Resume information:
 {resume_context}
 
+Structured resume data:
+{structured_resume_data or {}}
+
 Job posting:
 {job_posting}
 
@@ -175,7 +187,11 @@ IMPORTANT:
 - The candidate may only be associated with technologies explicitly present in:
   - provided skills
   - resume information
+  - structured resume data
   - project descriptions
+- If structured resume data is available, use it as the main source for skills, tools, technologies, projects, seniority, experience level and role fit
+- Do not treat the target role or job posting as proof of candidate expertise
+- Only mention missing or job-required technologies as requirements, never as existing candidate experience
 - NEVER mention:
   - ML pipelines
   - production ML systems
@@ -193,8 +209,9 @@ unless explicitly present in the provided candidate information
 - Do NOT include the candidate name at the end
 - Generate only the actual cover letter content
 - Mention concrete relevant systems or technical work where appropriate
-- Mention only technologies and competencies explicitly present in the resume information or provided skills
+- Mention only technologies and competencies explicitly present in the resume information, structured resume data or provided skills
 - Prefer specific implementation examples over generic statements
+- Prefer structured resume projects and evidence when they match the job posting
 - Keep sentences compact and direct
 - Reduce unnecessary soft-skill language
 - Avoid generic concluding paragraphs

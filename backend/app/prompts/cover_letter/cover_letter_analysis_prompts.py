@@ -140,7 +140,7 @@ Return JSON format:
     {{
       "title": "...",
       "description": "...",
-      "type": "warning | success | improvement"
+      "type": "warning | success | improvement",
       "priority": "high | medium | low"
     }}
   ],
