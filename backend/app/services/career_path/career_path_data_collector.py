@@ -55,6 +55,30 @@ def _safe_dict(value: Any) -> dict:
     return {}
 
 
+def _extract_structured_resume_analysis(analysis: dict) -> dict:
+    """
+    Extract the reusable structured resume payload from
+    the latest resume analysis if it exists.
+    """
+    structured = _safe_dict(
+        analysis.get("structured_resume_data"),
+    )
+
+    if structured:
+        return structured
+
+    return {
+        key: value
+        for key, value in analysis.items()
+        if key not in [
+            "smart_suggestions",
+            "recruiter_analysis",
+            "ats_score",
+            "raw_ai_analysis",
+        ] and value not in [None, "", [], {}]
+    }
+
+
 def _serialize_date(value: Any) -> str | None:
     if value is None:
         return None
@@ -69,14 +93,24 @@ def _limit(items: list, limit: int = MAX_ITEMS) -> list:
     return items[:limit]
 
 
-def _extract_resume_skills(resume_data: dict, analysis: dict) -> list:
+def _extract_resume_skills(
+    resume_data: dict,
+    analysis: dict,
+    structured_analysis: dict | None = None,
+) -> list:
     """
-    Extract and deduplicate relevant skills from resume data
-    and the latest stored resume analysis.
+    Extract and deduplicate relevant skills from resume data,
+    structured resume analysis and the latest stored analysis.
     """
     values = []
 
-    for source in [resume_data, analysis]:
+    sources = [
+        structured_analysis or {},
+        resume_data,
+        analysis,
+    ]
+
+    for source in sources:
         for key in [
             "skills",
             "technical_skills",
@@ -111,12 +145,22 @@ def _extract_resume_skills(resume_data: dict, analysis: dict) -> list:
     return _limit(result, 20)
 
 
-def _extract_resume_summary(resume_data: dict, analysis: dict) -> str:
+def _extract_resume_summary(
+    resume_data: dict,
+    analysis: dict,
+    structured_analysis: dict | None = None,
+) -> str:
     """
     Find the best available resume summary from
     structured resume data or analysis results.
     """
-    for source in [resume_data, analysis]:
+    sources = [
+        structured_analysis or {},
+        resume_data,
+        analysis,
+    ]
+
+    for source in sources:
         for key in [
             "summary",
             "professional_summary",
@@ -159,6 +203,11 @@ def _collect_latest_resume(
     analysis = prepare_data(
         _safe_dict(resume.latest_resume_analysis),
     )
+    structured_analysis = prepare_data(
+        _extract_structured_resume_analysis(
+            analysis,
+        ),
+    )
 
     return {
         "id": resume.id,
@@ -169,16 +218,43 @@ def _collect_latest_resume(
         "summary": _extract_resume_summary(
             resume_data=resume_data,
             analysis=analysis,
+            structured_analysis=structured_analysis,
         ),
         "skills": _extract_resume_skills(
             resume_data=resume_data,
             analysis=analysis,
+            structured_analysis=structured_analysis,
         ),
         "raw_data": resume_data,
         "latest_analysis": analysis,
+        "structured_resume_data": structured_analysis,
+        "target_role": (
+            structured_analysis.get("target_role")
+            or resume_data.get("target_role")
+            or resume_data.get("basics", {}).get("title")
+            or resume.title
+        ),
+        "candidate_level": structured_analysis.get("candidate_level"),
+        "seniority": structured_analysis.get("seniority"),
+        "experience_level": structured_analysis.get("experience_level"),
+        "technical_skills": _safe_list(
+            structured_analysis.get("technical_skills"),
+        ),
+        "tools": _safe_list(
+            structured_analysis.get("tools"),
+        ),
+        "technologies": _safe_list(
+            structured_analysis.get("technologies"),
+        ),
+        "tech_stack": _safe_list(
+            structured_analysis.get("tech_stack"),
+        ),
         "experiences": _limit(
             _safe_list(
-                resume_data.get("experiences")
+                structured_analysis.get("experience")
+                or structured_analysis.get("work_experience")
+                or structured_analysis.get("professional_experience")
+                or resume_data.get("experiences")
                 or resume_data.get("experience")
                 or resume_data.get("work_experience")
                 or resume_data.get("professional_experience")
@@ -186,13 +262,17 @@ def _collect_latest_resume(
         ),
         "projects": _limit(
             _safe_list(
-                resume_data.get("projects")
+                structured_analysis.get("projects")
+                or structured_analysis.get("portfolio_projects")
+                or resume_data.get("projects")
                 or resume_data.get("portfolio_projects")
             ),
         ),
         "education": _limit(
             _safe_list(
-                resume_data.get("education")
+                structured_analysis.get("education")
+                or structured_analysis.get("academic_background")
+                or resume_data.get("education")
                 or resume_data.get("educations")
             ),
         ),

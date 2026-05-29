@@ -10,9 +10,11 @@ Create a realistic, structured and practical career roadmap using the user's exi
 
 The available profile data may include:
 - resume data
-- resume experiences
-- resume projects
-- resume education
+- resume latest analysis
+- resume structured_resume_data
+- resume extracted skills, tools, technologies and tech stack
+- resume extracted projects, experience and education
+- resume candidate_level, seniority and experience_level
 - recruiter view analysis
 - LinkedIn analyzer results
 - portfolio analyzer results
@@ -37,6 +39,12 @@ IMPORTANT:
 - Do NOT invent work experience.
 - Do NOT invent certifications, companies, achievements or results.
 - Do NOT promise guaranteed jobs.
+- If resume.structured_resume_data is available, treat it as the main resume evidence source.
+- Use structured resume skills, technical_skills, tools, technologies, tech_stack, projects, experience, education, candidate_level, seniority and experience_level when evaluating role fit.
+- Do not treat the target role as proof of expertise.
+- Do not treat a resume headline or desired role as proof unless supported by skills, projects, experience, education or portfolio evidence.
+- When structured resume data already contains a skill, do not list it as a missing skill unless the evidence depth is weak or the target role requires a higher level.
+- If structured resume data shows skills but weak proof, focus on measurable impact, implementation depth and recruiter-facing evidence instead of generic skill advice.
 - If data is missing, work with what is available and mention the limitation indirectly.
 - Be specific, honest and practical.
 - Return valid JSON only.
@@ -98,8 +106,16 @@ Launchly career context:
 
 Create a practical career path roadmap based on the user's existing Launchly data.
 
+Resume evidence priority:
+- If career_context contains resume.structured_resume_data, use it as the primary source for resume-related reasoning.
+- Use extracted skills, technical_skills, tools, technologies, tech_stack, projects, experience, education, candidate_level, seniority and experience_level.
+- Use resume.latest_analysis and resume.latest_ats_score as supporting evidence, not as a replacement for actual skills and proof.
+- Do not infer skills only from the target role or resume headline.
+- If a skill exists in structured_resume_data, do not call it missing unless the target role requires stronger proof, deeper implementation or more advanced level.
+- If the structured data shows relevant skills but weak measurable impact, recommend proof-depth improvements instead of generic learning steps.
+
 Before generating the roadmap, perform a strict target-role fit analysis:
-- Compare the target role against the user's resume, skills, education, projects, LinkedIn data, portfolio data, applications, interview results and dashboard signals.
+- Compare the target role against the user's structured resume data, extracted skills, tools, technologies, projects, experience, education, LinkedIn data, portfolio data, applications, interview results and dashboard signals.
 - Decide whether the role fit is high, medium, low or very low.
 - The final roadmap must reflect this fit honestly.
 - Do not assume the user is qualified for the target role just because they entered it.
@@ -201,8 +217,11 @@ Rules:
 - priority must be one of: "high", "medium", "low".
 - difficulty must be one of: "easy", "medium", "hard".
 - Use concrete signals from the provided career context.
+- Prefer structured resume evidence over raw assumptions when resume.structured_resume_data is available.
+- Skill gaps must be based on missing skills, weak evidence, insufficient depth or role mismatch, not on the target role alone.
 - Prefer recommendations that connect resume, portfolio, LinkedIn, applications and interview feedback when they are relevant to the target role.
-- If the target role is unrelated to the user's profile, do not force resume/portfolio/project advice that only fits software roles.
+- Do not force software, coding or AI project recommendations when they do not fit the target role.
+- Treat closely related skill names as evidence of existing experience.
 - If the target role is regulated or credential-heavy, include realistic education, certification, licensing or retraining steps.
 - The summary must be written in direct second person, not third person.
 - The summary must feel personal and motivating, but still realistic and specific.
