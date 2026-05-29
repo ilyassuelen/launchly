@@ -118,12 +118,21 @@ def _clamp(value: int) -> int:
 def _serialize_linkedin_analysis(
     response: LinkedInAnalyzerResponse,
 ) -> dict:
+    """
+    Convert the validated LinkedIn analysis response
+    into a JSON-safe dictionary for database storage.
+    """
     return response.model_dump()
 
 
 def calculate_linkedin_signals(
     payload: LinkedInAnalyzerRequest,
 ) -> LinkedInSignals:
+    """
+    Calculate local LinkedIn profile signals based on
+    headline quality, about section, skills and search visibility.
+    """
+
     headline = payload.headline or ""
     about = payload.about or ""
     skills = payload.skills or []
@@ -204,6 +213,10 @@ async def analyze_linkedin_profile(
     db: Session | None = None,
     user_id: int | None = None,
 ) -> LinkedInAnalyzerResponse:
+    """
+    Analyze a LinkedIn profile with local scoring and AI feedback,
+    then optionally save the latest analysis for the user.
+    """
     signals = calculate_linkedin_signals(
         payload,
     )

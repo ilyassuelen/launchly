@@ -3,10 +3,12 @@ from statistics import mean
 
 
 def clamp(value: int) -> int:
+    """Clamp numeric values to a range between 0 and 100."""
     return max(0, min(100, int(value)))
 
 
 def average(values: list[int | float]) -> int:
+    """Calculate the rounded average of valid positive values."""
     clean_values = [
         float(value)
         for value in values
@@ -20,6 +22,7 @@ def average(values: list[int | float]) -> int:
 
 
 def score_to_grade(score: int) -> str:
+    """Convert numeric scores into dashboard grade labels."""
     if score >= 90:
         return "A"
     if score >= 82:
@@ -41,6 +44,10 @@ def calculate_application_score(
     applications_this_week: int,
     active_applications: int,
 ) -> int:
+    """
+    Calculate the application activity score
+    from recent and active applications.
+    """
     score = min(70, applications_this_week * 12)
 
     if active_applications >= 3:
@@ -56,6 +63,11 @@ def calculate_application_score(
 
 
 def calculate_core_scores(data: dict) -> dict:
+    """
+    Calculate the main dashboard scores from
+    collected resume, recruiter, portfolio,
+    LinkedIn, application and interview data.
+    """
     resume_score = average(
         data.get("resume", {}).get("scores", [])
     )
@@ -104,6 +116,10 @@ def calculate_core_scores(data: dict) -> dict:
 
 
 def build_profile_strength(scores: dict) -> dict:
+    """
+    Build a profile strength overview for
+    the dashboard radar/chart section.
+    """
     return {
         "Resume": scores["resume_score"],
         "Recruiter View": scores["recruiter_score"],
@@ -119,6 +135,10 @@ def build_market_fit(
     scores: dict,
     data: dict,
 ) -> dict:
+    """
+    Calculate market positioning and recruiter
+    fit signals from the user's profile data.
+    """
     market_fit_score = average([
         scores["career_score"] * 1.15,
         scores["recruiter_score"] * 1.2,
@@ -197,6 +217,10 @@ def build_career_growth(
     current_score: int,
     previous_score: int,
 ) -> list[dict]:
+    """
+    Generate a simple interpolated career
+    growth timeline for dashboard charts.
+    """
     labels = [
         "Mon",
         "Tue",
@@ -234,6 +258,10 @@ def build_activity_heatmap(
     *,
     applications: dict,
 ) -> dict:
+    """
+    Build the dashboard activity heatmap
+    from recent application activity.
+    """
     today = datetime.utcnow().date()
 
     heatmap = []
@@ -286,6 +314,10 @@ def build_fallback_insights(
     *,
     scores: dict,
 ) -> list[dict]:
+    """
+    Generate fallback dashboard insights
+    when no AI-generated insights exist.
+    """
     insights = []
 
     if scores["resume_score"] < 75:
@@ -340,6 +372,10 @@ def build_missing_skills(
     *,
     scores: dict,
 ) -> list[dict]:
+    """
+    Generate fallback missing-skill suggestions
+    from the user's current dashboard scores.
+    """
     skills = []
 
     if scores["linkedin_score"] < 75:
@@ -375,6 +411,10 @@ def build_weekly_plan(
     *,
     scores: dict,
 ) -> list[dict]:
+    """
+    Build a fallback weekly improvement plan
+    based on weak dashboard categories.
+    """
     plan = []
 
     if scores["resume_score"] < 80:

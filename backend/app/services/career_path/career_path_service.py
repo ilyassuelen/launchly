@@ -21,6 +21,10 @@ logger = logging.getLogger(__name__)
 
 
 def _safe_list(value: Any) -> list[dict[str, Any]]:
+    """
+    Return only dictionary items from a list
+    to ensure stable AI response structures.
+    """
     if isinstance(value, list):
         return [item for item in value if isinstance(item, dict)]
     return []
@@ -28,6 +32,10 @@ def _safe_list(value: Any) -> list[dict[str, Any]]:
 
 
 def _safe_int(value: Any, default: int = 70, minimum: int = 0, maximum: int = 100) -> int:
+    """
+    Safely convert a value into a bounded integer
+    with configurable fallback limits.
+    """
     try:
         number = int(value)
         return max(minimum, min(maximum, number))
@@ -35,8 +43,11 @@ def _safe_int(value: Any, default: int = 70, minimum: int = 0, maximum: int = 10
         return default
 
 
-# Helper to safely normalize role_fit field
 def _safe_role_fit(value: Any, default: str = "medium") -> str:
+    """
+    Normalize the AI-generated role fit value
+    to a supported confidence category.
+    """
     if not isinstance(value, str):
         return default
 
@@ -49,6 +60,10 @@ def _safe_role_fit(value: Any, default: str = "medium") -> str:
 
 
 def _fallback_payload(request: CareerPathGenerateRequest) -> dict[str, Any]:
+    """
+    Generate a stable fallback career roadmap
+    when AI generation is unavailable or invalid.
+    """
     target_role = request.target_role
 
     return {
@@ -186,6 +201,10 @@ def _normalize_payload(
     raw_payload: dict[str, Any],
     request: CareerPathGenerateRequest,
 ) -> dict[str, Any]:
+    """
+    Validate and normalize the AI-generated
+    career roadmap response structure.
+    """
     fallback = _fallback_payload(request)
 
     return {
@@ -219,6 +238,10 @@ async def _generate_ai_payload(
     request: CareerPathGenerateRequest,
     career_context: dict[str, Any],
 ) -> dict[str, Any]:
+    """
+    Generate a structured AI career roadmap
+    using the collected user career context.
+    """
     if not settings.OPENAI_API_KEY:
         logger.warning(
             "Career path generation using fallback because OPENAI_API_KEY is missing target_role=%s",
@@ -292,6 +315,10 @@ async def generate_career_path(
     user_id: int,
     request: CareerPathGenerateRequest,
 ) -> CareerPath:
+    """
+    Generate, store and return a personalized
+    AI-powered career roadmap for the user.
+    """
     career_context = collect_career_path_context(
         db=db,
         user_id=user_id,
@@ -350,6 +377,10 @@ def get_user_career_paths(
     db: Session,
     user_id: int,
 ) -> list[CareerPath]:
+    """
+    Return all saved career paths
+    for the selected user.
+    """
     return (
         db.query(CareerPath)
         .filter(CareerPath.user_id == user_id)
@@ -362,6 +393,10 @@ def get_latest_career_path(
     db: Session,
     user_id: int,
 ) -> Optional[CareerPath]:
+    """
+    Return the most recently generated
+    career path for the user.
+    """
     return (
         db.query(CareerPath)
         .filter(CareerPath.user_id == user_id)
@@ -375,6 +410,10 @@ def get_career_path_by_id(
     user_id: int,
     career_path_id: int,
 ) -> Optional[CareerPath]:
+    """
+    Return a specific user-owned
+    career path by its ID.
+    """
     return (
         db.query(CareerPath)
         .filter(
@@ -390,6 +429,10 @@ def delete_career_path(
     user_id: int,
     career_path_id: int,
 ) -> bool:
+    """
+    Delete a user-owned career path
+    and return whether it existed.
+    """
     career_path = get_career_path_by_id(
         db=db,
         user_id=user_id,

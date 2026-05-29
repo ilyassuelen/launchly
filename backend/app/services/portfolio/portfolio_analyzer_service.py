@@ -37,6 +37,10 @@ def _clamp(value: int) -> int:
 
 
 def _score_repo_locally(repo) -> int:
+    """
+    Calculate a local quality score for a repository
+    based on structure, README quality and recruiter signals.
+    """
     score = 35
 
     if repo.description:
@@ -94,6 +98,10 @@ def _score_repo_locally(repo) -> int:
 
 
 def _tag_from_score(score: int) -> str:
+    """
+    Convert a numeric repository score into
+    a recruiter-friendly quality label.
+    """
     if score >= 85:
         return "Strong"
 
@@ -107,6 +115,10 @@ def _tag_from_score(score: int) -> str:
 
 
 def _attention_from_score(score: int) -> str:
+    """
+    Estimate recruiter attention level
+    based on the repository score.
+    """
     if score >= 80:
         return "high"
 
@@ -117,6 +129,10 @@ def _attention_from_score(score: int) -> str:
 
 
 def _normalize_attention(value: str, score: int) -> str:
+    """
+    Normalize recruiter attention values and
+    fall back to a locally estimated level if needed.
+    """
     value = (value or "").lower().strip()
 
     if value in ["high", "medium", "low"]:
@@ -128,6 +144,10 @@ def _normalize_attention(value: str, score: int) -> str:
 async def analyze_portfolio(
     payload: PortfolioAnalyzerRequest,
 ) -> PortfolioAnalyzerResponse:
+    """
+    Analyze GitHub repositories with local scoring and AI feedback
+    to evaluate portfolio quality and recruiter relevance.
+    """
     github_profile = await fetch_github_profile(
         payload.github_username,
     )

@@ -27,6 +27,10 @@ URL_RE = re.compile(r"https?://\S+|www\.\S+")
 
 
 def clean_text(text: str) -> str:
+    """
+    Remove common sensitive information such as
+    emails, phone numbers and URLs from text.
+    """
     text = EMAIL_RE.sub("[email removed]", text)
     text = PHONE_RE.sub("[phone removed]", text)
     text = URL_RE.sub("[url removed]", text)
@@ -35,6 +39,10 @@ def clean_text(text: str) -> str:
 
 
 def prepare_data(data: Any) -> Any:
+    """
+    Recursively sanitize nested data structures
+    before sending content to language models.
+    """
     if isinstance(data, dict):
         clean_data = {}
 

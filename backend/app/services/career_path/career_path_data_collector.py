@@ -70,6 +70,10 @@ def _limit(items: list, limit: int = MAX_ITEMS) -> list:
 
 
 def _extract_resume_skills(resume_data: dict, analysis: dict) -> list:
+    """
+    Extract and deduplicate relevant skills from resume data
+    and the latest stored resume analysis.
+    """
     values = []
 
     for source in [resume_data, analysis]:
@@ -108,6 +112,10 @@ def _extract_resume_skills(resume_data: dict, analysis: dict) -> list:
 
 
 def _extract_resume_summary(resume_data: dict, analysis: dict) -> str:
+    """
+    Find the best available resume summary from
+    structured resume data or analysis results.
+    """
     for source in [resume_data, analysis]:
         for key in [
             "summary",
@@ -131,6 +139,10 @@ def _collect_latest_resume(
     db: Session,
     user_id: int,
 ) -> dict:
+    """
+    Collect the latest resume data and analysis
+    for the career path context.
+    """
     resume = (
         db.query(Resume)
         .filter(Resume.user_id == user_id)
@@ -192,6 +204,10 @@ def _collect_recruiter_view(
     db: Session,
     user_id: int,
 ) -> dict:
+    """
+    Collect recent recruiter view analysis results
+    for career path generation.
+    """
     analyses = (
         db.query(RecruiterViewAnalysis)
         .filter(RecruiterViewAnalysis.user_id == user_id)
@@ -227,6 +243,10 @@ def _collect_linkedin(
     db: Session,
     user_id: int,
 ) -> dict:
+    """
+    Collect the user's saved LinkedIn profile
+    and latest LinkedIn analysis.
+    """
     profile = (
         db.query(LinkedInProfile)
         .filter(LinkedInProfile.user_id == user_id)
@@ -255,6 +275,10 @@ def _collect_portfolio(
     db: Session,
     user_id: int,
 ) -> dict:
+    """
+    Collect the user's saved portfolio analysis
+    for career path generation.
+    """
     profile = (
         db.query(PortfolioProfile)
         .filter(PortfolioProfile.user_id == user_id)
@@ -278,6 +302,10 @@ def _collect_applications(
     db: Session,
     user_id: int,
 ) -> dict:
+    """
+    Collect recent job applications and status counts
+    to include application momentum in the roadmap.
+    """
     applications = (
         db.query(Application)
         .filter(Application.user_id == user_id)
@@ -314,6 +342,10 @@ def _collect_interviews(
     db: Session,
     user_id: int,
 ) -> dict:
+    """
+    Collect recent interview results and feedback
+    to include interview readiness in the roadmap.
+    """
     results = (
         db.query(InterviewResult)
         .filter(InterviewResult.user_id == user_id)
@@ -368,6 +400,10 @@ def _collect_dashboard(
     db: Session,
     user_id: int,
 ) -> dict:
+    """
+    Collect the latest dashboard snapshot and review
+    as additional career readiness context.
+    """
     snapshot = (
         db.query(DashboardSnapshot)
         .filter(DashboardSnapshot.user_id == user_id)
@@ -418,6 +454,10 @@ def collect_career_path_context(
     db: Session,
     user_id: int,
 ) -> dict:
+    """
+    Build a privacy-safe career context from saved
+    Launchly data for AI career path generation.
+    """
     return {
         "user_id": user_id,
         "generated_at": datetime.utcnow().isoformat(),

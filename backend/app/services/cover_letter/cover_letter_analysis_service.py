@@ -30,6 +30,11 @@ client = AsyncOpenAI(
 async def analyze_cover_letter(
     payload: CoverLetterAnalysisRequest,
 ) -> CoverLetterAnalysisResponse:
+    """
+    Analyze a cover letter from a recruiter perspective
+    and generate AI-powered feedback and improvements.
+    """
+
     clean_job_posting = prepare_data(payload.job_posting)
     clean_subject = prepare_data(payload.subject)
     clean_body = prepare_data(payload.body)

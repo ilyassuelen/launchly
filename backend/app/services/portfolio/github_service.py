@@ -18,6 +18,10 @@ GITHUB_API_BASE = "https://api.github.com"
 
 
 def _get_github_headers() -> dict:
+    """
+    Build GitHub API request headers and
+    optionally include the configured API token.
+    """
     token = getattr(settings, "GITHUB_TOKEN", None)
 
     headers = {
@@ -34,6 +38,10 @@ def _get_github_headers() -> dict:
 async def fetch_github_profile(
     username: str,
 ) -> GitHubProfile:
+    """
+    Fetch public GitHub profile information
+    for the provided username.
+    """
     username = username.strip()
 
     if not username:
@@ -99,6 +107,10 @@ async def _fetch_readme(
     username: str,
     repo_name: str,
 ) -> str:
+    """
+    Fetch and decode the repository README
+    content from the GitHub API.
+    """
     url = f"{GITHUB_API_BASE}/repos/{username}/{repo_name}/readme"
 
     try:
@@ -151,6 +163,10 @@ async def _fetch_readme(
 async def fetch_github_repositories(
     username: str,
 ) -> List[GitHubRepository]:
+    """
+    Fetch and normalize the user's public
+    GitHub repositories including README content.
+    """
     username = username.strip()
 
     if not username:

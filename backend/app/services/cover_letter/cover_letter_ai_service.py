@@ -28,6 +28,10 @@ logger = logging.getLogger(__name__)
 async def generate_cover_letter(
     payload: CoverLetterGenerateRequest,
 ) -> CoverLetterGenerateResponse:
+    """
+    Generate an AI-powered cover letter based on the
+    provided resume context, skills and job posting.
+    """
 
     clean_sender_name = prepare_data(payload.sender_name)
     clean_current_role = prepare_data(payload.current_role)

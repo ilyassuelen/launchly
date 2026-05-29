@@ -23,6 +23,10 @@ logger = logging.getLogger(__name__)
 
 
 def _score_from_label(value) -> int | None:
+    """
+    Convert common AI-generated score labels
+    into approximate numeric scores.
+    """
     if not isinstance(value, str):
         return None
 
@@ -47,6 +51,10 @@ def _score_from_label(value) -> int | None:
 
 
 def _clamp_score(value) -> int:
+    """
+    Convert a score-like value into an integer
+    between 0 and 100.
+    """
     label_score = _score_from_label(value)
 
     if label_score is not None:
@@ -62,6 +70,10 @@ def _first_present_score(
     evaluation: dict,
     keys: list[str],
 ) -> int:
+    """
+    Find the first usable score value from
+    multiple possible AI response keys.
+    """
     for key in keys:
         value = evaluation.get(key)
 
@@ -75,6 +87,7 @@ def _first_present_score(
 
 
 def _average_scores(values: list[int]) -> int:
+    """Calculate the average of valid positive scores."""
     clean_values = [
         value
         for value in values
@@ -87,7 +100,6 @@ def _average_scores(values: list[int]) -> int:
     return _clamp_score(sum(clean_values) / len(clean_values))
 
 
-# Weighted overall score helper
 def _weighted_overall_score(
     *,
     confidence_score: int,
@@ -95,6 +107,10 @@ def _weighted_overall_score(
     structure_score: int,
     specificity_score: int,
 ) -> int:
+    """
+    Calculate the final interview score from
+    weighted evaluation categories.
+    """
     scores = [
         confidence_score,
         communication_score,
@@ -116,6 +132,10 @@ def _weighted_overall_score(
 
 
 def _normalize_scores(evaluation: dict) -> dict:
+    """
+    Normalize AI and fallback evaluation scores
+    into the expected interview result fields.
+    """
     normalized = dict(evaluation)
 
     overall_score = _first_present_score(
@@ -220,6 +240,10 @@ def _safe_string(value) -> str | None:
 
 
 def _get_client() -> AsyncOpenAI:
+    """
+    Create an OpenAI client and fail early
+    if the API key is missing.
+    """
     if not settings.OPENAI_API_KEY:
         logger.error(
             "Interview evaluation failed because OPENAI_API_KEY is missing",
@@ -248,6 +272,10 @@ async def _run_interview_evaluation(
     session: InterviewSession,
     messages: list[InterviewMessage],
 ) -> dict:
+    """
+    Run the AI evaluation for a completed interview
+    session and return the parsed response.
+    """
     client = _get_client()
 
     prompt = build_interview_evaluation_prompt(
@@ -326,9 +354,12 @@ async def _run_interview_evaluation(
 
 def _build_fallback_evaluation(
     *,
-    session: InterviewSession,
     messages: list[InterviewMessage],
 ) -> dict:
+    """
+    Build a local interview evaluation fallback
+    when the AI response is unavailable or invalid.
+    """
     user_answers = [
         message.content
         for message in messages
@@ -426,6 +457,10 @@ async def evaluate_interview_session(
     user_id: int,
     session_id: int,
 ) -> InterviewResultResponse:
+    """
+    Evaluate a completed interview session, persist
+    the result and return the saved evaluation.
+    """
     existing_result = (
         db.query(InterviewResult)
         .filter(
@@ -473,7 +508,6 @@ async def evaluate_interview_session(
     )
 
     fallback_evaluation = _build_fallback_evaluation(
-        session=session,
         messages=messages,
     )
 

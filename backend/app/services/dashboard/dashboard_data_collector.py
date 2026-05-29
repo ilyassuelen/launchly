@@ -23,6 +23,10 @@ def _safe_int(value: Any) -> int:
 
 
 def _extract_portfolio_score(profile: PortfolioProfile | None) -> int:
+    """
+    Extract the best available portfolio score
+    from the profile or its stored analysis payload.
+    """
     if not profile:
         return 0
 
@@ -51,6 +55,10 @@ def _get_latest_portfolio_profile(
     db: Session,
     user_id: int,
 ) -> PortfolioProfile | None:
+    """
+    Return the latest portfolio profile using the
+    best available timestamp or ID ordering.
+    """
     query = (
         db.query(PortfolioProfile)
         .filter(PortfolioProfile.user_id == user_id)
@@ -72,6 +80,10 @@ def collect_dashboard_data(
     user_id: int,
     language: str,
 ) -> dict:
+    """
+    Collect the latest user data needed to calculate
+    dashboard scores and generate dashboard insights.
+    """
     today = datetime.utcnow().date()
     week_start = today - timedelta(days=7)
 

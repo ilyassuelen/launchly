@@ -135,6 +135,10 @@ def _safe_string(value: Any) -> str:
 
 
 def _normalize_priority(value: Any) -> str:
+    """
+    Normalize an AI-provided priority value to one
+    of the supported priority levels.
+    """
     priority = _safe_string(value).lower()
 
     if priority in PRIORITY_ORDER:
@@ -144,6 +148,11 @@ def _normalize_priority(value: Any) -> str:
 
 
 def _normalize_smart_suggestion(item: Any) -> dict | None:
+    """
+    Validate and normalize one AI-generated suggestion
+    so the response always has a title, description and
+    supported priority value.
+    """
     if not isinstance(item, dict):
         return None
 
@@ -162,6 +171,10 @@ def _normalize_smart_suggestion(item: Any) -> dict | None:
 
 
 def _normalize_smart_suggestions(parsed: dict) -> list[dict]:
+    """
+    Clean, sort and limit AI-generated resume suggestions
+    before converting them into response schemas.
+    """
     suggestions = [
         suggestion
         for suggestion in [
@@ -181,10 +194,14 @@ def _normalize_smart_suggestions(parsed: dict) -> list[dict]:
 
 
 def _extract_structured_resume_data(
-    *,
-    parsed: dict,
-    payload: ResumeAnalysisRequest,
+        *,
+        parsed: dict,
+        payload: ResumeAnalysisRequest
 ) -> dict:
+    """
+    Extract useful structured resume information from the
+    AI response so other features can reuse it later.
+    """
     structured = {}
 
     for key in STRUCTURED_RESUME_KEYS:
@@ -215,6 +232,10 @@ def _serialize_resume_analysis(
     raw_analysis: dict | None = None,
     structured_resume_data: dict | None = None,
 ) -> dict:
+    """
+    Convert the validated analysis response into a JSON-safe
+    dictionary for storing it on the resume record.
+    """
     serialized = {
         "smart_suggestions": [
             suggestion.model_dump()
@@ -243,6 +264,10 @@ def _save_resume_analysis(
     raw_analysis: dict | None = None,
     structured_resume_data: dict | None = None,
 ) -> None:
+    """
+    Save the latest ATS score and resume analysis result
+    on the matching user-owned resume.
+    """
     resume = (
         db.query(Resume)
         .filter(
@@ -275,6 +300,10 @@ async def analyze_resume(
     db: Session | None = None,
     user_id: int | None = None,
 ) -> ResumeAnalysisResponse:
+    """
+    Run an AI resume analysis, calculate the local ATS score,
+    and optionally persist the result for the selected resume.
+    """
     clean_resume_content = prepare_data(payload.resume_content)
     clean_target_role = prepare_data(payload.target_role or "")
 

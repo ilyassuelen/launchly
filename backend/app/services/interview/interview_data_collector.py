@@ -12,6 +12,7 @@ MAX_TEXT_LENGTH = 900
 
 
 def _safe_list(value: Any) -> list:
+    """Normalize arbitrary values into a clean list."""
     if isinstance(value, list):
         return [
             item
@@ -41,6 +42,7 @@ def _safe_list(value: Any) -> list:
 
 
 def _safe_text(value: Any) -> str:
+    """Convert values into trimmed text with length limits."""
     if value is None:
         return ""
 
@@ -53,6 +55,7 @@ def _safe_text(value: Any) -> str:
 
 
 def _safe_dict(value: Any) -> dict:
+    """Return the value if it is a dictionary, otherwise an empty dict."""
     if isinstance(value, dict):
         return value
 
@@ -60,6 +63,7 @@ def _safe_dict(value: Any) -> dict:
 
 
 def _merge_dicts(*values: Any) -> dict:
+    """Merge multiple dictionaries into one combined dictionary."""
     merged = {}
 
     for value in values:
@@ -198,6 +202,10 @@ def _extract_skills(
     resume: Resume,
     analysis: dict,
 ) -> list:
+    """
+    Extract normalized skill signals from resume
+    model fields and AI analysis payloads.
+    """
     return (
         _safe_list(getattr(resume, "skills", None))
         or _extract_first_available_list(
@@ -274,6 +282,10 @@ def _extract_projects(
     resume: Resume,
     analysis: dict,
 ) -> list:
+    """
+    Extract project-related experience from
+    resume fields and structured analysis data.
+    """
     return (
         _safe_list(getattr(resume, "projects", None))
         or _extract_first_available_list(
@@ -541,6 +553,10 @@ def _extract_candidate_level(
     *,
     analysis: dict,
 ) -> str:
+    """
+    Extract the detected candidate seniority
+    level from structured resume analysis data.
+    """
     return (
         _safe_text(analysis.get("candidate_level"))
         or _safe_text(analysis.get("seniority"))
@@ -554,6 +570,15 @@ def collect_interview_resume_context(
     db: Session,
     user_id: int,
 ) -> dict:
+    """
+    Collect and normalize resume-derived interview
+    context across the user's saved resumes.
+
+    The returned context is used to personalize
+    interview questions and evaluation prompts
+    with relevant skills, projects, experience,
+    achievements, education and career signals.
+    """
     resumes = (
         db.query(Resume)
         .filter(Resume.user_id == user_id)

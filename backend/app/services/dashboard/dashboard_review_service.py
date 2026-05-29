@@ -58,6 +58,10 @@ async def _run_llm_review(
     scores: dict,
     language: str,
 ) -> dict:
+    """
+    Generate AI dashboard insights from collected
+    user data and calculated dashboard scores.
+    """
     if not settings.OPENAI_API_KEY:
         logger.warning(
             "Dashboard review using fallback because OPENAI_API_KEY is missing language=%s",
@@ -121,9 +125,11 @@ async def _run_llm_review(
     return parsed
 
 
-def _normalize_list(
-    value,
-) -> list:
+def _normalize_list(value) -> list:
+    """
+    Return the value if it is a list,
+    otherwise return an empty list.
+    """
     if isinstance(value, list):
         return value
 
@@ -137,6 +143,11 @@ async def build_dashboard_review(
     language: str,
     persist: bool = True,
 ) -> DashboardSummaryResponse:
+    """
+    Build a dashboard summary by collecting user data,
+    calculating scores, generating AI insights and
+    optionally saving a dashboard snapshot.
+    """
     data = collect_dashboard_data(
         db=db,
         user_id=user_id,

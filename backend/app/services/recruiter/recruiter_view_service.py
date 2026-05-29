@@ -36,12 +36,20 @@ logger = logging.getLogger(__name__)
 def _serialize_recruiter_view_analysis(
     response: RecruiterViewResponse,
 ) -> dict:
+    """
+    Convert the validated recruiter analysis response
+    into a JSON-safe dictionary for database storage.
+    """
     return response.model_dump()
 
 
 def calculate_recruiter_signals(
     resume_content: str,
 ) -> RecruiterSignal:
+    """
+    Calculate local recruiter-oriented resume signals
+    such as readability, technical depth and impact density.
+    """
     text = (resume_content or "").lower()
 
     readability = 70
@@ -102,6 +110,10 @@ def save_recruiter_view_analysis(
     resume_id: int,
     analysis: RecruiterViewResponse,
 ) -> RecruiterViewAnalysis:
+    """
+    Save or update the recruiter view analysis
+    for the selected user-owned resume.
+    """
     resume = (
         db.query(Resume)
         .filter(
@@ -151,6 +163,10 @@ def get_saved_recruiter_view_analysis(
     user_id: int,
     resume_id: int,
 ) -> RecruiterViewAnalysis | None:
+    """
+    Return the previously saved recruiter analysis
+    for the selected resume if it exists.
+    """
     return (
         db.query(RecruiterViewAnalysis)
         .filter(
@@ -166,6 +182,11 @@ async def analyze_recruiter_view(
     db: Session | None = None,
     user_id: int | None = None,
 ) -> RecruiterViewResponse:
+    """
+    Run an AI-powered recruiter perspective analysis,
+    calculate local recruiter signals and optionally
+    persist the analysis result.
+    """
     clean_resume_content = prepare_data(payload.resume_content)
     clean_target_role = prepare_data(payload.target_role or "")
 

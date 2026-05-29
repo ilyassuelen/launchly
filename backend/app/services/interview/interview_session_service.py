@@ -40,6 +40,10 @@ logger = logging.getLogger(__name__)
 
 
 def _get_client() -> AsyncOpenAI:
+    """
+    Create an OpenAI client and fail early
+    if the API key is not configured.
+    """
     if not settings.OPENAI_API_KEY:
         logger.error(
             "Interview session failed because OPENAI_API_KEY is missing",
@@ -59,6 +63,10 @@ async def _generate_ai_message(
     system_prompt: str,
     user_prompt: str,
 ) -> str:
+    """
+    Generate the next interview assistant message
+    from the provided system and user prompts.
+    """
     client = _get_client()
 
     try:
@@ -132,6 +140,10 @@ def _get_session_or_404(
     user_id: int,
     session_id: int,
 ) -> InterviewSession:
+    """
+    Return a user-owned interview session
+    or raise a 404 error if it does not exist.
+    """
     session = (
         db.query(InterviewSession)
         .filter(
@@ -155,6 +167,10 @@ def _get_session_messages(
     db: Session,
     session_id: int,
 ) -> list[InterviewMessage]:
+    """
+    Return all messages for an interview session
+    in chronological order.
+    """
     return (
         db.query(InterviewMessage)
         .filter(InterviewMessage.session_id == session_id)
@@ -166,6 +182,10 @@ def _get_session_messages(
 def _messages_for_prompt(
     messages: list[InterviewMessage],
 ) -> list[dict]:
+    """
+    Convert saved interview messages into a compact
+    structure for the next AI prompt.
+    """
     return [
         {
             "role": message.role,
@@ -183,6 +203,10 @@ async def start_interview_session(
     user_id: int,
     payload: InterviewStartRequest,
 ) -> InterviewStartResponse:
+    """
+    Create a new interview session and generate
+    the first AI interview question.
+    """
     resume_context = collect_interview_resume_context(
         db=db,
         user_id=user_id,
@@ -278,6 +302,10 @@ def list_interview_sessions(
     db: Session,
     user_id: int,
 ) -> list[InterviewSession]:
+    """
+    Return the latest interview sessions
+    for the selected user.
+    """
     return (
         db.query(InterviewSession)
         .filter(InterviewSession.user_id == user_id)
@@ -293,6 +321,10 @@ def get_interview_session_detail(
     user_id: int,
     session_id: int,
 ) -> InterviewSessionDetailResponse:
+    """
+    Return a full interview session with
+    messages and evaluation result.
+    """
     session = _get_session_or_404(
         db=db,
         user_id=user_id,
@@ -330,6 +362,10 @@ async def submit_interview_answer(
     session_id: int,
     payload: InterviewAnswerRequest,
 ) -> InterviewAnswerResponse:
+    """
+    Save the user's answer, generate the next question,
+    or complete and evaluate the interview session.
+    """
     session = _get_session_or_404(
         db=db,
         user_id=user_id,
@@ -492,6 +528,10 @@ def delete_all_interview_sessions(
     db: Session,
     user_id: int,
 ) -> dict:
+    """
+    Delete all interview sessions for the selected user
+    and return the number of deleted sessions.
+    """
     sessions = (
         db.query(InterviewSession)
         .filter(InterviewSession.user_id == user_id)
