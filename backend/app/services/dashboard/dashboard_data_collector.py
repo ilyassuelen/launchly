@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timedelta
 from typing import Any
 
@@ -72,6 +73,51 @@ def _get_latest_portfolio_profile(
         query = query.order_by(PortfolioProfile.id.desc())
 
     return query.first()
+
+
+def _safe_dict_json(value: Any) -> dict:
+    if isinstance(value, dict):
+        return value
+
+    if isinstance(value, str):
+        try:
+            parsed = json.loads(value)
+            return parsed if isinstance(parsed, dict) else {}
+        except Exception:
+            return {}
+
+    return {}
+
+
+def _extract_resume_analysis(resume: Resume | None) -> dict:
+    if not resume:
+        return {}
+
+    analysis = _safe_dict_json(resume.latest_resume_analysis)
+
+    structured = _safe_dict_json(
+        analysis.get("structured_resume_data")
+    )
+
+    return {
+        "latest_ats_score": _safe_int(resume.latest_ats_score),
+        "ats_score": _safe_dict_json(analysis.get("ats_score")),
+        "smart_suggestions": analysis.get("smart_suggestions", []),
+        "recruiter_analysis": _safe_dict_json(
+            analysis.get("recruiter_analysis")
+        ),
+        "structured_resume_data": structured,
+        "target_role": structured.get("target_role", ""),
+        "skills": structured.get("skills", []),
+        "technical_skills": structured.get("technical_skills", []),
+        "tools": structured.get("tools", []),
+        "technologies": structured.get("technologies", []),
+        "projects": structured.get("projects", []),
+        "experience": structured.get("experience", []),
+        "candidate_level": structured.get("candidate_level", ""),
+        "seniority": structured.get("seniority", ""),
+        "experience_level": structured.get("experience_level", ""),
+    }
 
 
 def collect_dashboard_data(
@@ -157,6 +203,9 @@ def collect_dashboard_data(
         if resume.latest_ats_score is not None
     ]
 
+    latest_resume = resumes[0] if resumes else None
+    latest_resume_analysis = _extract_resume_analysis(latest_resume)
+
     recruiter_scores = [
         _safe_int(item.recruiter_score)
         for item in recruiter_analyses
@@ -203,6 +252,20 @@ def collect_dashboard_data(
             "count": len(resumes),
             "scores": resume_scores,
             "latest_score": resume_scores[0] if resume_scores else 0,
+            "latest_analysis": latest_resume_analysis,
+            "structured_resume_data": latest_resume_analysis.get(
+                "structured_resume_data",
+                {},
+            ),
+            "target_role": latest_resume_analysis.get("target_role", ""),
+            "skills": latest_resume_analysis.get("skills", []),
+            "technical_skills": latest_resume_analysis.get("technical_skills", []),
+            "tools": latest_resume_analysis.get("tools", []),
+            "technologies": latest_resume_analysis.get("technologies", []),
+            "projects": latest_resume_analysis.get("projects", []),
+            "candidate_level": latest_resume_analysis.get("candidate_level", ""),
+            "seniority": latest_resume_analysis.get("seniority", ""),
+            "experience_level": latest_resume_analysis.get("experience_level", ""),
         },
         "recruiter_view": {
             "count": len(recruiter_analyses),

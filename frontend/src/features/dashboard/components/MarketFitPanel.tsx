@@ -77,7 +77,7 @@ export function MarketFitPanel({
             <div className="flex items-center justify-between gap-3 text-xs">
               <span className="inline-flex min-w-0 items-center gap-1 text-muted-foreground">
                 <Target className="size-3 shrink-0" />
-                <span className="leading-4">Best role match</span>
+                <span className="leading-4">Career Goal</span>
               </span>
 
               <span className="max-w-[120px] text-right font-semibold leading-4 text-cyan-200">

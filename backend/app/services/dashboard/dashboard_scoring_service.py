@@ -160,8 +160,9 @@ def build_market_fit(
         label = "Pending"
 
     target_role = (
-        data.get("linkedin", {}).get("target_role")
-        or "AI Engineer"
+        data.get("resume", {}).get("target_role")
+        or data.get("linkedin", {}).get("target_role")
+        or "Unknown"
     )
 
     recruiter_confidence = average([

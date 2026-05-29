@@ -38,7 +38,7 @@ Relationship rules:
 - Strong Recruiter View plus weak Portfolio means the profile is promising, but proof depth is weak.
 - Weak LinkedIn plus strong Resume means the user may be applying with decent documents but losing discoverability.
 - Weak Applications lowers career momentum even if profile assets are strong.
-- Missing skills should reflect actual weak signals, missing keywords or proof gaps from the provided data.
+- Missing skills should reflect actual weak signals, missing keywords or proof gaps from the provided data, especially resume.structured_resume_data when available.
 
 Output quality rules:
 - Titles should feel like premium SaaS product insights, not generic coaching phrases.
@@ -74,6 +74,13 @@ DETERMINISTIC_SCORES:
 
 Use the deterministic scores as the source of truth.
 Do not change, recalculate or invent numeric scores.
+
+IMPORTANT RESUME DATA RULE:
+- If resume.structured_resume_data or resume.latest_resume_analysis is available, use it as the main source for resume-related reasoning.
+- Use extracted skills, technical_skills, tools, technologies, projects, candidate_level, seniority and experience_level.
+- Do not treat the target_role as proof of expertise.
+- Only recommend missing skills if they are not already present in structured_resume_data.
+- If resume data exists but recruiter proof is weak, focus on proof depth, measurable impact and role alignment instead of generic resume advice.
 
 Think like an elite AI career strategist.
 Find the biggest bottlenecks across resume, recruiter perception,
