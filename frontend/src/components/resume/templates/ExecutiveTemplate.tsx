@@ -54,13 +54,22 @@ export function ExecutiveTemplate({
   hiddenProfiles = [],
   photoUrl,
 }: Props) {
+  const basics = resume.basics || {};
+  const skills = resume.skills || [];
+  const languages = resume.languages || [];
+  const projects = resume.projects || [];
+  const experience = resume.experience || [];
+  const education = resume.education || [];
+  const softSkills = resume.softSkills || [];
+  const summary = resume.summary || {};
+
   const hasProfiles =
-    (!!resume.basics.linkedin &&
+    (!!basics.linkedin &&
       !hiddenProfiles.includes("linkedin")) ||
-    (!!resume.basics.github &&
+    (!!basics.github &&
       !hiddenProfiles.includes("github")) ||
-    (!!resume.basics.website) ||
-    (resume.basics.socialProfiles?.filter((profile) => {
+    (!!basics.website) ||
+    (basics.socialProfiles?.filter((profile) => {
       const platform =
         profile.platform?.toLowerCase();
 
@@ -75,25 +84,24 @@ export function ExecutiveTemplate({
     }).length ?? 0) > 0;
 
   const hasSkills =
-    resume.skills.length > 0;
+    skills.length > 0;
 
   const hasLanguages =
-    resume.languages.length > 0;
+    languages.length > 0;
 
-  const hasSoftSkills =
-    (resume.softSkills || []).length > 0;
+  const hasSoftSkills = softSkills.length > 0;
 
   const hasProjects =
-    resume.projects.length > 0;
+    projects.length > 0;
 
   const hasExperience =
-    resume.experience.length > 0;
+    experience.length > 0;
 
   const hasEducation =
-    resume.education.length > 0;
+    education.length > 0;
 
   const hasSummary =
-    !!resume.summary.content?.trim();
+    !!summary.content?.trim();
 
   const getTextItems = (
       value?: string | string[],
@@ -137,9 +145,9 @@ export function ExecutiveTemplate({
             {!hiddenProfiles.includes(
               "linkedin",
             ) &&
-              resume.basics.linkedin && (
+              basics.linkedin && (
                 <a
-                  href={resume.basics.linkedin}
+                  href={basics.linkedin}
                   target="_blank"
                   rel="noreferrer"
                   className="block underline-offset-2 hover:underline"
@@ -151,9 +159,9 @@ export function ExecutiveTemplate({
             {!hiddenProfiles.includes(
               "github",
             ) &&
-              resume.basics.github && (
+              basics.github && (
                 <a
-                  href={resume.basics.github}
+                  href={basics.github}
                   target="_blank"
                   rel="noreferrer"
                   className="block underline-offset-2 hover:underline"
@@ -162,9 +170,9 @@ export function ExecutiveTemplate({
                 </a>
               )}
 
-            {resume.basics.website && (
+            {basics.website && (
               <a
-                href={resume.basics.website}
+                href={basics.website}
                 target="_blank"
                 rel="noreferrer"
                 className="block underline-offset-2 hover:underline"
@@ -173,7 +181,7 @@ export function ExecutiveTemplate({
               </a>
             )}
 
-            {resume.basics.socialProfiles
+            {basics.socialProfiles
               ?.filter((profile) => {
                 const platform =
                   profile.platform?.toLowerCase();
@@ -217,7 +225,7 @@ export function ExecutiveTemplate({
           </div>
 
           <div className="mt-4 space-y-4">
-            {resume.skills.map(
+            {skills.map(
               (group: SkillGroup) => (
                 <div key={group.id}>
 
@@ -257,7 +265,7 @@ export function ExecutiveTemplate({
           </div>
 
           <div className="mt-3 space-y-2">
-            {resume.languages.map((lang: ResumeLanguage) => (
+            {languages.map((lang: ResumeLanguage) => (
               <div
                 key={lang.id}
                 className="flex items-center justify-between"
@@ -291,7 +299,7 @@ export function ExecutiveTemplate({
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
-            {(resume.softSkills || []).map(
+            {(softSkills || []).map(
               (skill: ResumeSoftSkill) => (
                 <span
                   key={skill.id}
@@ -325,7 +333,7 @@ export function ExecutiveTemplate({
           </div>
 
           <div className="mt-5 space-y-6">
-            {resume.projects.map(
+            {projects.map(
               (project: ProjectItem) => (
                 <div key={project.id}>
 
@@ -401,7 +409,7 @@ export function ExecutiveTemplate({
           </div>
 
           <div className="mt-5 space-y-6">
-            {resume.experience.map(
+            {experience.map(
               (item: ExperienceItem) => (
                 <div key={item.id}>
 
@@ -478,7 +486,7 @@ export function ExecutiveTemplate({
           </div>
 
           <div className="mt-5 space-y-5">
-            {resume.education.map(
+            {education.map(
               (item: EducationItem) => (
                 <div key={item.id}>
 
@@ -578,7 +586,7 @@ export function ExecutiveTemplate({
                 fontSize: scaleFont(42, typography),
               }}
             >
-              {resume.basics.fullName}
+              {basics.fullName}
             </div>
 
             <div
@@ -587,7 +595,7 @@ export function ExecutiveTemplate({
                 fontSize: scaleFont(15, typography),
               }}
             >
-              {resume.basics.title}
+              {basics.title}
             </div>
 
             <div
@@ -596,12 +604,12 @@ export function ExecutiveTemplate({
                 fontSize: scaleFont(12, typography),
               }}
             >
-              <span>{resume.basics.location}</span>
-              <span>{resume.basics.email}</span>
+              <span>{basics.location}</span>
+              <span>{basics.email}</span>
 
-              {resume.basics.website && (
+              {basics.website && (
                 <a
-                  href={resume.basics.website}
+                  href={basics.website}
                   target="_blank"
                   rel="noreferrer"
                   className="underline-offset-2 hover:underline"
@@ -617,7 +625,7 @@ export function ExecutiveTemplate({
                 photoUrl ||
                 "https://ui-avatars.com/api/?name=User"
               }
-              alt={resume.basics.fullName}
+              alt={basics.fullName || "Profile"}
               className="size-36 rounded-3xl object-cover shadow-2xl"
           />
         </div>
@@ -663,7 +671,7 @@ export function ExecutiveTemplate({
                   lineHeight: typography.lineHeight,
                 }}
               >
-                {resume.summary.content}
+                {summary.content}
               </p>
             </section>
           )}

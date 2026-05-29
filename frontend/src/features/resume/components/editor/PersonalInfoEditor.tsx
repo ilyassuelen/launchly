@@ -13,7 +13,7 @@ interface Props {
     React.SetStateAction<any>
   >;
   updateBasics: (
-    field: keyof typeof resume.basics,
+    field: keyof NonNullable<Resume["basics"]>,
     value: string,
   ) => void;
   activeSection: string;
@@ -27,6 +27,8 @@ export function PersonalInfoEditor({
   activeSection,
   setActiveSection,
 }: Props) {
+  const basics = resume.basics || {};
+
   const handlePhotoUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -43,7 +45,7 @@ export function PersonalInfoEditor({
       setResume((prev: any) => ({
         ...prev,
         basics: {
-          ...prev.basics,
+          ...(prev.basics || {}),
           photo: response.url,
         },
       }));
@@ -62,13 +64,13 @@ export function PersonalInfoEditor({
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-white/10 bg-black/20 p-4">
           <img
             src={
-              resume.basics.photo
-                ? resume.basics.photo.startsWith("http")
-                  ? resume.basics.photo
+              basics.photo
+                ? basics.photo.startsWith("http")
+                  ? basics.photo
                   : `${
                       import.meta.env.VITE_API_URL ||
                       "http://127.0.0.1:8000"
-                    }${resume.basics.photo}`
+                    }${basics.photo}`
                 : "https://ui-avatars.com/api/?name=User"
             }
             alt="Profile"
@@ -95,7 +97,7 @@ export function PersonalInfoEditor({
           </div>
 
           <input
-            value={resume.basics.fullName}
+            value={basics.fullName || ""}
             onChange={(e) =>
               updateBasics("fullName", e.target.value)
             }
@@ -109,7 +111,7 @@ export function PersonalInfoEditor({
           </div>
 
           <input
-            value={resume.basics.title}
+            value={basics.title || ""}
             onChange={(e) =>
               updateBasics("title", e.target.value)
             }
@@ -123,7 +125,7 @@ export function PersonalInfoEditor({
           </div>
 
           <input
-            value={resume.basics.email}
+            value={basics.email || ""}
             onChange={(e) =>
               updateBasics("email", e.target.value)
             }
@@ -131,7 +133,7 @@ export function PersonalInfoEditor({
           />
         </div>
 
-        {resume.basics.website && (
+        {basics.website && (
           <div>
             <div className="mb-1 text-[11px] text-muted-foreground">
               Website
@@ -140,7 +142,7 @@ export function PersonalInfoEditor({
             <div className="flex items-center gap-2">
               <div className="flex-1">
                 <input
-                  value={resume.basics.website}
+                  value={basics.website || ""}
                   onChange={(e) =>
                     updateBasics("website", e.target.value)
                   }
@@ -174,7 +176,7 @@ export function PersonalInfoEditor({
                 </div>
 
                 <input
-                  value={resume.basics.websiteLabel || ""}
+                  value={basics.websiteLabel || ""}
                   onChange={(e) =>
                     updateBasics(
                       "websiteLabel",
@@ -189,14 +191,14 @@ export function PersonalInfoEditor({
           </div>
         )}
 
-        {resume.basics.location && (
+        {basics.location && (
           <div>
             <div className="mb-1 text-[11px] text-muted-foreground">
               Location
             </div>
 
             <input
-              value={resume.basics.location}
+              value={basics.location || ""}
               onChange={(e) =>
                 updateBasics("location", e.target.value)
               }

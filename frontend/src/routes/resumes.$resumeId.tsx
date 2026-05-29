@@ -140,7 +140,7 @@ function ResumeBuilder() {
       contentRef: printRef,
 
       documentTitle:
-        `${resume?.basics.fullName || "Resume"}_Resume`,
+        `${resume?.basics?.fullName || "Resume"}_Resume`,
 
       pageStyle: `
         @page {
@@ -528,7 +528,7 @@ const selectedProfile =
   };
 
   const updateResumeBasicsField = (
-    field: keyof typeof resume.basics,
+    field: keyof NonNullable<typeof resume.basics>,
     value: string,
   ) => {
     if (!resume) {
@@ -536,7 +536,7 @@ const selectedProfile =
     }
     setResume((prev) => {
       const updatedBasics = {
-        ...prev.basics,
+        ...(prev.basics || {}),
         [field]: value,
       };
 
@@ -591,7 +591,7 @@ const selectedProfile =
     setResume((prev) => ({
       ...prev,
       summary: {
-        ...prev.summary,
+        ...(prev.summary || {}),
         content: value,
       },
     }));
@@ -617,9 +617,6 @@ const selectedProfile =
 
   const buildResumeContext = () => {
       return `
-Name:
-${resume?.basics?.fullName || ""}
-
 Headline:
 ${resume?.basics?.title || ""}
 
@@ -734,7 +731,7 @@ ${(p.bullets || []).join(" ")}
             ? {
                 ...project,
                 bullets:
-                  project.bullets?.map(
+                  (project.bullets || []).map(
                     (bullet, index) =>
                       index === bulletIndex
                         ? value
@@ -769,7 +766,7 @@ ${(p.bullets || []).join(" ")}
     setResume((prev) => ({
       ...prev,
       experience: [
-        ...prev.experience,
+        ...(prev.experience || []),
         {
           id: crypto.randomUUID(),
           company: "New Company",
@@ -791,7 +788,7 @@ ${(p.bullets || []).join(" ")}
     setResume((prev) => ({
       ...prev,
       experience:
-        prev.experience.filter(
+        (prev.experience || []).filter(
           (exp) =>
             exp.id !== experienceId,
         ),
@@ -802,7 +799,7 @@ ${(p.bullets || []).join(" ")}
     setResume((prev) => ({
       ...prev,
       projects: [
-        ...prev.projects,
+        ...(prev.projects || []),
         {
           id: crypto.randomUUID(),
           title: "New Project",
@@ -824,7 +821,7 @@ ${(p.bullets || []).join(" ")}
   ) => {
     setResume((prev) => ({
       ...prev,
-      projects: prev.projects.filter(
+      projects: (prev.projects || []).filter(
         (project) =>
           project.id !== projectId,
       ),
@@ -835,7 +832,7 @@ ${(p.bullets || []).join(" ")}
     setResume((prev) => ({
       ...prev,
       education: [
-        ...prev.education,
+        ...(prev.education || []),
         {
           id: crypto.randomUUID(),
           school: "New School",
@@ -854,7 +851,7 @@ ${(p.bullets || []).join(" ")}
     setResume((prev) => ({
       ...prev,
       education:
-        prev.education.filter(
+        (prev.education || []).filter(
           (edu) =>
             edu.id !== educationId,
         ),
@@ -868,7 +865,7 @@ ${(p.bullets || []).join(" ")}
   ) => {
     setResume((prev) => ({
       ...prev,
-      education: prev.education.map(
+      education: (prev.education || []).map(
         (edu) =>
           edu.id === educationId
             ? {
@@ -886,7 +883,7 @@ ${(p.bullets || []).join(" ")}
   ) => {
     setResume((prev) => ({
       ...prev,
-      experience: prev.experience.map(
+      experience: (prev.experience || []).map(
         (exp) =>
           exp.id === experienceId
             ? {
@@ -904,7 +901,7 @@ ${(p.bullets || []).join(" ")}
   ) => {
     setResume((prev) => ({
       ...prev,
-      projects: prev.projects.map(
+      projects: (prev.projects || []).map(
         (project) =>
           project.id === projectId
             ? {
@@ -922,7 +919,7 @@ ${(p.bullets || []).join(" ")}
   ) => {
     setResume((prev) => ({
       ...prev,
-      education: prev.education.map(
+      education: (prev.education || []).map(
         (edu) =>
           edu.id === educationId
             ? {
@@ -940,7 +937,7 @@ ${(p.bullets || []).join(" ")}
   ) => {
     setResume((prev) => ({
       ...prev,
-      languages: prev.languages.map(
+      languages: (prev.languages || []).map(
         (lang) =>
           lang.id === languageId
             ? {
@@ -956,7 +953,7 @@ ${(p.bullets || []).join(" ")}
     setResume((prev) => ({
       ...prev,
       languages: [
-        ...prev.languages,
+        ...(prev.languages || []),
         {
           id: crypto.randomUUID(),
           name: "New Language",
@@ -972,7 +969,7 @@ ${(p.bullets || []).join(" ")}
     setResume((prev) => ({
       ...prev,
       languages:
-        prev.languages.filter(
+        (prev.languages || []).filter(
           (lang) =>
             lang.id !== languageId,
         ),
@@ -1016,7 +1013,7 @@ ${(p.bullets || []).join(" ")}
   ) => {
     setResume((prev) => ({
       ...prev,
-      languages: prev.languages.map(
+      languages: (prev.languages || []).map(
         (lang) =>
           lang.id === languageId
             ? {
@@ -1032,7 +1029,7 @@ ${(p.bullets || []).join(" ")}
     setResume((prev) => ({
       ...prev,
       skills: [
-        ...prev.skills,
+        ...(prev.skills || []),
         {
           id: crypto.randomUUID(),
           category:
@@ -1048,7 +1045,7 @@ ${(p.bullets || []).join(" ")}
   ) => {
     setResume((prev) => ({
       ...prev,
-      skills: prev.skills.filter(
+      skills: (prev.skills || []).filter(
         (group) =>
           group.id !== skillId,
       ),
@@ -1061,7 +1058,7 @@ ${(p.bullets || []).join(" ")}
   ) => {
     setResume((prev) => ({
       ...prev,
-      skills: prev.skills.map(
+      skills: (prev.skills || []).map(
         (group) =>
           group.id === skillId
             ? {
@@ -1105,7 +1102,7 @@ ${(p.bullets || []).join(" ")}
 
     setResume((prev) => ({
       ...prev,
-      skills: prev.skills.map(
+      skills: (prev.skills || []).map(
         (group) =>
           group.id === editingSkillId
             ? {
@@ -1160,9 +1157,9 @@ ${(p.bullets || []).join(" ")}
     setResume((prev) => ({
       ...prev,
       basics: {
-        ...prev.basics,
+        ...(prev.basics || {}),
         socialProfiles: [
-          ...(prev.basics.socialProfiles || []),
+          ...(prev.basics?.socialProfiles || []),
           {
             id: crypto.randomUUID(),
             platform: "X",
@@ -1190,10 +1187,10 @@ ${(p.bullets || []).join(" ")}
       setResume((prev) => ({
         ...prev,
         basics: {
-          ...prev.basics,
+          ...(prev.basics || {}),
           socialProfiles: (
             prev.basics
-              .socialProfiles || []
+              ?.socialProfiles || []
           ).filter(
             (profile) =>
               profile.id !== profileId,
@@ -1232,9 +1229,9 @@ ${(p.bullets || []).join(" ")}
     setResume((prev) => ({
       ...prev,
       basics: {
-        ...prev.basics,
+        ...(prev.basics || {}),
         socialProfiles: (
-          prev.basics.socialProfiles || []
+          prev.basics?.socialProfiles || []
         ).map((profile) =>
           profile.id === id
             ? {
@@ -1324,7 +1321,7 @@ ${(p.bullets || []).join(" ")}
         return (
           <LanguagesSection
             languages={
-              resume.languages
+              resume.languages || []
             }
             addLanguage={
               addLanguage
@@ -1378,7 +1375,7 @@ ${(p.bullets || []).join(" ")}
         return (
           <ExperienceSection
               experience={
-                resume.experience
+                resume.experience || []
               }
               updateExperienceBullet={
                 updateExperienceBullet
@@ -1405,7 +1402,7 @@ ${(p.bullets || []).join(" ")}
       case "projects":
         return (
           <ProjectsSection
-            projects={resume.projects}
+            projects={resume.projects || []}
             updateProjectBullet={
               updateProjectBullet
             }
@@ -1430,7 +1427,7 @@ ${(p.bullets || []).join(" ")}
         return (
           <EducationSection
             education={
-              resume.education
+              resume.education || []
             }
             addEducation={
               addEducation
@@ -1470,7 +1467,7 @@ ${(p.bullets || []).join(" ")}
           activeSection={activeSection}
           setActiveSection={setActiveSection}
           updateBasics={updateResumeBasicsField}
-          summary={resume.summary.content}
+          summary={resume.summary?.content || ""}
           updateSummary={updateSummary}
           sidebarSections={sidebarSections}
           mainSections={mainSections}
@@ -1765,8 +1762,9 @@ ${(p.bullets || []).join(" ")}
             ""
           }
           description={
-            selectedEducation?.description ||
-            ""
+              Array.isArray(selectedEducation?.description)
+                ? selectedEducation.description.join("\n")
+                : selectedEducation?.description || ""
           }
           onClose={() =>
             setSelectedEducationId(
@@ -1910,10 +1908,10 @@ ${(p.bullets || []).join(" ")}
                 setResume((prev) => ({
                     ...prev,
                     basics: {
-                        ...prev.basics,
+                        ...(prev.basics || {}),
                         socialProfiles: (
                             prev.basics
-                                .socialProfiles || []
+                                ?.socialProfiles || []
                         ).filter(
                             (profile) =>
                                 profile.id !==

@@ -1,3 +1,5 @@
+import type React from "react";
+
 import type {
   Resume,
   ExperienceItem,
@@ -53,12 +55,21 @@ export function GradientTemplate({
   hiddenProfiles = [],
   photoUrl,
 }: Props) {
+  const basics = resume.basics || {};
+  const skills = resume.skills || [];
+  const languages = resume.languages || [];
+  const projects = resume.projects || [];
+  const experience = resume.experience || [];
+  const education = resume.education || [];
+  const softSkills = resume.softSkills || [];
+  const summary = resume.summary || {};
+
   const hasProfiles =
-    (!!resume.basics.linkedin &&
+    (!!basics.linkedin &&
       !hiddenProfiles.includes("linkedin")) ||
-    (!!resume.basics.github &&
+    (!!basics.github &&
       !hiddenProfiles.includes("github")) ||
-    (resume.basics.socialProfiles?.filter((profile) => {
+    (basics.socialProfiles?.filter((profile) => {
       const platform = profile.platform?.toLowerCase();
 
       return (
@@ -69,13 +80,13 @@ export function GradientTemplate({
       );
     }).length ?? 0) > 0;
 
-  const hasSkills = resume.skills.length > 0;
-  const hasLanguages = resume.languages.length > 0;
-  const hasEducation = resume.education.length > 0;
-  const hasSoftSkills = (resume.softSkills || []).length > 0;
-  const hasSummary = !!resume.summary.content?.trim();
-  const hasProjects = resume.projects.length > 0;
-  const hasExperience = resume.experience.length > 0;
+  const hasSkills = skills.length > 0;
+  const hasLanguages = languages.length > 0;
+  const hasEducation = education.length > 0;
+  const hasSoftSkills = softSkills.length > 0;
+  const hasSummary = !!summary.content?.trim();
+  const hasProjects = projects.length > 0;
+  const hasExperience = experience.length > 0;
 
   const getTextItems = (value?: string | string[]) => {
     if (Array.isArray(value)) {
@@ -159,9 +170,9 @@ export function GradientTemplate({
             }}
           >
             {!hiddenProfiles.includes("linkedin") &&
-              resume.basics.linkedin && (
+              basics.linkedin && (
                 <a
-                  href={resume.basics.linkedin}
+                  href={basics.linkedin}
                   target="_blank"
                   rel="noreferrer"
                   className="underline-offset-2 hover:underline"
@@ -171,9 +182,9 @@ export function GradientTemplate({
               )}
 
             {!hiddenProfiles.includes("github") &&
-              resume.basics.github && (
+              basics.github && (
                 <a
-                  href={resume.basics.github}
+                  href={basics.github}
                   target="_blank"
                   rel="noreferrer"
                   className="underline-offset-2 hover:underline"
@@ -182,7 +193,7 @@ export function GradientTemplate({
                 </a>
               )}
 
-            {resume.basics.socialProfiles
+            {basics.socialProfiles
               ?.filter((profile) => {
                 const platform = profile.platform?.toLowerCase();
 
@@ -215,7 +226,7 @@ export function GradientTemplate({
           title={sidebarSectionTitles.skills}
         >
           <div className="space-y-2.5">
-            {resume.skills.map((group: SkillGroup) => (
+            {skills.map((group: SkillGroup) => (
               <div key={group.id}>
                 <div
                   className="font-black text-[#1c1917] tracking-[-0.01em]"
@@ -248,7 +259,7 @@ export function GradientTemplate({
           title={sidebarSectionTitles.languages}
         >
           <div className="space-y-1.5">
-            {resume.languages.map((lang: ResumeLanguage) => (
+            {languages.map((lang: ResumeLanguage) => (
               <div
                 key={lang.id}
                 className="flex items-center justify-between gap-3 text-[#3f3a36] font-medium"
@@ -271,7 +282,7 @@ export function GradientTemplate({
           title={sidebarSectionTitles.softskills}
         >
           <div className="flex flex-wrap gap-1.5">
-            {(resume.softSkills || []).map((skill: ResumeSoftSkill) => (
+            {(softSkills || []).map((skill: ResumeSoftSkill) => (
               <span
                 key={skill.id}
                 className="border border-[#ddb892] bg-[#fff8ef] px-2.5 py-1 font-semibold text-[#6f4e37]"
@@ -294,7 +305,7 @@ export function GradientTemplate({
           <SectionTitle>{mainSectionTitles.projects}</SectionTitle>
 
           <div className="mt-3 space-y-3.5">
-            {resume.projects.map((project: ProjectItem) => (
+            {projects.map((project: ProjectItem) => (
               <div
                 key={project.id}
                 className="border-l-2 border-[#d6a16d] pl-4"
@@ -350,7 +361,7 @@ export function GradientTemplate({
           <SectionTitle>{mainSectionTitles.experience}</SectionTitle>
 
           <div className="mt-3 space-y-3.5">
-            {resume.experience.map((item: ExperienceItem) => (
+            {experience.map((item: ExperienceItem) => (
               <div key={item.id}>
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -402,7 +413,7 @@ export function GradientTemplate({
           <SectionTitle>{mainSectionTitles.education}</SectionTitle>
 
           <div className="mt-3 space-y-3">
-            {resume.education.map((item: EducationItem) => (
+            {education.map((item: EducationItem) => (
               <div key={item.id}>
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -478,7 +489,7 @@ export function GradientTemplate({
               fontSize: scaleFont(38, typography),
             }}
           >
-            {resume.basics.fullName}
+            {basics.fullName}
           </div>
 
           <div
@@ -488,7 +499,7 @@ export function GradientTemplate({
               lineHeight: typography.lineHeight,
             }}
           >
-            {resume.basics.title}
+            {basics.title}
           </div>
 
           <div
@@ -497,11 +508,11 @@ export function GradientTemplate({
               fontSize: scaleFont(10.5, typography),
             }}
           >
-            {resume.basics.location && <span>{resume.basics.location}</span>}
-            {resume.basics.email && <span>{resume.basics.email}</span>}
-            {resume.basics.website && (
+            {basics.location && <span>{basics.location}</span>}
+            {basics.email && <span>{basics.email}</span>}
+            {basics.website && (
               <a
-                href={resume.basics.website}
+                href={basics.website}
                 target="_blank"
                 rel="noreferrer"
                 className="underline-offset-2 hover:underline"
@@ -517,7 +528,7 @@ export function GradientTemplate({
             photoUrl ||
             "https://ui-avatars.com/api/?name=User"
           }
-          alt={resume.basics.fullName}
+          alt={basics.fullName || "Profile"}
           className="size-30 object-cover"
         />
       </header>
@@ -533,7 +544,7 @@ export function GradientTemplate({
                   lineHeight: typography.lineHeight,
                 }}
               >
-                {resume.summary.content}
+                {summary.content}
               </p>
             </section>
           )}

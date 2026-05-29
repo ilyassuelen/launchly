@@ -139,6 +139,13 @@ GERMAN EXAMPLE:
   "priority": "high"
 }}
 
+STRUCTURED DATA RULES:
+- Extract structured resume data from the resume content
+- Only include information that is clearly visible in the resume
+- Do not invent skills, tools, projects, education or experience
+- Keep structured data concise and reusable for career path, recruiter view and interview preparation
+- If something is not visible, return an empty array. Do not return placeholder objects with "unknown".
+
 Return JSON format:
 
 {{
@@ -155,6 +162,49 @@ Return JSON format:
     "strongest_area": "...",
     "improvement_opportunity": "...",
     "recruiter_impression": "..."
-  }}
+  }},
+
+  "summary": "...",
+
+  "skills": ["..."],
+  "technical_skills": ["..."],
+  "soft_skills": ["..."],
+  "tools": ["..."],
+  "technologies": ["..."],
+  "tech_stack": ["..."],
+
+  "projects": [
+    {{
+      "name": "...",
+      "description": "...",
+      "technologies": ["..."],
+      "evidence": "..."
+    }}
+  ],
+
+  "experience": [
+    {{
+      "role": "...",
+      "company": "...",
+      "evidence": "..."
+    }}
+  ],
+
+  "education": [
+    {{
+      "school": "...",
+      "degree": "...",
+      "evidence": "..."
+    }}
+  ],
+
+  "keywords": ["..."],
+  "ats_keywords": ["..."],
+  "role_keywords": ["..."],
+
+  "target_roles": ["..."],
+  "candidate_level": "junior | mid | senior | unknown",
+  "seniority": "junior | mid | senior | unknown",
+  "experience_level": "..."
 }}
 """

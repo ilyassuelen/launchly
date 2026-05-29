@@ -11,17 +11,48 @@ import {
 
 import type { Resume } from "@/features/resume/types/resume";
 
+
 function normalizeResumeResponse(
   response: any,
 ): Resume {
-  return (
-    response?.data?.data ||
+  const backendResume =
     response?.data?.resume ||
-    response?.data ||
     response?.resume ||
-    response
-  );
+    response;
+
+  if (!backendResume) {
+    throw new Error(
+      "Invalid resume response",
+    );
+  }
+
+  const resumeData =
+    backendResume.data &&
+    typeof backendResume.data === "object"
+      ? backendResume.data
+      : {};
+
+  return {
+    ...resumeData,
+
+    id: backendResume.id,
+    title: backendResume.title,
+    template: backendResume.template,
+
+    latest_ats_score:
+      backendResume.latest_ats_score,
+    latest_resume_analysis:
+      backendResume.latest_resume_analysis,
+    analyzed_at:
+      backendResume.analyzed_at,
+
+    created_at:
+      backendResume.created_at,
+    updated_at:
+      backendResume.updated_at,
+  };
 }
+
 
 export function useResume(
   resumeId: string,
@@ -91,6 +122,16 @@ export function useResume(
     }
 
     try {
+      const {
+        id,
+        latest_ats_score,
+        latest_resume_analysis,
+        analyzed_at,
+        created_at,
+        updated_at,
+        ...resumeData
+      } = currentResume;
+
       const response =
         await updateResume(
           resumeId,
@@ -99,7 +140,15 @@ export function useResume(
               currentResume.title,
             template:
               currentResume.template,
-            data: currentResume,
+
+            data: resumeData,
+
+            latest_ats_score:
+                currentResume.latest_ats_score,
+            latest_resume_analysis:
+                currentResume.latest_resume_analysis,
+            analyzed_at:
+                currentResume.analyzed_at,
           },
         );
 
@@ -108,9 +157,27 @@ export function useResume(
           response,
         );
 
-      setResume(normalizedResume);
+      const mergedResume = {
+          ...normalizedResume,
 
-      return normalizedResume;
+          latest_ats_score:
+            normalizedResume.latest_ats_score &&
+            normalizedResume.latest_ats_score > 0
+                ? normalizedResume.latest_ats_score
+                : currentResume.latest_ats_score,
+
+          latest_resume_analysis:
+            normalizedResume.latest_resume_analysis ||
+            currentResume.latest_resume_analysis,
+
+          analyzed_at:
+            normalizedResume.analyzed_at ||
+            currentResume.analyzed_at,
+      };
+
+      setResume(mergedResume);
+
+      return mergedResume;
     } catch (error) {
       console.error(
         "Resume save failed:",

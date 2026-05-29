@@ -232,10 +232,6 @@ def _serialize_resume_analysis(
     raw_analysis: dict | None = None,
     structured_resume_data: dict | None = None,
 ) -> dict:
-    """
-    Convert the validated analysis response into a JSON-safe
-    dictionary for storing it on the resume record.
-    """
     serialized = {
         "smart_suggestions": [
             suggestion.model_dump()
@@ -243,11 +239,8 @@ def _serialize_resume_analysis(
         ],
         "recruiter_analysis": response.recruiter_analysis.model_dump(),
         "ats_score": response.ats_score.model_dump(),
+        "structured_resume_data": structured_resume_data or {},
     }
-
-    if structured_resume_data:
-        serialized.update(structured_resume_data)
-        serialized["structured_resume_data"] = structured_resume_data
 
     if raw_analysis:
         serialized["raw_ai_analysis"] = raw_analysis
@@ -370,6 +363,11 @@ async def analyze_resume(
         target_role=clean_target_role,
     )
 
+    structured_resume_data = _extract_structured_resume_data(
+        parsed=parsed,
+        payload=payload,
+    )
+
     analysis = ResumeAnalysisResponse(
         smart_suggestions=[
             SmartSuggestion(**item)
@@ -379,11 +377,7 @@ async def analyze_resume(
             **parsed.get("recruiter_analysis", {})
         ),
         ats_score=ats_score,
-    )
-
-    structured_resume_data = _extract_structured_resume_data(
-        parsed=parsed,
-        payload=payload,
+        structured_resume_data=structured_resume_data,
     )
 
     if payload.resume_id and db and user_id:

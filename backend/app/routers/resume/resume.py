@@ -1,3 +1,5 @@
+from datetime import datetime
+import json
 from copy import deepcopy
 
 from fastapi import (
@@ -87,6 +89,16 @@ def _delete_photo_if_unused(
         return
 
     delete_resume_photo(photo_url)
+
+
+def _normalize_jsonb_value(value):
+    if isinstance(value, str):
+        try:
+            return json.loads(value)
+        except Exception:
+            return value
+
+    return value
 
 
 def serialize_resume(resume: Resume):
@@ -257,6 +269,24 @@ def update_resume(
 
     if "template" in payload:
         resume.template = payload["template"]
+
+    if "latest_ats_score" in payload:
+        resume.latest_ats_score = payload["latest_ats_score"]
+
+    if "latest_resume_analysis" in payload:
+        resume.latest_resume_analysis = _normalize_jsonb_value(
+            payload["latest_resume_analysis"]
+        )
+
+    if "analyzed_at" in payload:
+        analyzed_at = payload["analyzed_at"]
+
+        if isinstance(analyzed_at, str):
+            resume.analyzed_at = datetime.fromisoformat(
+                analyzed_at.replace("Z", "+00:00")
+            ).replace(tzinfo=None)
+        else:
+            resume.analyzed_at = analyzed_at
 
     db.commit()
 

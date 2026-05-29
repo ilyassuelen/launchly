@@ -52,12 +52,22 @@ export function AuroraTemplate({
   hiddenProfiles = [],
   photoUrl,
 }: Props) {
+
+  const basics = resume.basics || {};
+  const skills = resume.skills || [];
+  const languages = resume.languages || [];
+  const projects = resume.projects || [];
+  const experience = resume.experience || [];
+  const education = resume.education || [];
+  const softSkills = resume.softSkills || [];
+  const summary = resume.summary || {};
+
   const hasProfiles =
-    (!!resume.basics.linkedin &&
+    (!!basics.linkedin &&
       !hiddenProfiles.includes("linkedin")) ||
-    (!!resume.basics.github &&
+    (!!basics.github &&
       !hiddenProfiles.includes("github")) ||
-    (resume.basics.socialProfiles?.filter((profile) => {
+    (basics.socialProfiles?.filter((profile) => {
       const platform = profile.platform?.toLowerCase();
       return (
         !hiddenProfiles.includes(String(profile.id)) &&
@@ -68,25 +78,24 @@ export function AuroraTemplate({
     }).length ?? 0) > 0;
 
   const hasSkills =
-    resume.skills.length > 0;
+    skills.length > 0;
 
   const hasLanguages =
-    resume.languages.length > 0;
+    languages.length > 0;
 
-  const hasSoftSkills =
-    (resume.softSkills || []).length > 0;
+  const hasSoftSkills = softSkills.length > 0;
 
   const hasProjects =
-    resume.projects.length > 0;
+    projects.length > 0;
 
   const hasExperience =
-    resume.experience.length > 0;
+    experience.length > 0;
 
   const hasEducation =
-    resume.education.length > 0;
+    education.length > 0;
 
   const hasSummary =
-    !!resume.summary.content?.trim();
+    !!summary.content?.trim();
 
   const getTextItems = (
     value?: string | string[],
@@ -132,9 +141,9 @@ export function AuroraTemplate({
             {!hiddenProfiles.includes(
               "linkedin",
             ) &&
-              resume.basics.linkedin && (
+              basics.linkedin && (
                 <a
-                  href={resume.basics.linkedin}
+                  href={basics.linkedin}
                   target="_blank"
                   rel="noreferrer"
                   className="flex items-center rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2 text-white/80 transition hover:border-violet-400/20 hover:bg-white/[0.05]"
@@ -148,9 +157,9 @@ export function AuroraTemplate({
             {!hiddenProfiles.includes(
               "github",
             ) &&
-              resume.basics.github && (
+              basics.github && (
                 <a
-                  href={resume.basics.github}
+                  href={basics.github}
                   target="_blank"
                   rel="noreferrer"
                   className="flex items-center rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2 text-white/80 transition hover:border-violet-400/20 hover:bg-white/[0.05]"
@@ -161,7 +170,7 @@ export function AuroraTemplate({
 
             {/* EXTRA SOCIALS */}
 
-            {resume.basics.socialProfiles
+            {basics.socialProfiles
               ?.filter((profile) => {
                 const platform =
                   profile.platform?.toLowerCase();
@@ -204,7 +213,7 @@ export function AuroraTemplate({
           </div>
 
           <div className="mt-4 space-y-3">
-            {resume.skills.map(
+            {skills.map(
               (group: SkillGroup) => (
                 <div
                   key={group.id}
@@ -248,7 +257,7 @@ export function AuroraTemplate({
           </div>
 
           <div className="mt-4 space-y-2.5">
-            {resume.languages.map((lang) => (
+            {languages.map((lang) => (
               <div
                 key={lang.id}
                 className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/[0.03] px-3 py-2"
@@ -280,7 +289,7 @@ export function AuroraTemplate({
           </div>
 
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {(resume.softSkills || []).map((skill) => (
+            {(softSkills || []).map((skill) => (
               <div
                 key={skill.id}
                 className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 font-medium tracking-[0.04em] text-white/75"
@@ -310,7 +319,7 @@ export function AuroraTemplate({
         </div>
 
         <div className="mt-5 space-y-5">
-          {resume.projects.map(
+          {projects.map(
             (project: ProjectItem) => (
               <div key={project.id}>
 
@@ -384,7 +393,7 @@ export function AuroraTemplate({
         </div>
 
         <div className="mt-5 space-y-5">
-          {resume.experience.map(
+          {experience.map(
             (item: ExperienceItem) => (
               <div key={item.id}>
                 <div className="flex items-start justify-between gap-4">
@@ -459,7 +468,7 @@ export function AuroraTemplate({
         </div>
 
         <div className="mt-5 space-y-4">
-          {resume.education.map((edu) => (
+          {education.map((edu) => (
             <div key={edu.id}>
               <div
                 className="font-bold"
@@ -548,7 +557,7 @@ export function AuroraTemplate({
                 photoUrl ||
                 "https://ui-avatars.com/api/?name=User"
               }
-              alt={resume.basics.fullName}
+              alt={basics.fullName || "Profile"}
               className="size-36 rounded-3xl object-cover shadow-2xl"
             />
 
@@ -558,7 +567,7 @@ export function AuroraTemplate({
                 fontSize: scaleFont(27, typography),
               }}
             >
-              {resume.basics.fullName}
+              {basics.fullName}
             </div>
 
             <div
@@ -568,7 +577,7 @@ export function AuroraTemplate({
                 lineHeight: typography.lineHeight,
               }}
             >
-              {resume.basics.title}
+              {basics.title}
             </div>
           </div>
 
@@ -590,11 +599,11 @@ export function AuroraTemplate({
                 fontSize: scaleFont(12, typography),
               }}
             >
-              <div>{resume.basics.location}</div>
-              <div>{resume.basics.email}</div>
-              {resume.basics.website && (
+              <div>{basics.location}</div>
+              <div>{basics.email}</div>
+              {basics.website && (
                 <a
-                  href={resume.basics.website}
+                  href={basics.website}
                   target="_blank"
                   rel="noreferrer"
                   className="underline-offset-2 hover:underline"
@@ -642,7 +651,7 @@ export function AuroraTemplate({
                   lineHeight: typography.lineHeight,
                 }}
               >
-                {resume.summary.content}
+                {summary.content}
               </p>
             </section>
           )}
