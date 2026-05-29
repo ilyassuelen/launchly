@@ -161,11 +161,32 @@ def _extract_nested_lists(
 def _extract_resume_analysis(
     resume: Resume,
 ) -> dict:
+    latest_analysis = _safe_dict(
+        getattr(resume, "latest_resume_analysis", None),
+    )
+
+    structured_resume_data = _safe_dict(
+        latest_analysis.get("structured_resume_data"),
+    )
+
     return _merge_dicts(
         getattr(resume, "analysis", None),
-        getattr(resume, "latest_resume_analysis", None),
         getattr(resume, "parsed_resume", None),
         getattr(resume, "resume_data", None),
+        latest_analysis,
+        structured_resume_data,
+    )
+
+
+def _extract_structured_resume_data(
+    resume: Resume,
+) -> dict:
+    latest_analysis = _safe_dict(
+        getattr(resume, "latest_resume_analysis", None),
+    )
+
+    return _safe_dict(
+        latest_analysis.get("structured_resume_data"),
     )
 
 
@@ -601,9 +622,10 @@ def collect_interview_resume_context(
     candidate_levels = []
 
     for resume in resumes[:MAX_RESUMES_IN_CONTEXT]:
-        analysis = prepare_data(
-            _extract_resume_analysis(resume),
-        )
+        raw_analysis = _extract_resume_analysis(resume)
+        structured_resume_data = _extract_structured_resume_data(resume)
+
+        analysis = prepare_data(raw_analysis)
 
         skills = _extract_skills(
             resume=resume,
@@ -660,6 +682,10 @@ def collect_interview_resume_context(
             "id": getattr(resume, "id", None),
             "title": prepare_data(_extract_resume_title(resume)),
             "ats_score": getattr(resume, "latest_ats_score", None),
+            "latest_analysis": prepare_data(
+                getattr(resume, "latest_resume_analysis", None),
+            ),
+            "structured_resume_data": prepare_data(structured_resume_data),
             "summary": prepare_data(summary),
             "skills": prepare_data(_unique_strings(skills)),
             "tools": prepare_data(_unique_strings(tools)),
