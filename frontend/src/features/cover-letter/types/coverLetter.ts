@@ -59,6 +59,8 @@ export interface CoverLetter {
 
   resumeContext?: string;
 
+  structuredResumeData?: Record<string, any> | null;
+
   language?: "english" | "german";
 
   jobPosting: string;

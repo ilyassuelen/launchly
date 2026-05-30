@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import Any, List
 
 
 class CoverLetterGenerateRequest(BaseModel):
@@ -9,6 +9,7 @@ class CoverLetterGenerateRequest(BaseModel):
     current_role: str
     skills: List[str] = []
     resume_context: str = ""
+    structured_resume_data: dict[str, Any] | None = None
     job_posting: str
     hiring_contact: str = ""
 

@@ -37,6 +37,7 @@ async def generate_cover_letter(
     clean_current_role = prepare_data(payload.current_role)
     clean_skills = prepare_data(payload.skills)
     clean_resume_context = prepare_data(payload.resume_context)
+    clean_structured_resume_data = prepare_data(payload.structured_resume_data or {})
     clean_job_posting = prepare_data(payload.job_posting)
 
     hiring_contact = getattr(
@@ -52,6 +53,7 @@ async def generate_cover_letter(
         current_role=clean_current_role,
         skills=clean_skills,
         resume_context=clean_resume_context,
+        structured_resume_data=clean_structured_resume_data,
         job_posting=clean_job_posting,
         hiring_contact=hiring_contact,
     )

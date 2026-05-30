@@ -64,6 +64,7 @@ export async function generateAICoverLetter(
     current_role: string;
     skills: string[];
     resume_context: string;
+    structured_resume_data?: Record<string, any> | null;
     job_posting: string;
     hiring_contact?: string;
   },

@@ -316,6 +316,9 @@ const textareaClassName =
               resume_context:
                 coverLetter.resumeContext || "",
 
+              structured_resume_data:
+                coverLetter.structuredResumeData || null,
+
               job_posting:
                 coverLetter.jobPosting,
 
@@ -714,17 +717,16 @@ const textareaClassName =
       const resumeId =
         e.target.value;
 
-      updateField(
-        "selectedResumeId",
-        resumeId,
-      );
 
       if (!resumeId) {
-        updateField(
-          "resumeContext",
-          "",
-        );
-        return;
+          setCoverLetter((prev: any) => ({
+            ...prev,
+            selectedResumeId: "",
+            resumeContext: "",
+            structuredResumeData: null,
+          }));
+
+          return;
       }
 
       try {
@@ -741,31 +743,82 @@ const textareaClassName =
           return;
         }
 
+        const resumeData = resume.data || resume;
+
+        const structuredResumeData =
+          resume.latest_resume_analysis?.structured_resume_data ||
+          null;
+
         const resumeContext = `
 Headline:
-${resume.personalInfo?.headline || ""}
+${resumeData.basics?.title || resume.title || ""}
 
 Summary:
-${resume.summary || ""}
+${resumeData.summary?.content || resumeData.summary || ""}
 
 Skills:
-${resume.skills
-  ?.map((s: any) => s.name)
-  .join(", ") || ""}
+${
+  structuredResumeData?.skills?.length
+    ? structuredResumeData.skills.join(", ")
+    : resumeData.skills
+        ?.flatMap((group: any) => group.skills || [])
+        .join(", ") || ""
+}
+
+Technical Skills:
+${
+  structuredResumeData?.technical_skills?.length
+    ? structuredResumeData.technical_skills.join(", ")
+    : ""
+}
+
+Tools:
+${
+  structuredResumeData?.tools?.length
+    ? structuredResumeData.tools.join(", ")
+    : ""
+}
 
 Projects:
-${resume.projects
-  ?.map(
-    (p: any) =>
-      `${p.title}: ${p.description}`,
-  )
-  .join("\n") || ""}
+${
+  structuredResumeData?.projects?.length
+    ? structuredResumeData.projects
+        .map(
+          (p: any) =>
+            `${p.name || p.title || ""}: ${p.description || p.evidence || ""}`,
+        )
+        .join("\n")
+    : resumeData.projects
+        ?.map(
+          (p: any) =>
+            `${p.title || ""}: ${p.description || ""}`,
+        )
+        .join("\n") || ""
+}
+
+Experience:
+${
+  structuredResumeData?.experience?.length
+    ? structuredResumeData.experience
+        .map(
+          (e: any) =>
+            `${e.role || ""} at ${e.company || ""}: ${e.evidence || ""}`,
+        )
+        .join("\n")
+    : resumeData.experience
+        ?.map(
+          (e: any) =>
+            `${e.role || ""} at ${e.company || ""}: ${(e.bullets || []).join(" ")}`,
+        )
+        .join("\n") || ""
+}
 `;
 
-        updateField(
-          "resumeContext",
+        setCoverLetter((prev: any) => ({
+          ...prev,
           resumeContext,
-        );
+          structuredResumeData,
+        }));
       } catch (error) {
         console.error(error);
       }
