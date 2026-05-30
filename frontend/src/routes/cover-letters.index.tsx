@@ -88,6 +88,20 @@ function CoverLettersPage() {
       : title;
   };
 
+  const getCoverLetterDisplayTitle = (
+      coverLetter: any,
+    ) => {
+      const data =
+        coverLetter.data ||
+        coverLetter;
+
+      return (
+        data.content?.subject ||
+        coverLetter.title ||
+        "Untitled Cover Letter"
+      );
+  };
+
   const handleCreateCoverLetter =
     async () => {
       try {
@@ -238,14 +252,20 @@ function CoverLettersPage() {
                 <div className="p-4">
                   <div className="line-clamp-2 min-h-[48px] text-[15px] font-semibold leading-5 tracking-tight">
                     {truncateTitle(
-                      coverLetter.title,
+                        getCoverLetterDisplayTitle(
+                            coverLetter,
+                        ),
                     )}
                   </div>
 
                   <div className="mt-1 text-xs text-muted-foreground">
-                    {
-                      coverLetter.template
-                    }
+
+                      Template · {
+                          coverLetter.template
+                              ? coverLetter.template.charAt(0).toUpperCase() +
+                                  coverLetter.template.slice(1)
+                              : "Classic"
+                      }
                   </div>
                 </div>
               </button>

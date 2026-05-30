@@ -330,6 +330,10 @@ const textareaClassName =
             (prev: any) => ({
               ...prev,
 
+              title:
+                response.subject ||
+                prev.title,
+
               content: {
                 ...prev.content,
 

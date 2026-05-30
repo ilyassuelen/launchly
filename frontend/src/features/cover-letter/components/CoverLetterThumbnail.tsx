@@ -1,25 +1,13 @@
-import { Link } from "@tanstack/react-router";
-
 import {
-  Copy,
-  Trash2,
   Clock3,
 } from "lucide-react";
 
 type Props = {
   coverLetter: any;
-  onDuplicate: (
-    id: string,
-  ) => void;
-  onDelete: (
-    id: string,
-  ) => void;
 };
 
 export function CoverLetterThumbnail({
   coverLetter,
-  onDuplicate,
-  onDelete,
 }: Props) {
   return (
     <div className="group relative overflow-hidden rounded-[28px] border border-white/10 bg-[#0B1020] transition hover:border-violet-400/30 hover:bg-[#0D1326]">
@@ -27,14 +15,7 @@ export function CoverLetterThumbnail({
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(139,92,246,0.12),transparent_35%)]" />
 
       {/* preview */}
-      <Link
-        to="/cover-letters/$coverLetterId"
-        params={{
-          coverLetterId:
-            coverLetter.id,
-        }}
-        className="block"
-      >
+      <div className="block">
         <div className="relative p-5">
           <div className="flex items-center justify-between">
             <div>
@@ -93,37 +74,9 @@ export function CoverLetterThumbnail({
               <Clock3 className="size-3" />
               Updated recently
             </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-
-                  onDuplicate(
-                    coverLetter.id,
-                  );
-                }}
-                className="grid size-9 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-white/60 transition hover:bg-white/[0.08] hover:text-white"
-              >
-                <Copy className="size-4" />
-              </button>
-
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-
-                  onDelete(
-                    coverLetter.id,
-                  );
-                }}
-                className="grid size-9 place-items-center rounded-xl border border-red-400/10 bg-red-400/[0.05] text-red-300 transition hover:bg-red-400/[0.12]"
-              >
-                <Trash2 className="size-4" />
-              </button>
-            </div>
           </div>
         </div>
-      </Link>
+      </div>
     </div>
   );
 }
