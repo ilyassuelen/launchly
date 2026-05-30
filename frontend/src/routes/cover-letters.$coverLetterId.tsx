@@ -816,6 +816,7 @@ ${
 
         setCoverLetter((prev: any) => ({
           ...prev,
+          selectedResumeId: resumeId,
           resumeContext,
           structuredResumeData,
         }));

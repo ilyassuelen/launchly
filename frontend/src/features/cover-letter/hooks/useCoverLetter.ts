@@ -13,14 +13,54 @@ import type { CoverLetter } from "@/features/cover-letter/types/coverLetter";
 
 function normalizeCoverLetterResponse(
   response: any,
-): CoverLetter {
-  return (
-    response?.data?.data ||
-    response?.data?.coverLetter ||
+) {
+  const backendCoverLetter =
+    response?.data?.cover_letter ||
+    response?.cover_letter ||
     response?.data ||
-    response?.coverLetter ||
-    response
-  );
+    response;
+
+  if (!backendCoverLetter) {
+    throw new Error(
+      "Invalid cover letter response",
+    );
+  }
+
+  const coverLetterData =
+    backendCoverLetter.data ||
+    backendCoverLetter;
+
+  return {
+    ...coverLetterData,
+
+    id:
+      backendCoverLetter.id ??
+      coverLetterData.id,
+
+    title:
+      backendCoverLetter.title ??
+      coverLetterData.title,
+
+    template:
+      backendCoverLetter.template ??
+      coverLetterData.template,
+
+    createdAt:
+      backendCoverLetter.created_at ??
+      coverLetterData.createdAt,
+
+    updatedAt:
+      backendCoverLetter.updated_at ??
+      coverLetterData.updatedAt,
+
+    created_at:
+      backendCoverLetter.created_at ??
+      coverLetterData.created_at,
+
+    updated_at:
+      backendCoverLetter.updated_at ??
+      coverLetterData.updated_at,
+  };
 }
 
 export function useCoverLetter(
@@ -101,6 +141,15 @@ export function useCoverLetter(
       }
 
       try {
+        const {
+          id,
+          createdAt,
+          updatedAt,
+          created_at,
+          updated_at,
+          ...coverLetterData
+        } = currentCoverLetter;
+
         const response =
           await updateCoverLetter(
             coverLetterId,
@@ -111,7 +160,7 @@ export function useCoverLetter(
               template:
                 currentCoverLetter.template,
 
-              data: currentCoverLetter,
+              data: coverLetterData,
             },
           );
 
