@@ -334,6 +334,12 @@ async def analyze_recruiter_view(
     try:
         parsed = json.loads(content)
 
+        if not isinstance(parsed, dict):
+            raise HTTPException(
+                status_code=500,
+                detail="Invalid recruiter analysis response structure",
+            )
+
     except Exception as exc:
         logger.exception(
             "Recruiter view JSON parsing failed for user_id=%s resume_id=%s response_preview=%s",
