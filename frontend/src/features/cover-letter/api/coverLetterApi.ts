@@ -85,6 +85,7 @@ export async function analyzeCoverLetter(
     job_posting: string;
     subject: string;
     body: string;
+    cover_letter_id?: number | string;
   },
 ) {
   return apiFetch(

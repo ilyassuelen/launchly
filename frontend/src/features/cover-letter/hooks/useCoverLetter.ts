@@ -60,6 +60,14 @@ function normalizeCoverLetterResponse(
     updated_at:
       backendCoverLetter.updated_at ??
       coverLetterData.updated_at,
+
+    latest_cover_letter_analysis:
+      backendCoverLetter.latest_cover_letter_analysis ??
+      coverLetterData.latest_cover_letter_analysis,
+
+    latest_cover_letter_analysis_created_at:
+      backendCoverLetter.latest_cover_letter_analysis_created_at ??
+      coverLetterData.latest_cover_letter_analysis_created_at,
   };
 }
 
@@ -147,6 +155,8 @@ export function useCoverLetter(
           updatedAt,
           created_at,
           updated_at,
+          latest_cover_letter_analysis,
+          latest_cover_letter_analysis_created_at,
           ...coverLetterData
         } = currentCoverLetter;
 

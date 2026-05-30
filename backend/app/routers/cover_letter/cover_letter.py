@@ -23,6 +23,8 @@ def serialize_cover_letter(cover_letter: CoverLetter):
         "data": cover_letter.data,
         "created_at": cover_letter.created_at,
         "updated_at": cover_letter.updated_at,
+        "latest_cover_letter_analysis": cover_letter.latest_cover_letter_analysis,
+        "latest_cover_letter_analysis_created_at": cover_letter.latest_cover_letter_analysis_created_at,
     }
 
 
@@ -46,14 +48,7 @@ def get_cover_letters(
     )
 
     return [
-        {
-            "id": cover_letter.id,
-            "title": cover_letter.title,
-            "template": cover_letter.template,
-            "updated_at": cover_letter.updated_at,
-            "created_at": cover_letter.created_at,
-            "data": cover_letter.data,
-        }
+        serialize_cover_letter(cover_letter)
         for cover_letter in cover_letters
     ]
 
@@ -180,9 +175,9 @@ def duplicate_cover_letter(
         user_id=current_user.id,
         title=f"{cover_letter.title} (Copy)",
         template=cover_letter.template,
-        data=deepcopy(
-            cover_letter.data
-        ),
+        data=deepcopy(cover_letter.data),
+        latest_cover_letter_analysis=deepcopy(cover_letter.latest_cover_letter_analysis),
+        latest_cover_letter_analysis_created_at=cover_letter.latest_cover_letter_analysis_created_at,
     )
 
     db.add(duplicated_cover_letter)

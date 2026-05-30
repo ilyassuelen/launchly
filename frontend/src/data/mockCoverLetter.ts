@@ -68,13 +68,9 @@ export const mockCoverLetter: CoverLetter =
 
     content: {
       subject:
-        "Application for",
+        "",
 
-      body: `When I discovered your company and the role, I was immediately excited by the opportunity to contribute my skills and continue growing as a professional.
-
-I enjoy building thoughtful digital experiences and solving real-world problems through clean, scalable solutions.
-
-I would love the opportunity to contribute to your team and further develop my technical and professional abilities in a fast-paced environment.`,
+      body: ``,
 
       closing:
         "Sincerely,",

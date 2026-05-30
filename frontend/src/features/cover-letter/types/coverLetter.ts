@@ -81,5 +81,13 @@ export interface CoverLetter {
 
   updatedAt?: string;
 
+  created_at?: string;
+
+  updated_at?: string;
+
+  latest_cover_letter_analysis?: Record<string, any> | null;
+
+  latest_cover_letter_analysis_created_at?: string | null;
+
   content: CoverLetterContent;
 }

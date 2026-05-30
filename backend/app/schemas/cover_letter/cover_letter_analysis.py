@@ -21,6 +21,7 @@ class CoverLetterAnalysisRequest(BaseModel):
     job_posting: str
     subject: str
     body: str
+    cover_letter_id: int | None = None
 
 
 class CoverLetterAnalysisResponse(BaseModel):

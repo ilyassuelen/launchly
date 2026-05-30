@@ -1,11 +1,15 @@
 import json
 import logging
+from datetime import datetime
 
 from openai import AsyncOpenAI
 
 from fastapi import HTTPException
+from sqlalchemy.orm import Session
 
 from backend.app.core.config import settings
+
+from backend.app.models.cover_letter.cover_letter import CoverLetter
 
 from backend.app.prompts.cover_letter.cover_letter_analysis_prompts import (
     COVER_LETTER_ANALYSIS_SYSTEM_PROMPT,
@@ -29,6 +33,8 @@ client = AsyncOpenAI(
 
 async def analyze_cover_letter(
     payload: CoverLetterAnalysisRequest,
+    db: Session | None = None,
+    user_id: int | None = None,
 ) -> CoverLetterAnalysisResponse:
     """
     Analyze a cover letter from a recruiter perspective
@@ -81,6 +87,20 @@ async def analyze_cover_letter(
     try:
         parsed = json.loads(content)
 
+        if not isinstance(parsed, dict):
+            logger.error(
+                "Cover letter analysis response is not a dictionary: %s",
+                parsed,
+            )
+
+            raise HTTPException(
+                status_code=500,
+                detail="Invalid response structure",
+            )
+
+    except HTTPException:
+        raise
+
     except Exception as exc:
         logger.exception(
             "Failed to parse cover letter analysis response",
@@ -110,17 +130,6 @@ async def analyze_cover_letter(
         ),
     )[:3]
 
-    if not isinstance(parsed, dict):
-        logger.error(
-            "Cover letter analysis response is not a dictionary: %s",
-            parsed,
-        )
-
-        raise HTTPException(
-            status_code=500,
-            detail="Invalid response structure",
-        )
-
     if "recruiter_analysis" not in parsed:
         logger.error(
             "Missing recruiter_analysis in cover letter analysis response: %s",
@@ -132,13 +141,36 @@ async def analyze_cover_letter(
             detail="Incomplete response",
         )
 
-    return CoverLetterAnalysisResponse(
+    analysis = CoverLetterAnalysisResponse(
         smart_suggestions=[
             SmartSuggestion(**item)
             for item in parsed.get("smart_suggestions", [])
         ],
-
         recruiter_analysis=RecruiterAnalysis(
             **parsed.get("recruiter_analysis", {})
         ),
     )
+
+    if payload.cover_letter_id and db and user_id:
+        cover_letter = (
+            db.query(CoverLetter)
+            .filter(
+                CoverLetter.id == payload.cover_letter_id,
+                CoverLetter.user_id == user_id,
+            )
+            .first()
+        )
+
+        if not cover_letter:
+            raise HTTPException(
+                status_code=404,
+                detail="Cover letter not found",
+            )
+
+        cover_letter.latest_cover_letter_analysis = analysis.model_dump()
+        cover_letter.latest_cover_letter_analysis_created_at = datetime.utcnow()
+
+        db.commit()
+        db.refresh(cover_letter)
+
+    return analysis

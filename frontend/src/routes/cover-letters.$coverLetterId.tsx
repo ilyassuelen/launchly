@@ -200,10 +200,19 @@ const textareaClassName =
   }, []);
 
   useEffect(() => {
-    if (!coverLetter?.content?.body) {
-      setAnalysis(null);
-    }
-  }, [coverLetter?.content?.body]);
+      if (!coverLetter?.content?.body) {
+        setAnalysis(null);
+        return;
+      }
+
+      setAnalysis(
+        coverLetter.latest_cover_letter_analysis || null,
+      );
+  }, [
+      coverLetter?.id,
+      coverLetter?.content?.body,
+      coverLetter?.latest_cover_letter_analysis,
+  ]);
 
   if (
     isLoading ||
@@ -373,9 +382,19 @@ const textareaClassName =
               subject,
 
               body,
+
+              cover_letter_id:
+                coverLetter.id,
             });
 
           setAnalysis(response);
+
+          setCoverLetter((prev: any) => ({
+              ...prev,
+              latest_cover_letter_analysis: response,
+              latest_cover_letter_analysis_created_at:
+                new Date().toISOString(),
+          }));
         } catch (error) {
           console.error(error);
         } finally {

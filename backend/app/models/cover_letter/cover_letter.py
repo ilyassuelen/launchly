@@ -24,3 +24,6 @@ class CoverLetter(Base):
 
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    latest_cover_letter_analysis = Column(JSON, nullable=True)
+    latest_cover_letter_analysis_created_at = Column(DateTime(timezone=True))
