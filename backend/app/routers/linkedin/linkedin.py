@@ -51,7 +51,8 @@ async def analyze_linkedin(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    payload.language = normalize_linkedin_language(
+    payload.language = normalize_linkedin_language(payload.language)
+    payload.analysis_language = normalize_linkedin_language(
         current_user.ai_response_language
     )
 
@@ -86,7 +87,7 @@ def save_linkedin_profile(
     current_user: User = Depends(get_current_user),
 ):
     payload.language = normalize_linkedin_language(
-        current_user.ai_response_language
+        payload.language
     )
 
     return upsert_linkedin_profile(

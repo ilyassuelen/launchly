@@ -108,6 +108,8 @@ function LinkedInPage() {
   const [saveStatus, setSaveStatus] = useState<
     "idle" | "saved"
   >("idle");
+  const [linkedinTextLanguage, setLinkedinTextLanguage] =
+    useState<"en" | "de">("en");
 
   useEffect(() => {
     if (!loading && !user) {
@@ -160,6 +162,7 @@ function LinkedInPage() {
           }),
       );
       setTargetRole(savedProfile.target_role || "");
+      setLinkedinTextLanguage(savedProfile.language === "de" ? "de" : "en");
       setAnalysis(savedProfile.analysis || null);
     });
   }, [user, loading]);
@@ -215,6 +218,7 @@ function LinkedInPage() {
     }
 
     await analyze({
+      language: linkedinTextLanguage,
       headline,
       about,
       skills,
@@ -235,6 +239,7 @@ function LinkedInPage() {
     }
 
     await saveProfile({
+      language: linkedinTextLanguage,
       headline,
       about,
       skills,
@@ -382,6 +387,30 @@ function LinkedInPage() {
                 : "Save profile"}
           </button>
 
+          <div className="flex rounded-xl border border-white/10 bg-white/[0.04] p-1 text-xs">
+            {[
+              ["en", "English"],
+              ["de", "Deutsch"],
+            ].map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => {
+                  setLinkedinTextLanguage(value as "en" | "de");
+                  resetAnalysis();
+                  setSaveStatus("idle");
+                }}
+                className={`rounded-lg px-3 py-1.5 font-semibold transition ${
+                  linkedinTextLanguage === value
+                    ? "bg-cyan-400/15 text-cyan-100 shadow-[0_0_24px_rgba(34,211,238,0.10)]"
+                    : "text-white/45 hover:text-white/70"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
           <button
             onClick={handleAnalyzeLinkedInProfile}
             disabled={!canAnalyze || isAnalyzing}
@@ -400,79 +429,137 @@ function LinkedInPage() {
         </div>
       }
     >
-      <div className="space-y-4">
-        <div className="grid gap-4 lg:grid-cols-4">
-          <Card className="relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.08),transparent_40%)]" />
+      <div className="space-y-5">
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]">
+          <Card className="relative overflow-hidden border-cyan-300/15 bg-[linear-gradient(135deg,rgba(15,23,42,0.98),rgba(8,13,24,0.98)_48%,rgba(18,32,58,0.88))] shadow-[0_28px_90px_rgba(6,182,212,0.10),0_0_0_1px_rgba(255,255,255,0.03)]">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_0%,rgba(34,211,238,0.20),transparent_34%),radial-gradient(circle_at_86%_10%,rgba(139,92,246,0.16),transparent_36%),linear-gradient(180deg,rgba(255,255,255,0.045),transparent_34%)]" />
+            <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/70 to-transparent" />
 
-            <div className="relative">
-              <div className="text-xs text-muted-foreground">
-                Profile strength
+            <div className="relative grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+              <div className="relative overflow-hidden rounded-[2rem] border border-cyan-300/15 bg-black/25 p-6 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_24px_80px_rgba(0,0,0,0.26)]">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.22),transparent_58%)]" />
+
+                <div className="relative">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/15 bg-cyan-300/[0.08] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-100/75">
+                    <Linkedin className="size-3.5 text-cyan-300" />
+                    Profile strength
+                  </div>
+
+                  <div className="relative isolate mx-auto mt-6 grid size-40 place-items-center overflow-hidden rounded-full border border-cyan-300/20 bg-white/[0.045] shadow-[0_28px_85px_rgba(34,211,238,0.16)]">
+                    <div className="pointer-events-none absolute inset-4 rounded-full border border-violet-300/10" />
+                    <div className="pointer-events-none absolute inset-8 rounded-full bg-black/20" />
+
+                    <div className="relative z-10 text-center">
+                      <div className="text-6xl font-semibold tracking-[-0.04em] text-white">
+                        {profileScore}
+                      </div>
+
+                      <div className="mt-1 text-[10px] uppercase tracking-[0.24em] text-cyan-100/70">
+                        /100
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-5">
+                    <Progress value={profileScore} />
+                  </div>
+
+                  <div className="mt-5 inline-flex items-center justify-center gap-2 rounded-full border border-emerald-300/15 bg-emerald-400/[0.08] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-100">
+                    <Check className="size-3.5 text-emerald-300" />
+                    {profileScore >= 85
+                      ? "Recruiter ready"
+                      : profileScore >= 70
+                        ? "Strong foundation"
+                        : profileScore > 0
+                          ? "Needs polish"
+                          : "Awaiting analysis"}
+                  </div>
+
+                  <div className="mt-4 text-xs leading-5 text-white/55">
+                    {analysis
+                      ? profileScore >= 85
+                        ? "Your profile has strong recruiter visibility and clear target-role positioning."
+                        : "Your profile has a useful base, with clear opportunities to improve recruiter visibility."
+                      : isLoadingProfile
+                        ? "Loading your saved LinkedIn profile..."
+                        : "Add your profile details and run an analysis to unlock your score."}
+                  </div>
+                </div>
               </div>
 
-              <div className="mt-2 flex items-end gap-2">
-                <div className="text-5xl font-semibold tracking-tight text-gradient">
-                  {profileScore}
+              <div className="min-w-0">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div>
+                    <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/55">
+                      LinkedIn readiness
+                    </div>
+
+                    <div className="mt-4 text-3xl font-semibold tracking-tight text-white">
+                      Build a profile recruiters can actually find.
+                    </div>
+
+                    <div className="mt-2 max-w-2xl text-sm leading-6 text-white/55">
+                      Optimize your headline, About section, keywords and proof points around your target role.
+                    </div>
+                  </div>
+
                 </div>
 
-                <div className="mb-2 text-sm text-muted-foreground">
-                  /100
+                <div className="mt-6 grid gap-3 md:grid-cols-2">
+                  <div className="rounded-2xl border border-white/7 bg-white/[0.035] p-4">
+                    <Progress
+                      label="Headline"
+                      value={headlineScore}
+                      color={headlineScore < 65 ? "pink" : undefined}
+                    />
+                  </div>
+
+                  <div className="rounded-2xl border border-white/7 bg-white/[0.035] p-4">
+                    <Progress
+                      label="About"
+                      value={aboutScore}
+                    />
+                  </div>
+
+                  <div className="rounded-2xl border border-white/7 bg-white/[0.035] p-4">
+                    <Progress
+                      label="Skills"
+                      value={skillsScore}
+                      color={skillsScore >= 80 ? "green" : undefined}
+                    />
+                  </div>
+
+                  <div className="rounded-2xl border border-white/7 bg-white/[0.035] p-4">
+                    <Progress
+                      label="Search visibility"
+                      value={searchVisibilityScore}
+                      color={searchVisibilityScore < 65 ? "pink" : "green"}
+                    />
+                  </div>
                 </div>
-              </div>
-
-              <div className="mt-3">
-                <Progress value={profileScore} />
-              </div>
-
-              <div className="mt-3 text-xs text-muted-foreground">
-                {analysis
-                  ? "Based on your provided LinkedIn profile inputs."
-                  : isLoadingProfile
-                    ? "Loading your saved LinkedIn profile..."
-                    : "Enter your LinkedIn details, save them, and run an analysis."}
               </div>
             </div>
           </Card>
 
-          <Card>
-            <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
-              <TrendingUp className="size-4 text-cyan-300" />
-              Recruiter signals
-            </div>
-
-            <div className="space-y-3">
-              <Progress
-                label="Headline"
-                value={headlineScore}
-                color={headlineScore < 65 ? "pink" : undefined}
-              />
-
-              <Progress
-                label="About"
-                value={aboutScore}
-              />
-
-              <Progress
-                label="Skills"
-                value={skillsScore}
-                color={skillsScore >= 80 ? "green" : undefined}
-              />
-
-              <Progress
-                label="Search visibility"
-                value={searchVisibilityScore}
-                color={searchVisibilityScore < 65 ? "pink" : "green"}
-              />
-            </div>
-          </Card>
-
-          <Card className="relative overflow-hidden lg:col-span-2">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(168,85,247,0.10),transparent_40%)]" />
+          <Card className="relative overflow-hidden border-white/7 bg-white/[0.025]">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(168,85,247,0.12),transparent_42%)]" />
 
             <div className="relative">
-              <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
-                <Search className="size-4 text-violet-300" />
-                Missing recruiter keywords
+              <div className="mb-4 flex items-start justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                    <Search className="size-4 text-violet-300" />
+                    Missing recruiter keywords
+                  </div>
+
+                  <div className="mt-1 text-xs leading-5 text-white/45">
+                    Small keyword gaps that could limit recruiter discovery.
+                  </div>
+                </div>
+
+                <div className="rounded-full border border-white/10 bg-white/[0.035] px-2.5 py-1 text-[10px] text-white/45">
+                  {analysis?.missing_keywords?.length || 0} gaps
+                </div>
               </div>
 
               <div className="flex flex-wrap gap-2 text-xs">
@@ -480,20 +567,20 @@ function LinkedInPage() {
                   analysis.missing_keywords.map((item) => (
                     <div
                       key={item.keyword}
-                      className="rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-3"
+                      className="rounded-2xl border border-violet-300/10 bg-violet-400/[0.045] px-3 py-3"
                     >
-                      <div className="flex items-center gap-1 text-[oklch(0.85_0.14_250)]">
+                      <div className="flex items-center gap-1 text-violet-100">
                         <Plus className="size-3" />
                         {item.keyword}
                       </div>
 
-                      <div className="mt-1 text-[10px] text-muted-foreground">
+                      <div className="mt-1 text-[10px] leading-4 text-white/45">
                         {item.reason}
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-sm text-white/55">
+                  <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-sm leading-6 text-white/50">
                     Missing keywords will appear here after your analysis.
                   </div>
                 )}
@@ -502,36 +589,30 @@ function LinkedInPage() {
           </Card>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-12">
-          <Card className="relative overflow-hidden lg:col-span-7">
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),transparent)]" />
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(360px,0.8fr)]">
+          <Card className="relative overflow-hidden border-cyan-300/10 bg-[linear-gradient(145deg,rgba(15,23,42,0.96),rgba(8,13,24,0.98)_52%,rgba(24,18,54,0.78))] shadow-[0_24px_80px_rgba(6,182,212,0.08)]">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(34,211,238,0.14),transparent_34%),radial-gradient(circle_at_90%_12%,rgba(139,92,246,0.16),transparent_38%)]" />
 
             <div className="relative">
-              <div className="flex items-center justify-between border-b border-white/5 pb-4">
+              <div className="mb-5 flex flex-col gap-3 border-b border-white/5 pb-5 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <div className="flex items-center gap-2 text-sm font-semibold">
-                    <Linkedin className="size-4 text-[oklch(0.78_0.16_200)]" />
-                    Headline AI Optimizer
+                  <div className="flex items-center gap-2 text-base font-semibold text-white">
+                    <Linkedin className="size-5 text-[oklch(0.78_0.16_200)]" />
+                    Headline Optimizer
                   </div>
 
                   <div className="mt-1 text-xs text-muted-foreground">
-                    Manual LinkedIn input, recruiter visibility analysis.
+                    Your main LinkedIn positioning block. Role, keywords and recruiter clarity.
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-cyan-400/10 bg-cyan-400/10 px-2 py-1 text-[11px] text-cyan-200">
-                  {isLoadingProfile
-                    ? "Loading saved profile"
-                    : saveStatus === "saved"
-                      ? "Profile saved"
-                      : analysis
-                        ? "Analysis ready"
-                        : "Input required"}
+                <div className="rounded-full border border-cyan-400/15 bg-cyan-400/10 px-3 py-1.5 text-[11px] font-medium text-cyan-200">
+                  Primary optimization area
                 </div>
               </div>
 
-              <div className="mt-6 grid gap-4 lg:grid-cols-2">
-                <div className="rounded-2xl border border-white/5 bg-black/20 p-5">
+              <div className="grid gap-4 lg:grid-cols-2">
+                <div className="rounded-[1.75rem] border border-white/7 bg-black/25 p-5">
                   <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Current headline
                   </div>
@@ -546,7 +627,7 @@ function LinkedInPage() {
                     }
                     rows={5}
                     placeholder="Example: AI Engineer | Python, FastAPI, RAG, LLM"
-                    className="w-full resize-none rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-sm leading-7 text-white/75 outline-none transition placeholder:text-white/30 focus:border-cyan-300/25"
+                    className="w-full resize-none rounded-2xl border border-white/7 bg-white/[0.035] p-4 text-sm leading-7 text-white/75 outline-none transition placeholder:text-white/30 focus:border-cyan-300/25"
                   />
 
                   <div className="mt-4 space-y-2 text-xs text-muted-foreground">
@@ -562,16 +643,16 @@ function LinkedInPage() {
                   </div>
                 </div>
 
-                <div className="relative overflow-hidden rounded-2xl border border-violet-400/10 bg-gradient-to-br from-violet-500/10 to-cyan-400/5 p-5">
+                <div className="relative overflow-hidden rounded-[1.75rem] border border-violet-400/15 bg-gradient-to-br from-violet-500/12 to-cyan-400/6 p-5 shadow-[0_24px_70px_rgba(139,92,246,0.12)]">
                   <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent)] animate-pulse" />
 
                   <div className="relative">
                     <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-violet-200">
                       <Sparkles className="size-3.5" />
-                          Optimized Version
+                      Optimized Version
                     </div>
 
-                    <div className="min-h-[138px] rounded-2xl border border-white/10 bg-black/20 p-4 text-sm leading-7 text-white/90 shadow-[0_20px_60px_rgba(168,85,247,0.15)]">
+                    <div className="min-h-[138px] rounded-2xl border border-white/10 bg-black/25 p-4 text-sm leading-7 text-white/90 shadow-[0_20px_60px_rgba(168,85,247,0.15)]">
                       {analysis?.headline_rewrite ||
                         "Your optimized LinkedIn headline will appear here after the analysis."}
                     </div>
@@ -603,7 +684,7 @@ function LinkedInPage() {
                     )
                   }
                   placeholder="Target role"
-                  className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/80 outline-none transition placeholder:text-white/30 focus:border-violet-400/30 md:col-span-1"
+                  className="rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-white/80 outline-none transition placeholder:text-white/30 focus:border-violet-400/30 md:col-span-1"
                 />
 
                 <input
@@ -615,7 +696,7 @@ function LinkedInPage() {
                     )
                   }
                   placeholder="Skills / keywords, separated by commas"
-                  className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/80 outline-none transition placeholder:text-white/30 focus:border-violet-400/30 md:col-span-2"
+                  className="rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-white/80 outline-none transition placeholder:text-white/30 focus:border-violet-400/30 md:col-span-2"
                 />
               </div>
 
@@ -624,21 +705,19 @@ function LinkedInPage() {
                   {error}
                 </div>
               )}
-
-
             </div>
           </Card>
 
-          <Card className="relative overflow-hidden lg:col-span-5">
+          <Card className="relative overflow-hidden border-white/7 bg-white/[0.025]">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.08),transparent_45%)]" />
 
             <div className="relative">
-              <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
+              <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-white">
                 <Eye className="size-4 text-cyan-300" />
-                Recruiter search visibility
+                Recruiter visibility preview
               </div>
 
-              <div className="rounded-2xl border border-white/5 bg-black/20 p-5">
+              <div className="rounded-[1.75rem] border border-white/5 bg-black/20 p-5">
                 <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
                   <ScanSearch className="size-3.5" />
                   Simulated recruiter search
@@ -674,10 +753,10 @@ function LinkedInPage() {
                 </div>
               </div>
 
-              <div className="mt-4 rounded-2xl border border-white/5 bg-white/[0.03] p-4">
-                <div className="flex items-center gap-2 text-sm font-semibold">
+              <div className="mt-4 rounded-[1.75rem] border border-emerald-400/10 bg-emerald-400/[0.045] p-5">
+                <div className="flex items-center gap-2 text-sm font-semibold text-white">
                   <Check className="size-4 text-emerald-300" />
-                  Conclusion
+                  Recruiter conclusion
                 </div>
 
                 <div className="mt-2 text-sm leading-7 text-white/70">
@@ -689,19 +768,19 @@ function LinkedInPage() {
           </Card>
         </div>
 
-        <Card className="relative overflow-hidden border-white/5 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.06),transparent_32%)]">
+        <Card className="relative overflow-hidden border-cyan-300/10 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.08),transparent_32%)]">
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.025),transparent)]" />
 
           <div className="relative">
-            <div className="mb-4 flex flex-col gap-3 border-b border-white/5 pb-4 md:flex-row md:items-center md:justify-between">
+            <div className="mb-5 flex flex-col gap-3 border-b border-white/5 pb-5 md:flex-row md:items-center md:justify-between">
               <div>
-                <div className="flex items-center gap-2 text-sm font-semibold">
+                <div className="flex items-center gap-2 text-base font-semibold text-white">
                   <Plus className="size-4 text-cyan-300" />
-                  LinkedIn projects / featured work
+                  Proof points / featured work
                 </div>
 
                 <div className="mt-1 text-xs text-muted-foreground">
-                  Add proof points that support your headline, About section and target role.
+                  Projects that support your headline, About section and target role.
                 </div>
               </div>
 
@@ -721,83 +800,127 @@ function LinkedInPage() {
               </div>
             </div>
 
-            {projectDrafts.length === 0 ? (
-              <button
-                type="button"
-                onClick={openNewProjectModal}
-                className="flex w-full items-center justify-center rounded-2xl border border-dashed border-cyan-400/20 bg-cyan-400/[0.035] px-5 py-7 text-sm font-medium text-cyan-100/80 transition hover:bg-cyan-400/[0.06]"
-              >
-                <Plus className="mr-2 size-4" />
-                Add your first featured LinkedIn project
-              </button>
-            ) : (
-              <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-                {projectDrafts.map((project) => (
-                  <div
-                    key={project.id}
-                    className="group flex items-center justify-between gap-3 rounded-2xl border border-white/5 bg-white/[0.025] px-4 py-3 transition hover:border-cyan-400/20 hover:bg-cyan-400/[0.04]"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditingProject(project);
-                        setProjectSkillInput("");
-                      }}
-                      className="min-w-0 flex-1 text-left"
-                    >
-                      <div className="truncate text-sm font-semibold text-white/90">
-                        {project.title || "Untitled project"}
-                      </div>
+            <div className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
+              <div className="rounded-[1.75rem] border border-cyan-300/10 bg-cyan-300/[0.045] p-5">
+                <div className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-100/70">
+                  Evidence strength
+                </div>
 
-                      <div className="mt-1 flex items-center gap-2 text-[11px] text-white/40">
-                        <span>
-                          {project.skills.length} skills
-                        </span>
-
-                        {project.description && (
-                          <>
-                            <span className="size-1 rounded-full bg-white/20" />
-                            <span>Click to edit details</span>
-                          </>
-                        )}
-                      </div>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => deleteProject(project.id)}
-                      className="shrink-0 rounded-xl border border-red-400/10 bg-red-400/[0.04] px-2.5 py-1.5 text-[10px] font-semibold text-red-200/80 opacity-70 transition hover:border-red-400/25 hover:bg-red-400/[0.10] hover:opacity-100"
-                    >
-                      Delete
-                    </button>
+                <div className="mt-4 flex items-end gap-2">
+                  <div className="text-4xl font-semibold tracking-tight text-white">
+                    {projectDrafts.length}
                   </div>
-                ))}
+
+                  <div className="mb-1 text-sm text-white/45">
+                    projects
+                  </div>
+                </div>
+
+                <div className="mt-3 text-xs leading-5 text-white/55">
+                  Strong proof points help recruiters trust your target-role positioning.
+                </div>
               </div>
-            )}
+
+              <div>
+                {projectDrafts.length === 0 ? (
+                  <button
+                    type="button"
+                    onClick={openNewProjectModal}
+                    className="flex min-h-[150px] w-full items-center justify-center rounded-[1.75rem] border border-dashed border-cyan-400/20 bg-cyan-400/[0.035] px-5 py-7 text-sm font-medium text-cyan-100/80 transition hover:bg-cyan-400/[0.06]"
+                  >
+                    <Plus className="mr-2 size-4" />
+                    Add your first featured LinkedIn project
+                  </button>
+                ) : (
+                  <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+                    {projectDrafts.map((project) => (
+                      <div
+                        key={project.id}
+                        className="group flex items-center justify-between gap-3 rounded-2xl border border-white/5 bg-white/[0.025] px-4 py-3 transition hover:border-cyan-400/20 hover:bg-cyan-400/[0.04]"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingProject(project);
+                            setProjectSkillInput("");
+                          }}
+                          className="min-w-0 flex-1 text-left"
+                        >
+                          <div className="truncate text-sm font-semibold text-white/90">
+                            {project.title || "Untitled project"}
+                          </div>
+
+                          <div className="mt-1 flex items-center gap-2 text-[11px] text-white/40">
+                            <span>
+                              {project.skills.length} skills
+                            </span>
+
+                            {project.description && (
+                              <>
+                                <span className="size-1 rounded-full bg-white/20" />
+                                <span>Click to edit details</span>
+                              </>
+                            )}
+                          </div>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => deleteProject(project.id)}
+                          className="shrink-0 rounded-xl border border-red-400/10 bg-red-400/[0.04] px-2.5 py-1.5 text-[10px] font-semibold text-red-200/80 opacity-70 transition hover:border-red-400/25 hover:bg-red-400/[0.10] hover:opacity-100"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </Card>
 
-        <div className="grid gap-4 lg:grid-cols-12">
-          <Card className="relative overflow-hidden lg:col-span-7">
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent)]" />
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
+          <Card className="relative overflow-hidden border-violet-300/10 bg-white/[0.025]">
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.025),transparent)]" />
 
             <div className="relative">
-              <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
+              <div className="mb-4 flex items-center gap-2 text-base font-semibold text-white">
                 <MessageSquare className="size-4 text-violet-300" />
-                LinkedIn About Section
+                About section & positioning
               </div>
 
-              <textarea
-                value={about}
-                onChange={(event) =>
-                  handleInputChange(
-                    setAbout,
-                    event.target.value,
-                  )
-                }
-                className="h-52 w-full resize-none rounded-2xl border border-white/10 bg-black/20 p-5 text-sm leading-8 text-white/80 outline-none transition placeholder:text-white/30 focus:border-violet-400/30"
-                placeholder="Paste your current LinkedIn About section here..."
-              />
+              <div className="grid gap-4 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+                <div>
+                  <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Current About
+                  </div>
+
+                  <textarea
+                    value={about}
+                    onChange={(event) =>
+                      handleInputChange(
+                        setAbout,
+                        event.target.value,
+                      )
+                    }
+                    className="h-64 w-full resize-none rounded-2xl border border-white/10 bg-black/20 p-5 text-sm leading-8 text-white/80 outline-none transition placeholder:text-white/30 focus:border-violet-400/30"
+                    placeholder="Paste your current LinkedIn About section here..."
+                  />
+                </div>
+
+                <div className="rounded-[1.75rem] border border-violet-400/10 bg-violet-400/[0.04] p-5">
+                  <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-violet-200">
+                    <Sparkles className="size-3.5" />
+                    Improved About version
+                  </div>
+
+                  <div className="max-h-64 overflow-y-auto pr-2 text-sm leading-7 text-white/75">
+                    {analysis?.about_rewrite ||
+                      "Your improved LinkedIn About section will appear here after the analysis."}
+                  </div>
+                </div>
+              </div>
 
               <div className="mt-4 grid gap-3 md:grid-cols-3">
                 {[
@@ -825,55 +948,67 @@ function LinkedInPage() {
                 ))}
               </div>
 
-              <div className="mt-4 rounded-2xl border border-violet-400/10 bg-violet-400/[0.04] p-5">
-                <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-violet-200">
-                  <Sparkles className="size-3.5" />
-                  Improved About version
-                </div>
-
-                <div className="text-sm leading-7 text-white/75">
-                  {analysis?.about_rewrite ||
-                    "Your improved LinkedIn About section will appear here after the analysis."}
-                </div>
-              </div>
             </div>
           </Card>
 
-          <Card className="relative overflow-hidden lg:col-span-5">
+          <Card className="relative overflow-hidden border-white/7 bg-white/[0.025]">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(168,85,247,0.08),transparent_40%)]" />
 
             <div className="relative">
-              <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
+              <div className="mb-4 flex items-center gap-2 text-base font-semibold text-white">
                 <Target className="size-4 text-cyan-300" />
                 Recruiter match breakdown
               </div>
 
-              <div className="space-y-3">
-                <Progress
-                  label="Target role match"
-                  value={analysis?.match_breakdown?.target_role_match || 0}
-                />
+              <div className="grid gap-3 sm:grid-cols-2">
+                {[
+                  [
+                    "Target role",
+                    analysis?.match_breakdown?.target_role_match || 0,
+                  ],
+                  [
+                    "Keywords",
+                    analysis?.match_breakdown?.keyword_coverage || 0,
+                  ],
+                  [
+                    "Visibility",
+                    analysis?.match_breakdown?.search_visibility || 0,
+                  ],
+                  [
+                    "Clarity",
+                    analysis?.match_breakdown?.profile_clarity || 0,
+                  ],
+                ].map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="rounded-[1.35rem] border border-white/7 bg-black/15 p-4"
+                  >
+                    <div className="text-xs text-white/45">
+                      {label}
+                    </div>
 
-                <Progress
-                  label="Keyword coverage"
-                  value={analysis?.match_breakdown?.keyword_coverage || 0}
-                  color="green"
-                />
+                    <div className="mt-2 flex items-end gap-1">
+                      <div className="text-3xl font-semibold tracking-tight text-white">
+                        {value}
+                      </div>
 
-                <Progress
-                  label="Search visibility"
-                  value={analysis?.match_breakdown?.search_visibility || 0}
-                />
+                      <div className="mb-1 text-xs text-white/45">
+                        /100
+                      </div>
+                    </div>
 
-                <Progress
-                  label="Profile clarity"
-                  value={analysis?.match_breakdown?.profile_clarity || 0}
-                  color="green"
-                />
+                    <div className="mt-3">
+                      <Progress
+                        value={Number(value)}
+                        color={Number(value) >= 80 ? "green" : undefined}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
 
-              <div className="mt-5 rounded-2xl border border-white/5 bg-white/[0.03] p-4">
-                <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
+              <div className="mt-5 rounded-[1.75rem] border border-orange-400/10 bg-orange-400/[0.045] p-4">
+                <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-white">
                   <AlertTriangle className="size-4 text-orange-300" />
                   Missing proof points
                 </div>

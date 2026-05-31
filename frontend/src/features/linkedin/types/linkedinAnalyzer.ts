@@ -1,6 +1,8 @@
 export interface LinkedInAnalyzerRequest {
   language?: string;
 
+  analysis_language?: string;
+
   headline: string;
 
   about: string;

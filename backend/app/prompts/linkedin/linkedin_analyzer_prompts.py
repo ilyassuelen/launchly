@@ -29,29 +29,41 @@ IMPORTANT:
 
 def build_linkedin_analyzer_prompt(
     *,
-    language: str,
+    analysis_language: str,
+    linkedin_text_language: str,
     headline: str,
     about: str,
     skills: list[str],
     projects: list[str],
     target_role: str,
 ):
-    language_instruction = (
-        "IMPORTANT: You MUST write ALL output in German."
-        if language.lower() == "de"
-        else "IMPORTANT: You MUST write ALL output in English."
+    analysis_language_instruction = (
+        "IMPORTANT: Write ALL analysis, explanations, conclusions, descriptions and feedback in German."
+        if analysis_language.lower() == "de"
+        else "IMPORTANT: Write ALL analysis, explanations, conclusions, descriptions and feedback in English."
+    )
+
+    linkedin_text_language_instruction = (
+        "IMPORTANT: headline_rewrite and about_rewrite MUST be written in German."
+        if linkedin_text_language.lower() == "de"
+        else "IMPORTANT: headline_rewrite and about_rewrite MUST be written in English."
     )
 
     skills_text = ", ".join(skills)
+
     projects_text = "\n".join(
-        f"- {project}" for project in projects if project.strip()
+        f"- {project}"
+        for project in projects
+        if project.strip()
     )
 
     if not projects_text:
         projects_text = "No projects provided."
 
     return f"""
-{language_instruction}
+{analysis_language_instruction}
+
+{linkedin_text_language_instruction}
 
 Target role:
 {target_role}
@@ -71,6 +83,7 @@ Current LinkedIn projects / featured projects:
 Analyze this LinkedIn profile for recruiter visibility.
 
 Return ONLY valid JSON with this structure:
+
 {{
   "missing_keywords": [
     {{
@@ -93,7 +106,21 @@ Return ONLY valid JSON with this structure:
   "ai_conclusion": ""
 }}
 
+LANGUAGE RULES:
+
+- headline_rewrite MUST use the LinkedIn text language.
+- about_rewrite MUST use the LinkedIn text language.
+
+- missing_keywords.reason MUST use the analysis language.
+- recruiter_search_visibility.title MUST use the analysis language.
+- recruiter_search_visibility.description MUST use the analysis language.
+- match_breakdown.missing_proof_points MUST use the analysis language.
+- ai_conclusion MUST use the analysis language.
+
+- Never mix languages inside a single field.
+
 Rules:
+
 - missing_keywords should contain 4-6 relevant keywords.
 - headline_rewrite must be concise and recruiter-search optimized.
 - about_rewrite must be professional but not exaggerated.

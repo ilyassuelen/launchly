@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 
 class LinkedInProfileBase(BaseModel):
-    language: str = "english"
+    language: str = "en"
     headline: str = ""
     about: str = ""
     skills: List[str] = []

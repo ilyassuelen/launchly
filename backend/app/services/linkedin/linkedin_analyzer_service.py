@@ -275,7 +275,8 @@ async def analyze_linkedin_profile(
     clean_target_role = prepare_data(payload.target_role)
 
     prompt = build_linkedin_analyzer_prompt(
-        language=payload.language,
+        analysis_language=payload.analysis_language,
+        linkedin_text_language=payload.language,
         headline=clean_headline,
         about=clean_about,
         skills=clean_skills,
