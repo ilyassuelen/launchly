@@ -533,20 +533,7 @@ ${(p.bullets || []).join(" ")}
                           </>
                     )}
 
-                  {/* Focus hotspots */}
-                    {attentionZones.slice(0, 3).map((zone, index) => (
-                      <div
-                        key={`${zone.label}-${index}`}
-                        className="pointer-events-none absolute flex items-center gap-2 rounded-full border border-cyan-300/20 bg-white/55 px-4 py-2 text-[20px] font-semibold tracking-[0.01em] text-cyan-950 shadow-[0_12px_40px_rgba(34,211,238,0.12)] backdrop-blur-xl"
-                        style={{
-                          left: `${zone.x}%`,
-                          top: `${zone.y}%`,
-                        }}
-                      >
-                        <MousePointer2 className="size-4" />
-                        {zone.label}
-                      </div>
-                    ))}
+
                 </div>
 
                 <div className={`pointer-events-none absolute right-6 top-6 rounded-2xl bg-[oklch(0.72_0.20_295_/_0.08)] px-4 py-2 text-xs font-medium text-[oklch(0.55_0.18_200)] backdrop-blur-xl ${isAnalyzing ? "animate-pulse" : ""}`}>

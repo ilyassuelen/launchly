@@ -159,22 +159,35 @@ IMPORTANT:
 RECRUITER ATTENTION SIMULATION:
 Simulate the first 8 seconds of recruiter attention.
 
-Generate attention_zones using percentage-based coordinates:
-- x, y, width and height must be numbers from 0 to 100
-- coordinates should roughly map to where the section appears on a typical resume page
-- headline and summary usually appear near the top
-- skills often appear upper or mid page
-- experience/projects usually appear mid to lower page
-- attention must be 0-100
-- start_second and end_second must be between 0 and 8
-- priority must reflect attention importance
+Generate attention_zones using percentage-based coordinates.
+
+IMPORTANT HOTSPOT PLACEMENT RULES:
+- x, y, width and height must be numbers from 0 to 100.
+- Do NOT place hotspots randomly.
+- Each hotspot must point to the resume section where the highlighted content actually appears.
+- The label must describe the visible text in that exact area.
+- The label must be short, max 6 words.
+- If the hotspot is about the summary, place it in the summary area, not over the photo or sidebar.
+- If the hotspot is about skills, place it over the skills/sidebar area.
+- If the hotspot is about projects, place it over the projects area.
+- If the hotspot is about experience, place it over the experience area.
+- If the hotspot is about education, place it over the education area.
+- Do not create a hotspot for content if you cannot estimate where it appears.
+- Prefer fewer but more accurate hotspots over many vague hotspots.
+
+Typical layout guidance:
+- headline/name: upper left or top area
+- summary/profile text: upper main content area
+- skills/tools: left sidebar or skills block
+- projects: middle main content area
+- experience: below projects
+- education: lower page
 
 Generate scan_path as ordered gaze points across the first 8 seconds.
 Generate drop_off_points if the recruiter may lose attention due to vague wording, low proof, weak metrics or poor hierarchy.
 Generate recruiter_timeline as concise second-by-second recruiter perception events.
 
-Do not invent visual sections that are not present in the resume.
-If section location is uncertain, estimate based on typical resume layout and the provided resume content order.
+Return realistic recruiter-style feedback.
 
 Return realistic recruiter-style feedback.
 """
