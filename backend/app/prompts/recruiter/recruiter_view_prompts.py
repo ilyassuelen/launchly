@@ -71,7 +71,8 @@ Return:
       "start_second": 0,
       "end_second": 0,
       "reason": "",
-      "priority": "high|medium|low"
+      "priority": "high|medium|low",
+      "heat_level": "high|medium|low"
     }
   ],
   "scan_path": [
@@ -161,6 +162,25 @@ Simulate the first 8 seconds of recruiter attention.
 
 Generate attention_zones using percentage-based coordinates.
 
+IMPORTANT HEATMAP RULES:
+- attention_zones are visual heatmap areas, not decorative blobs.
+- The heatmap must simulate where a real recruiter would focus during the first 8 seconds.
+- Use stronger attention values only for sections that contain strong, relevant evidence.
+- Use medium attention values for supporting but less decisive information.
+- Use lower attention values for areas a recruiter may briefly notice but not deeply inspect.
+- Do NOT make every heatmap zone high attention.
+- Do NOT create multiple equally strong red zones unless the resume truly contains multiple highly relevant proof areas.
+- Attention should normally decrease over time: early zones are usually strongest, later zones are usually weaker.
+- If a section is visually present but less important, give it lower attention instead of making it red.
+- Prefer 3 to 5 meaningful attention_zones over many vague zones.
+
+HEATMAP COLOR MEANING FOR THE FRONTEND:
+- attention 75-100 = highest recruiter focus, shown as red.
+- attention 45-74 = medium recruiter focus, shown as orange.
+- attention 15-44 = lower recruiter focus or attention fading, shown as green.
+- priority must match the attention level: high for 75-100, medium for 45-74, low for 15-44.
+- heat_level must match the priority: high, medium, or low.
+
 IMPORTANT HOTSPOT PLACEMENT RULES:
 - x, y, width and height must be numbers from 0 to 100.
 - Do NOT place hotspots randomly.
@@ -186,8 +206,6 @@ Typical layout guidance:
 Generate scan_path as ordered gaze points across the first 8 seconds.
 Generate drop_off_points if the recruiter may lose attention due to vague wording, low proof, weak metrics or poor hierarchy.
 Generate recruiter_timeline as concise second-by-second recruiter perception events.
-
-Return realistic recruiter-style feedback.
 
 Return realistic recruiter-style feedback.
 """

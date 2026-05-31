@@ -102,6 +102,18 @@ function RecruiterView() {
   const attentionZones =
       analysis?.attention_zones || [];
 
+  const getHeatmapColor = (attention: number) => {
+      if (attention >= 75) {
+        return "oklch(0.7 0.22 25)";
+      }
+
+      if (attention >= 45) {
+        return "oklch(0.78 0.16 65)";
+      }
+
+      return "oklch(0.78 0.17 155)";
+  };
+
   const timelineEvents =
       analysis?.recruiter_timeline || [];
 
@@ -486,40 +498,34 @@ ${(p.bullets || []).join(" ")}
                     <div className="absolute inset-x-8 top-0 h-px animate-[scanDocument_4.2s_ease-in-out_infinite] bg-cyan-300 shadow-[0_0_28px_rgba(34,211,238,0.95)]" />
                   </div>
 
-                  {scanPath.map((point, index) => (
-                      <div
-                        key={`${point.section}-${point.second}-${index}`}
-                        className="pointer-events-none absolute size-4 rounded-full border border-cyan-300/50 bg-cyan-300/70 shadow-[0_0_24px_rgba(34,211,238,0.9)]"
-                        style={{
-                          left: `${point.x}%`,
-                          top: `${point.y}%`,
-                          animation: "gazePulse 4.8s ease-in-out infinite",
-                          animationDelay: `${index * 0.65}s`,
-                        }}
-                      >
-                        <div className="absolute inset-[-10px] animate-ping rounded-full border border-cyan-300/30" />
-                      </div>
-                  ))}
+                  {/*
+                      Scan path dots hidden for now.
+                  */}
+
                   {/* Heatmap zones */}
                     {attentionZones.length > 0 ? (
                           attentionZones.map((zone, index) => {
                             const opacity =
-                              zone.attention >= 80
+                              zone.attention >= 75
                                 ? 0.24
-                                : zone.attention >= 55
-                                  ? 0.16
-                                  : 0.10;
+                                : zone.attention >= 45
+                                  ? 0.18
+                                  : 0.13;
+
+                            const heatmapColor =
+                                getHeatmapColor(zone.attention || 0);
 
                             return (
                               <div
                                 key={`${zone.section}-${zone.label}-${index}`}
-                                className="pointer-events-none absolute rounded-full bg-[oklch(0.7_0.22_25)] blur-[80px] animate-pulse"
+                                className="pointer-events-none absolute rounded-full blur-[80px] animate-pulse"
                                 style={{
                                   left: `${zone.x}%`,
                                   top: `${zone.y}%`,
                                   width: `${zone.width}%`,
                                   height: `${zone.height}%`,
                                   opacity,
+                                  backgroundColor: heatmapColor,
                                   animationDelay: `${zone.start_second}s`,
                                 }}
                               />
@@ -563,6 +569,31 @@ ${(p.bullets || []).join(" ")}
               </div>
             </div>
 
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-3 rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3">
+              <div className="flex items-center gap-2">
+                <div className="size-3 rounded-full bg-[oklch(0.7_0.22_25)] shadow-[0_0_18px_rgba(255,80,80,0.6)]" />
+
+                <span className="text-xs text-white/70">
+                  High recruiter attention
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="size-3 rounded-full bg-[oklch(0.78_0.16_65)] shadow-[0_0_18px_rgba(255,180,80,0.5)]" />
+
+                <span className="text-xs text-white/70">
+                  Medium attention
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="size-3 rounded-full bg-[oklch(0.78_0.17_155)] shadow-[0_0_18px_rgba(120,255,180,0.45)]" />
+
+                <span className="text-xs text-white/70">
+                  Lower attention
+                </span>
+              </div>
+            </div>
 
             <div className="mt-5 grid gap-3 xl:grid-cols-3">
               {[
