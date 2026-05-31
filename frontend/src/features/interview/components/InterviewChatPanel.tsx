@@ -255,7 +255,7 @@ export function InterviewChatPanel({
               )}
             </div>
 
-            <input
+            <textarea
               value={answer}
               disabled={!session || sessionCompleted || isSubmitting || isStarting}
               onChange={(event) => onAnswerChange(event.target.value)}
@@ -265,7 +265,8 @@ export function InterviewChatPanel({
                   onSubmitAnswer();
                 }
               }}
-              className="flex-1 bg-transparent px-2 text-sm text-white/80 outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+              rows={1}
+              className="h-12 max-h-32 min-h-12 flex-1 resize-none bg-transparent px-2 py-3 text-sm leading-6 text-white/80 outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
               placeholder={
                 sessionCompleted
                   ? "Interview completed"
