@@ -422,13 +422,9 @@ async def submit_interview_answer(
             meta={},
         )
 
-        session.status = "completed"
-        session.ended_at = datetime.utcnow()
-
         try:
             db.add(closing_message)
             db.commit()
-            db.refresh(session)
             db.refresh(closing_message)
         except Exception:
             db.rollback()
@@ -438,12 +434,6 @@ async def submit_interview_answer(
                 session.id,
             )
             raise
-
-        logger.info(
-            "Completed interview session user_id=%s session_id=%s",
-            user_id,
-            session.id,
-        )
 
         try:
             result = await evaluate_interview_session(
@@ -457,7 +447,21 @@ async def submit_interview_answer(
                 user_id,
                 session.id,
             )
-            result = None
+            raise HTTPException(
+                status_code=500,
+                detail="Interview completed, but evaluation failed. Please try again later.",
+            )
+
+        session.status = "completed"
+        session.ended_at = datetime.utcnow()
+        db.commit()
+        db.refresh(session)
+
+        logger.info(
+            "Completed interview session user_id=%s session_id=%s",
+            user_id,
+            session.id,
+        )
 
         return InterviewAnswerResponse(
             session=_session_to_response(session),
