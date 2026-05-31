@@ -53,6 +53,15 @@ function RecruiterView() {
   const [previewZoom] =
       useState(0.62);
 
+  const previewWidth = 794;
+  const previewHeight = 1123;
+
+  const scaledPreviewWidth =
+      previewWidth * previewZoom;
+
+  const scaledPreviewHeight =
+      previewHeight * previewZoom;
+
   const [scanReplayKey, setScanReplayKey] =
       useState(0);
 
@@ -350,8 +359,8 @@ ${(p.bullets || []).join(" ")}
       }
     >
 
-      <div className="relative z-0 grid gap-4 lg:grid-cols-12">
-        <Card className="relative overflow-hidden border-white/5 bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.12),transparent_45%)] lg:col-span-8">
+      <div className="relative z-0 grid items-stretch gap-4 lg:grid-cols-12">
+        <Card className="relative h-full overflow-hidden border-white/5 bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.12),transparent_45%)] lg:col-span-8">
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0))]" />
 
           {/* cinematic scanner glow */}
@@ -443,50 +452,30 @@ ${(p.bullets || []).join(" ")}
               {/* recruiter scan line */}
               <div className="pointer-events-none absolute left-0 right-0 top-0 h-px animate-[scan_5s_linear_infinite] bg-cyan-300/60 shadow-[0_0_30px_rgba(34,211,238,0.8)]" />
 
-              {/* eye tracking paths */}
-              <svg
-                className="pointer-events-none absolute inset-0 h-full w-full opacity-50"
-                viewBox="0 0 1000 700"
-                preserveAspectRatio="none"
+
+
+              <div
+                  className="relative mx-auto flex items-start justify-center overflow-hidden rounded-[34px] border border-black/5 bg-[#f4f4f5] p-6 shadow-[0_30px_120px_rgba(0,0,0,0.30)] transition duration-500 hover:-translate-y-1 hover:shadow-[0_50px_160px_rgba(0,0,0,0.38)]"
+                  style={{
+                    width: `${scaledPreviewWidth + 48}px`,
+                    height: `${scaledPreviewHeight + 48}px`,
+                    maxWidth: "100%",
+                  }}
               >
-                <polyline
-                  points={scanPath
-                    .map((point) => `${point.x * 10},${point.y * 7}`)
-                    .join(" ")}
-                  stroke="rgba(34,211,238,0.35)"
-                  strokeWidth="2"
-                  strokeDasharray="10 12"
-                  fill="none"
-                  className="animate-pulse"
-                />
-
-                {scanPath.map((point, index) => (
-                  <circle
-                    key={`${point.section}-${index}`}
-                    cx={point.x * 10}
-                    cy={point.y * 7}
-                    r="5"
-                    fill="rgba(34,211,238,0.85)"
-                    className={index % 2 === 0 ? "animate-ping" : "animate-pulse"}
-                  />
-                ))}
-              </svg>
-
-              <div className="relative mx-auto flex max-h-[760px] max-w-[760px] items-start justify-center overflow-hidden rounded-[34px] border border-black/5 bg-[#f4f4f5] p-6 shadow-[0_30px_120px_rgba(0,0,0,0.30)] transition duration-500 hover:-translate-y-1 hover:shadow-[0_50px_160px_rgba(0,0,0,0.38)]">
 
                 <div
                   key={scanReplayKey}
                   className="relative origin-top transition-transform duration-200"
                   style={{
                     transform: `scale(${previewZoom})`,
-                    width: "794px",
-                    minHeight: "1123px",
+                    width: `${previewWidth}px`,
+                    height: `${previewHeight}px`,
                   }}
                 >
                   {resume ? (
                     <ResumePreview resume={resume} />
                   ) : (
-                    <div className="flex min-h-[1123px] items-center justify-center bg-white text-sm text-black/50">
+                    <div className="flex h-[1123px] items-center justify-center bg-white text-sm text-black/50">
                       Select a resume to preview the recruiter scan.
                     </div>
                   )}
@@ -564,11 +553,11 @@ ${(p.bullets || []).join(" ")}
                   Attention score: {animatedScore}/100
                 </div>
 
-                <div className="pointer-events-none absolute bottom-5 left-1/2 flex w-max -translate-x-1/2 flex-nowrap items-center justify-center gap-2">
+                <div className="pointer-events-none absolute inset-x-4 bottom-4 flex flex-nowrap items-center justify-center gap-2">
                   {detectedKeywords.map((keyword, index) => (
                     <div
                       key={`${keyword}-${scanReplayKey}`}
-                      className="flex translate-y-2 animate-[keywordReveal_0.7s_ease-out_forwards] items-center gap-1.5 rounded-full border border-cyan-300/20 bg-slate-950/75 px-3 py-1.5 text-[10px] font-semibold tracking-[0.01em] text-white opacity-0 shadow-[0_10px_28px_rgba(0,0,0,0.32)] backdrop-blur-xl"
+                      className="flex animate-[keywordReveal_0.7s_ease-out_forwards] items-center gap-1.5 rounded-full border border-cyan-300/20 bg-slate-950/75 px-2.5 py-1.5 text-[9px] font-semibold tracking-[0.01em] text-white opacity-0 shadow-[0_10px_28px_rgba(0,0,0,0.32)] backdrop-blur-xl"
                       style={{
                         animationDelay: `${700 + index * 450}ms`,
                       }}
@@ -587,25 +576,60 @@ ${(p.bullets || []).join(" ")}
               </div>
             </div>
 
-            <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-              <span className="inline-flex items-center gap-1">
-                <span className="size-2.5 rounded-full bg-[oklch(0.7_0.22_25)]" />
-                High attention
-              </span>
 
-              <span className="inline-flex items-center gap-1">
-                <span className="size-2.5 rounded-full bg-[oklch(0.83_0.16_75)]" />
-                Medium attention
-              </span>
+            <div className="mt-5 grid gap-3 xl:grid-cols-3">
+              {[
+                {
+                  t: "Strengths",
+                  c: "green",
+                  items: analysis?.strengths || [],
+                },
+                {
+                  t: "Weak spots",
+                  c: "warning",
+                  items: analysis?.weak_spots || [],
+                },
+                {
+                  t: "Missing impact",
+                  c: "pink",
+                  items: analysis?.missing_impact || [],
+                },
+              ].map((b) => (
+                <div
+                  key={b.t}
+                  className="min-h-[150px] rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+                >
+                  <div className="mb-3 text-sm font-semibold">
+                    {b.t}
+                  </div>
 
-              <span className="inline-flex items-center gap-1">
-                <span className="size-2.5 rounded-full bg-[oklch(0.78_0.17_155)]" />
-                Low attention
-              </span>
+                  <ul className="space-y-2 text-sm">
+                    {b.items.length === 0 && (
+                      <li className="text-sm text-white/45">
+                        Run a recruiter scan to generate insights.
+                      </li>
+                    )}
 
-              <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] px-2 py-1 text-[11px]">
-                Selected resume replay
-              </span>
+                    {b.items.map((i) => (
+                      <li key={i} className="flex gap-2">
+                        <span
+                          className={`mt-1.5 size-1.5 rounded-full ${
+                            b.c === "green"
+                              ? "bg-[oklch(0.78_0.17_155)]"
+                              : b.c === "warning"
+                                ? "bg-[oklch(0.83_0.16_75)]"
+                                : "bg-[oklch(0.78_0.18_340)]"
+                          }`}
+                        />
+
+                        <span className="text-white/75">
+                          {i}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           </div>
         </Card>
@@ -771,142 +795,71 @@ ${(p.bullets || []).join(" ")}
                 )}
               </div>
           </Card>
-          <Card>
-            <div className="mb-2 flex items-center gap-2 text-sm font-semibold"><Sparkles className="size-4 text-[oklch(0.85_0.14_250)]"/> AI panel feedback</div>
-            <div className="space-y-3">
-
-              {!analysis && (
-                <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-xs text-white/60">
-                  Run a recruiter scan to receive AI feedback.
-                </div>
-              )}
-
-              {(analysis?.ai_feedback || []).map(
-                (item, index) => {
-
-                  const isWarning =
-                    item.type === "warning";
-
-                  const isSuccess =
-                    item.type === "success";
-
-                  return (
-                    <div
-                      key={index}
-                      className={`rounded-2xl border p-4 ${
-                        isWarning
-                          ? "border-orange-400/10 bg-orange-400/[0.06]"
-                          : isSuccess
-                            ? "border-emerald-400/10 bg-emerald-400/[0.05]"
-                            : "border-cyan-400/10 bg-cyan-400/[0.05]"
-                      }`}
-                    >
-
-                      <div className="flex items-start justify-between gap-3">
-
-                        <div className="flex gap-2">
-
-                          {isWarning ? (
-                            <AlertTriangle className="mt-0.5 size-4 text-orange-300" />
-                          ) : isSuccess ? (
-                            <Check className="mt-0.5 size-4 text-emerald-300" />
-                          ) : (
-                            <Sparkles className="mt-0.5 size-4 text-cyan-300" />
-                          )}
-
-                          <div>
-
-                            <div className="text-sm font-medium text-white">
-                              {item.title}
-                            </div>
-
-                            <div className="mt-1 text-xs text-white/60">
-                              {item.description}
-                            </div>
-
-                          </div>
-
-                        </div>
-
-                        <div className="rounded-full bg-white/5 px-2 py-1 text-[10px] text-white/70">
-                          {item.confidence}
-                        </div>
-
-                      </div>
-
-                    </div>
-                  );
-                },
-              )}
-
-            </div>
-          </Card>
         </div>
       </div>
 
-      <div className="mt-4 grid gap-4 md:grid-cols-3">
+      <Card className="mt-4">
+          <div className="mb-4 flex items-center gap-2 text-sm font-semibold">
+            <Sparkles className="size-4 text-[oklch(0.85_0.14_250)]" />
+            Recruiter recommendations
+          </div>
 
-        {[
-          {
-            t: "Strengths",
-            c: "green",
-            items:
-              analysis?.strengths || [],
-          },
-          {
-            t: "Weak spots",
-            c: "warning",
-            items:
-              analysis?.weak_spots || [],
-          },
-          {
-            t: "Missing impact",
-            c: "pink",
-            items:
-              analysis?.missing_impact || [],
-          },
-        ].map((b) => (
-          <Card key={b.t}>
-
-            <div className="mb-3 text-sm font-semibold">
-              {b.t}
+          {!analysis && (
+            <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-xs text-white/60">
+              Run a recruiter scan to receive AI feedback.
             </div>
+          )}
 
-            <ul className="space-y-2 text-sm">
+          <div className="grid gap-3 md:grid-cols-3">
+            {(analysis?.ai_feedback || []).map((item, index) => {
+              const isWarning =
+                item.type === "warning";
 
-              {b.items.length === 0 && (
-                <li className="text-sm text-white/45">
-                  Run a recruiter scan to generate insights.
-                </li>
-              )}
+              const isSuccess =
+                item.type === "success";
 
-              {b.items.map((i) => (
-                <li
-                  key={i}
-                  className="flex gap-2"
+              return (
+                <div
+                  key={index}
+                  className={`rounded-2xl border p-4 ${
+                    isWarning
+                      ? "border-orange-400/10 bg-orange-400/[0.06]"
+                      : isSuccess
+                        ? "border-emerald-400/10 bg-emerald-400/[0.05]"
+                        : "border-cyan-400/10 bg-cyan-400/[0.05]"
+                  }`}
                 >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex gap-2">
+                      {isWarning ? (
+                        <AlertTriangle className="mt-0.5 size-4 text-orange-300" />
+                      ) : isSuccess ? (
+                        <Check className="mt-0.5 size-4 text-emerald-300" />
+                      ) : (
+                        <Sparkles className="mt-0.5 size-4 text-cyan-300" />
+                      )}
 
-                  <span
-                    className={`mt-1.5 size-1.5 rounded-full ${
-                      b.c === "green"
-                        ? "bg-[oklch(0.78_0.17_155)]"
-                        : b.c === "warning"
-                          ? "bg-[oklch(0.83_0.16_75)]"
-                          : "bg-[oklch(0.78_0.18_340)]"
-                    }`}
-                  />
+                      <div>
+                        <div className="text-sm font-medium text-white">
+                          {item.title}
+                        </div>
 
-                  {i}
+                        <div className="mt-1 text-xs leading-relaxed text-white/60">
+                          {item.description}
+                        </div>
+                      </div>
+                    </div>
 
-                </li>
-              ))}
+                    <div className="rounded-full bg-white/5 px-2 py-1 text-[10px] text-white/70">
+                      {item.confidence}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+      </Card>
 
-            </ul>
-
-          </Card>
-        ))}
-
-      </div>
       <style>
         {`
           @keyframes scanDocument {
