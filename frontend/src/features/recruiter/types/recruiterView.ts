@@ -18,6 +18,42 @@ export interface RecruiterFeedbackCard {
   type: string;
 }
 
+export interface RecruiterAttentionZone {
+  section: string;
+  label: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  attention: number;
+  start_second: number;
+  end_second: number;
+  reason: string;
+  priority: "high" | "medium" | "low" | string;
+}
+
+export interface RecruiterScanPathPoint {
+  section: string;
+  x: number;
+  y: number;
+  second: number;
+  label: string;
+}
+
+export interface RecruiterDropOffPoint {
+  second: number;
+  section: string;
+  reason: string;
+  severity: "low" | "medium" | "high" | string;
+}
+
+export interface RecruiterTimelineEvent {
+  second: number;
+  title: string;
+  description: string;
+  sentiment: "positive" | "neutral" | "negative" | string;
+}
+
 export interface RecruiterViewResponse {
   recruiter_score: number;
 
@@ -30,6 +66,14 @@ export interface RecruiterViewResponse {
   missing_impact: string[];
 
   ai_feedback: RecruiterFeedbackCard[];
+
+  attention_zones?: RecruiterAttentionZone[];
+
+  scan_path?: RecruiterScanPathPoint[];
+
+  drop_off_points?: RecruiterDropOffPoint[];
+
+  recruiter_timeline?: RecruiterTimelineEvent[];
 }
 
 export interface RecruiterViewRequest {

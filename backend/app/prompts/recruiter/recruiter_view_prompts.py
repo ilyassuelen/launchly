@@ -58,6 +58,46 @@ Return:
       "confidence": "",
       "type": ""
     }
+  ],
+  "attention_zones": [
+    {
+      "section": "headline|summary|skills|experience|projects|education|other",
+      "label": "",
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0,
+      "attention": 0,
+      "start_second": 0,
+      "end_second": 0,
+      "reason": "",
+      "priority": "high|medium|low"
+    }
+  ],
+  "scan_path": [
+    {
+      "section": "",
+      "x": 0,
+      "y": 0,
+      "second": 0,
+      "label": ""
+    }
+  ],
+  "drop_off_points": [
+    {
+      "second": 0,
+      "section": "",
+      "reason": "",
+      "severity": "low|medium|high"
+    }
+  ],
+  "recruiter_timeline": [
+    {
+      "second": 0,
+      "title": "",
+      "description": "",
+      "sentiment": "positive|neutral|negative"
+    }
   ]
 }
 """
@@ -115,6 +155,26 @@ IMPORTANT:
 - Return ONLY valid JSON
 - Do not include markdown
 - Do not hallucinate
+
+RECRUITER ATTENTION SIMULATION:
+Simulate the first 8 seconds of recruiter attention.
+
+Generate attention_zones using percentage-based coordinates:
+- x, y, width and height must be numbers from 0 to 100
+- coordinates should roughly map to where the section appears on a typical resume page
+- headline and summary usually appear near the top
+- skills often appear upper or mid page
+- experience/projects usually appear mid to lower page
+- attention must be 0-100
+- start_second and end_second must be between 0 and 8
+- priority must reflect attention importance
+
+Generate scan_path as ordered gaze points across the first 8 seconds.
+Generate drop_off_points if the recruiter may lose attention due to vague wording, low proof, weak metrics or poor hierarchy.
+Generate recruiter_timeline as concise second-by-second recruiter perception events.
+
+Do not invent visual sections that are not present in the resume.
+If section location is uncertain, estimate based on typical resume layout and the provided resume content order.
 
 Return realistic recruiter-style feedback.
 """

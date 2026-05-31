@@ -17,6 +17,41 @@ class RecruiterFeedbackCard(BaseModel):
     confidence: str
     type: str
 
+class RecruiterAttentionZone(BaseModel):
+    section: str
+    label: str
+    x: int
+    y: int
+    width: int
+    height: int
+    attention: int
+    start_second: float
+    end_second: float
+    reason: str
+    priority: str
+
+
+class RecruiterScanPathPoint(BaseModel):
+    section: str
+    x: int
+    y: int
+    second: float
+    label: str
+
+
+class RecruiterDropOffPoint(BaseModel):
+    second: float
+    section: str
+    reason: str
+    severity: str
+
+
+class RecruiterTimelineEvent(BaseModel):
+    second: float
+    title: str
+    description: str
+    sentiment: str
+
 
 class RecruiterViewRequest(BaseModel):
     language: str
@@ -32,7 +67,10 @@ class RecruiterViewResponse(BaseModel):
     weak_spots: List[str]
     missing_impact: List[str]
     ai_feedback: List[RecruiterFeedbackCard]
-
+    attention_zones: List[RecruiterAttentionZone] = []
+    scan_path: List[RecruiterScanPathPoint] = []
+    drop_off_points: List[RecruiterDropOffPoint] = []
+    recruiter_timeline: List[RecruiterTimelineEvent] = []
 
 class SavedRecruiterViewResponse(BaseModel):
     id: int

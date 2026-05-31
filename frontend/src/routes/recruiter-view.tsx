@@ -47,11 +47,11 @@ function RecruiterView() {
       resetAnalysis,
   } = useRecruiterView();
 
-  const [hasAnalyzed, setHasAnalyzed] =
+  const [, setHasAnalyzed] =
       useState(false);
 
-  const [previewZoom, setPreviewZoom] =
-      useState(0.60);
+  const [previewZoom] =
+      useState(0.62);
 
   const [scanReplayKey, setScanReplayKey] =
       useState(0);
@@ -78,13 +78,26 @@ function RecruiterView() {
     "Weak visual hierarchy can hide strong experience.",
   ];
 
-  const gazePoints = [
-    { left: "23%", top: "13%" },
-    { left: "63%", top: "25%" },
-    { left: "38%", top: "42%" },
-    { left: "71%", top: "58%" },
-    { left: "30%", top: "72%" },
+  const fallbackGazePoints = [
+      { x: 23, y: 13, label: "Headline", second: 0.5, section: "headline" },
+      { x: 63, y: 25, label: "Skills", second: 2, section: "skills" },
+      { x: 38, y: 42, label: "Experience", second: 4, section: "experience" },
+      { x: 71, y: 58, label: "Projects", second: 6, section: "projects" },
   ];
+
+  const scanPath =
+      analysis?.scan_path?.length
+        ? analysis.scan_path
+        : fallbackGazePoints;
+
+  const attentionZones =
+      analysis?.attention_zones || [];
+
+  const timelineEvents =
+      analysis?.recruiter_timeline || [];
+
+  const dropOffPoints =
+      analysis?.drop_off_points || [];
 
   const detectedKeywords = [
     "Metrics",
@@ -356,7 +369,7 @@ ${(p.bullets || []).join(" ")}
                 </div>
 
                 <div className="mt-1 text-xs text-muted-foreground">
-                  First 7 seconds · simulated recruiter scan of your selected resume
+                  First 8 seconds · simulated recruiter scan of your selected resume
                 </div>
               </div>
 
@@ -436,8 +449,10 @@ ${(p.bullets || []).join(" ")}
                 viewBox="0 0 1000 700"
                 preserveAspectRatio="none"
               >
-                <path
-                  d="M210 110 C 330 140, 430 190, 535 265"
+                <polyline
+                  points={scanPath
+                    .map((point) => `${point.x * 10},${point.y * 7}`)
+                    .join(" ")}
                   stroke="rgba(34,211,238,0.35)"
                   strokeWidth="2"
                   strokeDasharray="10 12"
@@ -445,47 +460,16 @@ ${(p.bullets || []).join(" ")}
                   className="animate-pulse"
                 />
 
-                <path
-                  d="M535 265 C 675 335, 735 420, 620 545"
-                  stroke="rgba(168,85,247,0.30)"
-                  strokeWidth="2"
-                  strokeDasharray="10 12"
-                  fill="none"
-                  className="animate-pulse"
-                />
-
-                <path
-                  d="M250 520 C 380 430, 540 420, 720 500"
-                  stroke="rgba(52,211,153,0.25)"
-                  strokeWidth="2"
-                  strokeDasharray="8 14"
-                  fill="none"
-                  className="animate-pulse"
-                />
-
-                <circle
-                  cx="210"
-                  cy="110"
-                  r="5"
-                  fill="rgba(34,211,238,0.85)"
-                  className="animate-ping"
-                />
-
-                <circle
-                  cx="535"
-                  cy="265"
-                  r="5"
-                  fill="rgba(168,85,247,0.80)"
-                  className="animate-pulse"
-                />
-
-                <circle
-                  cx="720"
-                  cy="500"
-                  r="5"
-                  fill="rgba(52,211,153,0.75)"
-                  className="animate-ping"
-                />
+                {scanPath.map((point, index) => (
+                  <circle
+                    key={`${point.section}-${index}`}
+                    cx={point.x * 10}
+                    cy={point.y * 7}
+                    r="5"
+                    fill="rgba(34,211,238,0.85)"
+                    className={index % 2 === 0 ? "animate-ping" : "animate-pulse"}
+                  />
+                ))}
               </svg>
 
               <div className="relative mx-auto flex max-h-[760px] max-w-[760px] items-start justify-center overflow-hidden rounded-[34px] border border-black/5 bg-[#f4f4f5] p-6 shadow-[0_30px_120px_rgba(0,0,0,0.30)] transition duration-500 hover:-translate-y-1 hover:shadow-[0_50px_160px_rgba(0,0,0,0.38)]">
@@ -513,44 +497,67 @@ ${(p.bullets || []).join(" ")}
                     <div className="absolute inset-x-8 top-0 h-px animate-[scanDocument_4.2s_ease-in-out_infinite] bg-cyan-300 shadow-[0_0_28px_rgba(34,211,238,0.95)]" />
                   </div>
 
-                  {gazePoints.map((point, index) => (
-                    <div
-                      key={`${point.left}-${point.top}-${index}`}
-                      className="pointer-events-none absolute size-4 rounded-full border border-cyan-300/50 bg-cyan-300/70 shadow-[0_0_24px_rgba(34,211,238,0.9)]"
-                      style={{
-                        left: point.left,
-                        top: point.top,
-                        animation: "gazePulse 4.8s ease-in-out infinite",
-                        animationDelay: `${index * 0.65}s`,
-                      }}
-                    >
-                      <div className="absolute inset-[-10px] rounded-full border border-cyan-300/30 animate-ping" />
-                    </div>
+                  {scanPath.map((point, index) => (
+                      <div
+                        key={`${point.section}-${point.second}-${index}`}
+                        className="pointer-events-none absolute size-4 rounded-full border border-cyan-300/50 bg-cyan-300/70 shadow-[0_0_24px_rgba(34,211,238,0.9)]"
+                        style={{
+                          left: `${point.x}%`,
+                          top: `${point.y}%`,
+                          animation: "gazePulse 4.8s ease-in-out infinite",
+                          animationDelay: `${index * 0.65}s`,
+                        }}
+                      >
+                        <div className="absolute inset-[-10px] animate-ping rounded-full border border-cyan-300/30" />
+                      </div>
                   ))}
                   {/* Heatmap zones */}
-                    <div className="pointer-events-none absolute left-[110px] top-[60px] size-52 rounded-full bg-[oklch(0.7_0.22_25)] opacity-20 blur-[90px] animate-pulse" />
+                    {attentionZones.length > 0 ? (
+                          attentionZones.map((zone, index) => {
+                            const opacity =
+                              zone.attention >= 80
+                                ? 0.24
+                                : zone.attention >= 55
+                                  ? 0.16
+                                  : 0.10;
 
-                    <div className="pointer-events-none absolute right-[100px] top-[140px] size-40 rounded-full bg-[oklch(0.83_0.16_75)] opacity-15 blur-[80px] animate-pulse" />
-
-                    <div className="pointer-events-none absolute left-[260px] top-[320px] size-64 rounded-full bg-[oklch(0.78_0.17_155)] opacity-12 blur-[100px] animate-pulse" />
-
-                    <div className="pointer-events-none absolute right-[180px] bottom-[150px] size-52 rounded-full bg-[oklch(0.8_0.18_75)] opacity-12 blur-[90px] animate-pulse" />
+                            return (
+                              <div
+                                key={`${zone.section}-${zone.label}-${index}`}
+                                className="pointer-events-none absolute rounded-full bg-[oklch(0.7_0.22_25)] blur-[80px] animate-pulse"
+                                style={{
+                                  left: `${zone.x}%`,
+                                  top: `${zone.y}%`,
+                                  width: `${zone.width}%`,
+                                  height: `${zone.height}%`,
+                                  opacity,
+                                  animationDelay: `${zone.start_second}s`,
+                                }}
+                              />
+                            );
+                          })
+                    ) : (
+                          <>
+                            <div className="pointer-events-none absolute left-[110px] top-[60px] size-52 rounded-full bg-[oklch(0.7_0.22_25)] opacity-20 blur-[90px] animate-pulse" />
+                            <div className="pointer-events-none absolute right-[100px] top-[140px] size-40 rounded-full bg-[oklch(0.83_0.16_75)] opacity-15 blur-[80px] animate-pulse" />
+                            <div className="pointer-events-none absolute left-[260px] top-[320px] size-64 rounded-full bg-[oklch(0.78_0.17_155)] opacity-12 blur-[100px] animate-pulse" />
+                          </>
+                    )}
 
                   {/* Focus hotspots */}
-                    <div className="pointer-events-none absolute left-[170px] top-[105px] flex items-center gap-2 rounded-full border border-cyan-300/20 bg-white/55 px-4 py-2 text-[20px] font-semibold tracking-[0.01em] text-cyan-950 shadow-[0_12px_40px_rgba(34,211,238,0.12)] backdrop-blur-xl">
-                      <MousePointer2 className="size-4" />
-                      Initial focus
-                    </div>
-
-                    <div className="pointer-events-none absolute left-1/2 top-[255px] flex -translate-x-1/2 items-center gap-2 rounded-full border border-violet-400/20 bg-white/55 px-4 py-2 text-[20px] font-semibold tracking-[0.01em] text-violet-950 shadow-[0_12px_40px_rgba(168,85,247,0.12)] backdrop-blur-xl">
-                      <ScanSearch className="size-4" />
-                      Metrics detected
-                    </div>
-
-                    <div className="pointer-events-none absolute left-[320px] top-[485px] flex items-center gap-2 rounded-full border border-emerald-400/20 bg-white/55 px-4 py-2 text-[20px] font-semibold tracking-[0.01em] text-emerald-950 shadow-[0_12px_40px_rgba(52,211,153,0.12)] backdrop-blur-xl">
-                      <SearchCheck className="size-4" />
-                      Relevant evidence
-                    </div>
+                    {attentionZones.slice(0, 3).map((zone, index) => (
+                      <div
+                        key={`${zone.label}-${index}`}
+                        className="pointer-events-none absolute flex items-center gap-2 rounded-full border border-cyan-300/20 bg-white/55 px-4 py-2 text-[20px] font-semibold tracking-[0.01em] text-cyan-950 shadow-[0_12px_40px_rgba(34,211,238,0.12)] backdrop-blur-xl"
+                        style={{
+                          left: `${zone.x}%`,
+                          top: `${zone.y}%`,
+                        }}
+                      >
+                        <MousePointer2 className="size-4" />
+                        {zone.label}
+                      </div>
+                    ))}
                 </div>
 
                 <div className={`pointer-events-none absolute right-6 top-6 rounded-2xl bg-[oklch(0.72_0.20_295_/_0.08)] px-4 py-2 text-xs font-medium text-[oklch(0.55_0.18_200)] backdrop-blur-xl ${isAnalyzing ? "animate-pulse" : ""}`}>
@@ -656,6 +663,43 @@ ${(p.bullets || []).join(" ")}
             </div>
           </Card>
           <Card>
+              <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
+                <Activity className="size-4 text-cyan-300" />
+                8-second recruiter timeline
+              </div>
+
+              <div className="space-y-3">
+                {(timelineEvents.length
+                  ? timelineEvents
+                  : [
+                      {
+                        second: 0,
+                        title: "Initial scan",
+                        description: "Run a recruiter scan to simulate the first impression.",
+                        sentiment: "neutral",
+                      },
+                    ]
+                ).map((event, index) => (
+                  <div
+                    key={`${event.second}-${index}`}
+                    className="rounded-2xl border border-white/10 bg-white/[0.03] p-3"
+                  >
+                    <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-200/70">
+                      {event.second}s
+                    </div>
+
+                    <div className="mt-1 text-sm font-semibold text-white">
+                      {event.title}
+                    </div>
+
+                    <div className="mt-1 text-xs leading-relaxed text-white/60">
+                      {event.description}
+                    </div>
+                  </div>
+                ))}
+              </div>
+          </Card>
+          <Card>
             <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
               <Target className="size-4 text-cyan-300" />
               Signals
@@ -697,6 +741,35 @@ ${(p.bullets || []).join(" ")}
               />
 
             </div>
+          </Card>
+          <Card>
+              <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
+                <AlertTriangle className="size-4 text-orange-300" />
+                Attention drop-off
+              </div>
+
+              <div className="space-y-3">
+                {dropOffPoints.length === 0 ? (
+                  <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-xs text-white/60">
+                    No major attention drop-off detected yet.
+                  </div>
+                ) : (
+                  dropOffPoints.map((point, index) => (
+                    <div
+                      key={`${point.section}-${index}`}
+                      className="rounded-2xl border border-orange-400/10 bg-orange-400/[0.05] p-3"
+                    >
+                      <div className="text-[11px] uppercase tracking-[0.18em] text-orange-200/70">
+                        {point.second}s · {point.section}
+                      </div>
+
+                      <div className="mt-1 text-xs leading-relaxed text-white/70">
+                        {point.reason}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
           </Card>
           <Card>
             <div className="mb-2 flex items-center gap-2 text-sm font-semibold"><Sparkles className="size-4 text-[oklch(0.85_0.14_250)]"/> AI panel feedback</div>

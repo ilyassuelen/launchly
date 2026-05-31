@@ -22,6 +22,10 @@ from backend.app.schemas.recruiter.recruiter_view import (
     RecruiterViewResponse,
     RecruiterSignal,
     RecruiterFeedbackCard,
+    RecruiterAttentionZone,
+    RecruiterScanPathPoint,
+    RecruiterDropOffPoint,
+    RecruiterTimelineEvent,
 )
 
 from backend.app.services.privacy.llm_privacy import prepare_data
@@ -374,6 +378,22 @@ async def analyze_recruiter_view(
         ai_feedback=[
             RecruiterFeedbackCard(**item)
             for item in parsed.get("ai_feedback", [])[:3]
+        ],
+        attention_zones=[
+            RecruiterAttentionZone(**item)
+            for item in parsed.get("attention_zones", [])[:6]
+        ],
+        scan_path=[
+            RecruiterScanPathPoint(**item)
+            for item in parsed.get("scan_path", [])[:8]
+        ],
+        drop_off_points=[
+            RecruiterDropOffPoint(**item)
+            for item in parsed.get("drop_off_points", [])[:3]
+        ],
+        recruiter_timeline=[
+            RecruiterTimelineEvent(**item)
+            for item in parsed.get("recruiter_timeline", [])[:6]
         ],
     )
 
