@@ -111,6 +111,44 @@ ACTION_WORDS = [
 ]
 
 
+def _safe_missing_keywords(
+    items: list,
+) -> list[MissingKeyword]:
+    results: list[MissingKeyword] = []
+
+    for item in items[:6]:
+        try:
+            results.append(
+                MissingKeyword(**item),
+            )
+        except Exception:
+            logger.warning(
+                "Skipping invalid missing keyword item: %s",
+                item,
+            )
+
+    return results
+
+
+def _safe_search_visibility_items(
+    items: list,
+) -> list[SearchVisibilityItem]:
+    results: list[SearchVisibilityItem] = []
+
+    for item in items[:3]:
+        try:
+            results.append(
+                SearchVisibilityItem(**item),
+            )
+        except Exception:
+            logger.warning(
+                "Skipping invalid search visibility item: %s",
+                item,
+            )
+
+    return results
+
+
 def _clamp(value: int) -> int:
     return max(0, min(100, value))
 
@@ -264,8 +302,22 @@ async def analyze_linkedin_profile(
             ],
         )
 
-        content = response.choices[0].message.content
+        content = (
+                response.choices[0].message.content
+                or ""
+        ).strip()
 
+        if not content:
+            logger.error(
+                "LinkedIn analyzer returned empty response",
+            )
+
+            raise HTTPException(
+                status_code=500,
+                detail="LinkedIn analyzer returned an empty response",
+            )
+    except HTTPException:
+        raise
     except Exception as exc:
         logger.exception(
             "LinkedIn analyzer request failed",
@@ -334,13 +386,12 @@ async def analyze_linkedin_profile(
 
         signals=signals,
 
-        missing_keywords=[
-            MissingKeyword(**item)
-            for item in parsed.get(
+        missing_keywords=_safe_missing_keywords(
+            parsed.get(
                 "missing_keywords",
                 [],
-            )[:6]
-        ],
+            ),
+        ),
 
         headline_rewrite=parsed.get(
             "headline_rewrite",
@@ -352,13 +403,12 @@ async def analyze_linkedin_profile(
             "",
         ),
 
-        recruiter_search_visibility=[
-            SearchVisibilityItem(**item)
-            for item in parsed.get(
+        recruiter_search_visibility=_safe_search_visibility_items(
+            parsed.get(
                 "recruiter_search_visibility",
                 [],
-            )[:3]
-        ],
+            ),
+        ),
 
         match_breakdown=RecruiterMatchBreakdown(
             target_role_match=_clamp(
