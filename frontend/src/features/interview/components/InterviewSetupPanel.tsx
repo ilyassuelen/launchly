@@ -87,18 +87,22 @@ export function InterviewSetupPanel({
         <div className="mb-5 border-b border-white/5 pb-5">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <div className="text-sm font-semibold">
-                Interview setup
+              <div className="flex items-center gap-2">
+                <div className="grid size-8 place-items-center rounded-xl bg-cyan-400/10 ring-1 ring-cyan-300/15">
+                  <Sparkles className="size-4 text-cyan-300" />
+                </div>
+
+                <div className="text-base font-semibold text-white">
+                  Interview Setup
+                </div>
               </div>
 
-              <div className="mt-1 text-xs text-muted-foreground">
-                Configure your AI mock session.
+              <div className="mt-2 text-xs text-muted-foreground">
+                Configure your AI mock interview session.
               </div>
             </div>
 
-            <div className="rounded-xl border border-cyan-400/10 bg-cyan-400/10 px-2 py-1 text-[11px] text-cyan-200">
-              Resume-aware
-            </div>
+
           </div>
         </div>
 

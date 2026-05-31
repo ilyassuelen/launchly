@@ -8,7 +8,6 @@ import {
 
 import {
   Card,
-  Progress,
 } from "@/components/launchly/AppShell";
 
 import type {
@@ -54,167 +53,175 @@ export function InterviewAnalysisPanel({
   isActive = false,
 }: InterviewAnalysisPanelProps) {
   return (
-    <div className="space-y-4">
-      <Card>
-        <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
-          <Activity className="size-4 text-cyan-300" />
-          Communication analysis
-        </div>
+    <Card className="relative overflow-hidden border-white/8 bg-white/[0.025] shadow-[0_18px_60px_rgba(0,0,0,0.18)]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(139,92,246,0.08),transparent_38%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.06),transparent_35%)]" />
 
-        <div className="space-y-4">
-          <Progress
-            label="Confidence"
-            value={result?.confidence_score || 0}
-          />
+      <div className="relative space-y-6">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/60">
+              <Activity className="size-3.5 text-cyan-300" />
+              Analysis
+            </div>
 
-          <Progress
-            label="Communication"
-            value={result?.communication_score || 0}
-            color={
-              (result?.communication_score || 0) >= 75
-                ? "green"
-                : undefined
-            }
-          />
+            <div className="mt-3 text-lg font-semibold text-white">
+              AI feedback overview
+            </div>
 
-          <Progress
-            label="Structure (STAR)"
-            value={result?.structure_score || 0}
-            color={
-              (result?.structure_score || 0) < 65
-                ? "pink"
-                : undefined
-            }
-          />
-
-          <Progress
-            label="Specificity"
-            value={result?.specificity_score || 0}
-          />
-        </div>
-
-        {!result && (
-          <div className="mt-5 rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-xs leading-5 text-white/50">
-            {isActive
-              ? "Your communication analysis will appear automatically after the final answer."
-              : "Start and complete an interview to unlock your analysis."}
-          </div>
-        )}
-      </Card>
-
-      <Card className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(168,85,247,0.08),transparent_40%)]" />
-
-        <div className="relative">
-          <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
-            <Sparkles className="size-4 text-violet-300" />
-            AI recruiter insights
+            <div className="mt-1 max-w-xl text-sm leading-6 text-white/50">
+              {result
+                ? "Recruiter-style interpretation, coaching priorities and session signals generated from your answers."
+                : isActive
+                  ? "Your feedback overview will appear automatically after the final answer."
+                  : "Start and complete an interview to unlock your feedback overview."}
+            </div>
           </div>
 
-          <div className="space-y-3">
-            {!result && (
-              <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-sm text-white/50">
-                Recruiter-style insights will be generated after the interview.
+          <div className="shrink-0 rounded-full border border-white/10 bg-white/[0.035] px-3 py-1.5 text-xs font-medium text-white/45">
+            {result ? "Generated" : "Pending"}
+          </div>
+        </div>
+
+        <div className="grid gap-4 xl:grid-cols-2">
+          <div className="rounded-[1.75rem] border border-white/7 bg-black/15 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+            <div className="mb-5 flex items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                  <Sparkles className="size-4 text-violet-300" />
+                  Recruiter perspective
+                </div>
+
+                <div className="mt-1 text-xs leading-5 text-white/45">
+                  What a recruiter would likely notice first.
+                </div>
               </div>
-            )}
 
-            {result?.recruiter_insights?.map((insight, index) => {
-              const styles = getImpactStyles(insight.impact);
-              const Icon = styles.iconType;
+              {result && (
+                <div className="rounded-full bg-white/[0.04] px-2.5 py-1 text-[10px] text-white/45">
+                  {result.recruiter_insights?.length || 0} signals
+                </div>
+              )}
+            </div>
 
-              return (
-                <div
-                  key={`${insight.title}-${index}`}
-                  className={`rounded-2xl border p-4 ${styles.card}`}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex gap-2">
-                      <Icon className={`mt-0.5 size-4 ${styles.icon}`} />
+            <div className="divide-y divide-white/[0.06]">
+              {!result && (
+                <div className="rounded-2xl border border-white/5 bg-white/[0.025] p-4 text-sm leading-6 text-white/50">
+                  Recruiter-style insights will be generated after the interview.
+                </div>
+              )}
 
-                      <div>
-                        <div className="text-sm font-medium text-white">
-                          {insight.title}
+              {result?.recruiter_insights?.map((insight, index) => {
+                const styles = getImpactStyles(insight.impact);
+                const Icon = styles.iconType;
+
+                return (
+                  <div
+                    key={`${insight.title}-${index}`}
+                    className="py-4 first:pt-0 last:pb-0"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex min-w-0 gap-3">
+                        <div className={`mt-0.5 grid size-8 shrink-0 place-items-center rounded-xl bg-white/[0.04] ${styles.icon}`}>
+                          <Icon className="size-4" />
                         </div>
 
-                        <div className="mt-1 text-xs leading-5 text-white/60">
-                          {insight.description}
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium text-white">
+                            {insight.title}
+                          </div>
+
+                          <div className="mt-1 text-xs leading-5 text-white/55">
+                            {insight.description}
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div
-                      className={`shrink-0 rounded-full px-2 py-1 text-[10px] capitalize ${styles.badge}`}
-                    >
-                      {insight.impact || "medium"}
+                      <div
+                        className={`shrink-0 rounded-full px-2 py-1 text-[10px] capitalize ${styles.badge}`}
+                      >
+                        {insight.impact || "medium"}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+
+            <div className="mt-5 rounded-2xl border border-white/[0.06] bg-white/[0.025] p-4">
+              <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
+                <TrendingUp className="size-3.5 text-cyan-300" />
+                Session signals
+              </div>
+
+              <div className="grid gap-3 text-xs sm:grid-cols-3">
+                {[
+                  [
+                    "Engagement",
+                    result?.recruiter_engagement || "Pending",
+                  ],
+                  [
+                    "Filler words",
+                    result?.filler_words || "Unknown",
+                  ],
+                  [
+                    "Confidence",
+                    result?.estimated_confidence || "Pending",
+                  ],
+                ].map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="rounded-xl border border-white/[0.05] bg-black/10 p-3"
+                  >
+                    <div className="text-white/40">
+                      {label}
+                    </div>
+
+                    <div className="mt-1 font-semibold text-white/80">
+                      {value}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[1.75rem] border border-white/7 bg-black/15 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+            <div className="mb-5">
+              <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                <TrendingUp className="size-4 text-cyan-300" />
+                Growth opportunities
+              </div>
+
+              <div className="mt-1 text-xs leading-5 text-white/45">
+                The highest-leverage next steps to improve your interview performance.
+              </div>
+            </div>
+
+            <ul className="space-y-4 text-sm text-white/65">
+              {!result && (
+                <li className="rounded-2xl border border-white/5 bg-white/[0.025] p-4 text-white/50">
+                  Coaching tips will be generated from your answers.
+                </li>
+              )}
+
+              {result?.coaching_tips?.map((tip, index) => (
+                <li
+                  key={`${tip}-${index}`}
+                  className="flex gap-3 border-b border-white/[0.06] pb-4 last:border-b-0 last:pb-0"
+                >
+                  <div className="grid size-7 shrink-0 place-items-center rounded-xl border border-cyan-300/10 bg-cyan-300/[0.06] text-[11px] font-semibold text-cyan-200">
+                    {index + 1}
+                  </div>
+
+                  <span className="leading-6">
+                    {tip}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
-      </Card>
-
-      <Card>
-        <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
-          <TrendingUp className="size-4 text-cyan-300" />
-          Session telemetry
-        </div>
-
-        <div className="space-y-3 text-sm">
-          {[
-            [
-              "Recruiter engagement",
-              result?.recruiter_engagement || "Pending",
-            ],
-            [
-              "Filler words",
-              result?.filler_words || "Unknown",
-            ],
-            [
-              "Estimated confidence",
-              result?.estimated_confidence || "Pending",
-            ],
-          ].map(([label, value]) => (
-            <div
-              key={label}
-              className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/[0.03] p-3"
-            >
-              <span className="text-white/60">
-                {label}
-              </span>
-
-              <span className="font-medium text-white/85">
-                {value}
-              </span>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      <Card>
-        <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
-          <Sparkles className="size-4 text-violet-300" />
-          AI coaching tips
-        </div>
-
-        <ul className="space-y-3 text-sm text-white/75">
-          {!result && (
-            <li className="rounded-xl border border-white/5 bg-white/[0.03] p-3 text-white/50">
-              Coaching tips will be generated from your answers.
-            </li>
-          )}
-
-          {result?.coaching_tips?.map((tip, index) => (
-            <li
-              key={`${tip}-${index}`}
-              className="rounded-xl border border-white/5 bg-white/[0.03] p-3"
-            >
-              {tip}
-            </li>
-          ))}
-        </ul>
-      </Card>
-    </div>
+      </div>
+    </Card>
   );
 }

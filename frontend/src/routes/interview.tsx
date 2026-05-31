@@ -123,8 +123,8 @@ function Interview() {
           </Card>
         )}
 
-        <div className="grid gap-4 lg:grid-cols-12">
-          <div className="space-y-4 lg:col-span-3">
+        <div className="grid gap-4 xl:grid-cols-[300px_minmax(0,1fr)]">
+          <aside className="space-y-4 xl:sticky xl:top-6 xl:self-start">
             <InterviewSetupPanel
               mode={mode}
               role={role}
@@ -147,35 +147,41 @@ function Interview() {
               onDeleteSession={removeInterviewSession}
               onReset={clearInterviewHistory}
             />
-          </div>
+          </aside>
 
-          <div className="space-y-4 lg:col-span-6">
-            <InterviewChatPanel
-              session={session}
-              messages={messages}
-              result={result}
-              answer={answer}
-              isStarting={isStarting}
-              isSubmitting={isSubmitting}
-              onAnswerChange={setAnswer}
-              onSubmitAnswer={submitAnswer}
-            />
+          <main className="min-w-0 space-y-4">
+            <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_340px]">
+              <div className="min-w-0 space-y-4">
+                <InterviewChatPanel
+                  session={session}
+                  messages={messages}
+                  result={result}
+                  answer={answer}
+                  isStarting={isStarting}
+                  isSubmitting={isSubmitting}
+                  onAnswerChange={setAnswer}
+                  onSubmitAnswer={submitAnswer}
+                />
 
-            <InterviewResultSummary
-              result={result}
-            />
-          </div>
+                <InterviewResultSummary
+                  result={result}
+                />
+              </div>
 
-          <div className="space-y-4 lg:col-span-3">
-            <InterviewAnalysisPanel
-              result={result}
-              isActive={isSessionActive}
-            />
+              <aside className="space-y-4 2xl:sticky 2xl:top-6 2xl:self-start">
+                <InterviewAnalysisPanel
+                  result={result}
+                  isActive={isSessionActive}
+                />
 
-            <InterviewStatsPanel
-              stats={stats}
-            />
-          </div>
+                <InterviewStatsPanel
+                  stats={stats}
+                />
+
+
+              </aside>
+            </div>
+          </main>
         </div>
       </div>
     </AppShell>
