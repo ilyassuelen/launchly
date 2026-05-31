@@ -30,6 +30,18 @@ router = APIRouter(
 )
 
 
+def normalize_linkedin_language(value: str | None) -> str:
+    if not value:
+        return "en"
+
+    value = value.lower().strip()
+
+    if value in {"de", "deutsch", "german", "germany"}:
+        return "de"
+
+    return "en"
+
+
 @router.post(
     "/analyze",
     response_model=LinkedInAnalyzerResponse,
@@ -39,7 +51,9 @@ async def analyze_linkedin(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    payload.language = current_user.ai_response_language or "english"
+    payload.language = normalize_linkedin_language(
+        current_user.ai_response_language
+    )
 
     return await analyze_linkedin_profile(
         payload=payload,
@@ -71,6 +85,10 @@ def save_linkedin_profile(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    payload.language = normalize_linkedin_language(
+        current_user.ai_response_language
+    )
+
     return upsert_linkedin_profile(
         db=db,
         user_id=current_user.id,

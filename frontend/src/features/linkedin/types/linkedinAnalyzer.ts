@@ -1,5 +1,5 @@
 export interface LinkedInAnalyzerRequest {
-  language: string;
+  language?: string;
 
   headline: string;
 
@@ -71,7 +71,7 @@ export interface LinkedInProfileData {
 
   user_id?: number;
 
-  language: string;
+  language?: string;
 
   headline: string;
 

@@ -215,7 +215,6 @@ function LinkedInPage() {
     }
 
     await analyze({
-      language: "english",
       headline,
       about,
       skills,
@@ -236,7 +235,6 @@ function LinkedInPage() {
     }
 
     await saveProfile({
-      language: "english",
       headline,
       about,
       skills,

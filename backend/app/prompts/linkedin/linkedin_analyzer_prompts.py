@@ -38,7 +38,7 @@ def build_linkedin_analyzer_prompt(
 ):
     language_instruction = (
         "IMPORTANT: You MUST write ALL output in German."
-        if language.lower() == "german"
+        if language.lower() == "de"
         else "IMPORTANT: You MUST write ALL output in English."
     )
 

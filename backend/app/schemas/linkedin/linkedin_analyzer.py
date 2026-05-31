@@ -3,7 +3,7 @@ from typing import List
 
 
 class LinkedInAnalyzerRequest(BaseModel):
-    language: str = "english"
+    language: str = "en"
     headline: str
     about: str
     skills: List[str] = []
