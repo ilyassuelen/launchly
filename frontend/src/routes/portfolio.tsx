@@ -160,7 +160,6 @@ function Portfolio() {
 
     await analyze({
       github_username: githubUsername.trim(),
-      language: "english",
     });
   };
 

@@ -1,7 +1,7 @@
 export interface PortfolioAnalyzerRequest {
   github_username: string;
 
-  language: string;
+  language?: string;
 }
 
 export interface GitHubProfile {
@@ -92,7 +92,7 @@ export interface PortfolioProfileData {
 
   github_username: string;
 
-  language: string;
+  language?: string;
 
   analysis: PortfolioAnalyzerResponse | null;
 }

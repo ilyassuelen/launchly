@@ -31,6 +31,18 @@ router = APIRouter(
 )
 
 
+def normalize_portfolio_language(value: str | None) -> str:
+    if not value:
+        return "en"
+
+    value = value.lower().strip()
+
+    if value in {"de", "deutsch", "german", "germany"}:
+        return "de"
+
+    return "en"
+
+
 @router.get(
     "/profile",
     response_model=PortfolioProfileResponse | None,
@@ -54,7 +66,9 @@ async def analyze_github_portfolio(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    payload.language = current_user.ai_response_language or "english"
+    payload.language = normalize_portfolio_language(
+        current_user.ai_response_language
+    )
 
     analysis = await analyze_portfolio(
         payload,

@@ -37,7 +37,7 @@ def build_portfolio_analyzer_prompt(
 ) -> str:
     language_instruction = (
         "IMPORTANT: You MUST write ALL output in German."
-        if language.lower() == "german"
+        if language.lower() == "de"
         else "IMPORTANT: You MUST write ALL output in English."
     )
 

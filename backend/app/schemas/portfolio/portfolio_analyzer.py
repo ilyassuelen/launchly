@@ -4,7 +4,7 @@ from typing import List, Literal, Optional
 
 class PortfolioAnalyzerRequest(BaseModel):
     github_username: str
-    language: str = "english"
+    language: str = "en"
 
 
 class GitHubProfile(BaseModel):

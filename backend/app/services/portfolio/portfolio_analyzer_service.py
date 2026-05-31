@@ -36,6 +36,20 @@ def _clamp(value: int) -> int:
     return max(0, min(100, value))
 
 
+def _safe_string_list(
+    value,
+    limit: int,
+) -> list[str]:
+    if not isinstance(value, list):
+        return []
+
+    return [
+        str(item).strip()
+        for item in value
+        if str(item).strip()
+    ][:limit]
+
+
 def _score_repo_locally(repo) -> int:
     """
     Calculate a local quality score for a repository
@@ -207,7 +221,23 @@ async def analyze_portfolio(
             ],
         )
 
-        content = response.choices[0].message.content
+        content = (
+                response.choices[0].message.content
+                or ""
+        ).strip()
+
+        if not content:
+            logger.error(
+                "Portfolio analyzer returned empty response",
+            )
+
+            raise HTTPException(
+                status_code=500,
+                detail="Portfolio analyzer returned an empty response",
+            )
+
+    except HTTPException:
+        raise
 
     except Exception as exc:
         logger.exception(
@@ -292,9 +322,9 @@ async def analyze_portfolio(
                     "",
                 ),
                 summary=item.get("summary", ""),
-                strengths=item.get("strengths", [])[:4],
-                risks=item.get("risks", [])[:3],
-                improvements=item.get("improvements", [])[:4],
+                strengths=_safe_string_list(item.get("strengths"), 4),
+                risks=_safe_string_list(item.get("risks"), 3),
+                improvements=_safe_string_list(item.get("improvements"), 4),
             )
         )
 
