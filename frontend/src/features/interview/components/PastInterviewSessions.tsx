@@ -2,6 +2,7 @@ import {
   Clock3,
   History,
   RotateCcw,
+  Trash2,
   Trophy,
 } from "lucide-react";
 
@@ -19,6 +20,7 @@ type PastInterviewSessionsProps = {
   stats: InterviewStatsResponse | null;
   activeSessionId?: number | null;
   onSelectSession?: (sessionId: number) => void;
+  onDeleteSession?: (sessionId: number) => Promise<unknown>;
   onReset?: () => Promise<unknown>;
 };
 
@@ -67,6 +69,7 @@ export function PastInterviewSessions({
   stats,
   activeSessionId,
   onSelectSession,
+  onDeleteSession,
   onReset,
 }: PastInterviewSessionsProps) {
   const handleReset = async () => {
@@ -90,26 +93,29 @@ export function PastInterviewSessions({
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(139,92,246,0.08),transparent_40%)]" />
 
       <div className="relative">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm font-semibold">
-            <History className="size-4 text-violet-300" />
-            Past sessions
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-sm font-semibold text-white">
+              <History className="size-4 shrink-0 text-violet-300" />
+              <span>Past sessions</span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
+            <div className="rounded-full border border-white/10 bg-white/[0.04] px-1 py-1.5 text-[11px] font-medium text-white/55">
+              Last 30
+            </div>
+
             {sessions.length > 0 && (
               <button
+                type="button"
                 onClick={handleReset}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-red-400/10 bg-red-400/[0.05] px-3 py-1.5 text-[11px] font-medium text-red-200 transition hover:bg-red-400/[0.12]"
+                className="inline-flex items-center gap-1.5 rounded-full border border-red-400/15 bg-red-400/[0.07] px-3 py-1.5 text-[11px] font-medium text-red-100 transition hover:border-red-300/25 hover:bg-red-400/[0.13]"
               >
                 <RotateCcw className="size-3.5" />
                 Reset
               </button>
             )}
-
-            <div className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-white/55">
-              Last 30
-            </div>
           </div>
         </div>
 
@@ -127,15 +133,13 @@ export function PastInterviewSessions({
             );
 
             return (
-              <button
-                  type="button"
-                  key={session.id}
-                  onClick={() => onSelectSession?.(session.id)}
-                  className={`w-full rounded-2xl border p-4 text-left transition hover:border-violet-300/15 hover:bg-white/[0.05] ${
-                    activeSessionId === session.id
-                      ? "border-violet-300/25 bg-violet-400/[0.08]"
-                      : "border-white/5 bg-white/[0.03]"
-                  }`}
+              <div
+                key={session.id}
+                className={`group relative w-full overflow-hidden rounded-2xl border p-4 text-left transition hover:border-violet-300/15 hover:bg-white/[0.05] ${
+                  activeSessionId === session.id
+                    ? "border-violet-300/25 bg-violet-400/[0.08]"
+                    : "border-white/5 bg-white/[0.03]"
+                }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
@@ -172,7 +176,41 @@ export function PastInterviewSessions({
                     </div>
                   )}
                 </div>
-              </button>
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-2xl border border-white/10 bg-black/80 opacity-0 backdrop-blur-lg transition duration-200 group-hover:pointer-events-auto group-hover:opacity-100">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onSelectSession?.(session.id)}
+                      className="inline-flex items-center justify-center rounded-xl border border-violet-300/20 bg-violet-400/15 px-3 py-2 text-xs font-semibold text-violet-100 shadow-[0_14px_40px_rgba(139,92,246,0.22)] transition hover:bg-violet-400/25"
+                    >
+                      View results
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const confirmed = window.confirm(
+                          "Are you sure you want to delete this interview session?",
+                        );
+
+                        if (!confirmed) {
+                          return;
+                        }
+
+                        try {
+                          await onDeleteSession?.(session.id);
+                        } catch (error) {
+                          console.error(error);
+                        }
+                      }}
+                      className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-red-400/20 bg-red-400/15 px-3 py-2 text-xs font-semibold text-red-100 shadow-[0_14px_40px_rgba(248,113,113,0.16)] transition hover:bg-red-400/25"
+                    >
+                      <Trash2 className="size-3.5" />
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
             );
           })}
         </div>

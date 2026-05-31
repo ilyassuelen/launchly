@@ -71,3 +71,20 @@ export async function resetInterviewSessions(): Promise<{
     },
   );
 }
+
+export async function deleteInterviewSession(
+  sessionId: number,
+): Promise<{
+  success: boolean;
+  deleted_session: number;
+}> {
+  return apiFetch<{
+    success: boolean;
+    deleted_session: number;
+  }>(
+    `/interview/sessions/${sessionId}`,
+    {
+      method: "DELETE",
+    },
+  );
+}

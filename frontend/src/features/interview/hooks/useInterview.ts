@@ -7,6 +7,7 @@ import {
   resetInterviewSessions,
   startInterviewSession,
   submitInterviewAnswer,
+  deleteInterviewSession,
 } from "@/features/interview/api/interviewApi";
 
 import type {
@@ -217,6 +218,42 @@ export function useInterview() {
     }
   };
 
+  const removeInterviewSession = async (sessionId: number) => {
+      try {
+        setIsLoadingSessions(true);
+        setError(null);
+
+        const response = await deleteInterviewSession(sessionId);
+
+        setSessions((current) =>
+          current.filter((item) => item.id !== sessionId),
+        );
+
+        if (session?.id === sessionId) {
+          setSession(null);
+          setMessages([]);
+          setResult(null);
+          setAnswer("");
+        }
+
+        await loadStats();
+
+        return response;
+      } catch (error) {
+        console.error(error);
+
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Failed to delete interview session",
+        );
+
+        return null;
+      } finally {
+        setIsLoadingSessions(false);
+      }
+  };
+
   const clearInterviewHistory = async () => {
       try {
         setIsLoadingSessions(true);
@@ -290,5 +327,6 @@ export function useInterview() {
     loadSessionDetail,
     resetInterview,
     clearInterviewHistory,
+    removeInterviewSession,
   };
 }

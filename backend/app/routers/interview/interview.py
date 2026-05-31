@@ -17,6 +17,7 @@ from backend.app.schemas.interview.interview import (
 
 from backend.app.services.interview.interview_session_service import (
     delete_all_interview_sessions,
+    delete_single_interview_session,
     get_interview_session_detail,
     list_interview_sessions,
     start_interview_session,
@@ -135,4 +136,19 @@ def delete_interview_sessions(
     return delete_all_interview_sessions(
         db=db,
         user_id=current_user.id,
+    )
+
+
+@router.delete(
+    "/sessions/{session_id}",
+)
+def delete_interview_session(
+    session_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return delete_single_interview_session(
+        db=db,
+        user_id=current_user.id,
+        session_id=session_id,
     )

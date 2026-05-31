@@ -71,6 +71,7 @@ function Interview() {
     loadSessions,
     loadStats,
     loadSessionDetail,
+    removeInterviewSession,
     clearInterviewHistory,
   } = useInterview();
 
@@ -143,6 +144,7 @@ function Interview() {
               stats={stats}
               activeSessionId={session?.id || null}
               onSelectSession={loadSessionDetail}
+              onDeleteSession={removeInterviewSession}
               onReset={clearInterviewHistory}
             />
           </div>

@@ -527,6 +527,37 @@ async def submit_interview_answer(
     )
 
 
+def delete_single_interview_session(
+    *,
+    db: Session,
+    user_id: int,
+    session_id: int,
+) -> dict:
+    session = _get_session_or_404(
+        db=db,
+        user_id=user_id,
+        session_id=session_id,
+    )
+
+    db.delete(session)
+
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        logger.exception(
+            "Failed to delete interview session user_id=%s session_id=%s",
+            user_id,
+            session_id,
+        )
+        raise
+
+    return {
+        "success": True,
+        "deleted_session": session_id,
+    }
+
+
 def delete_all_interview_sessions(
     *,
     db: Session,
