@@ -25,7 +25,6 @@ export interface InterviewStartRequest {
   mode: string;
   role: string;
   difficulty: string;
-  language: string;
   max_questions: number;
 }
 

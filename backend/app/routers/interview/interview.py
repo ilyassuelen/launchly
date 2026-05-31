@@ -31,6 +31,18 @@ router = APIRouter(
 )
 
 
+def normalize_interview_language(value: str | None) -> str:
+    if not value:
+        return "en"
+
+    value = value.lower().strip()
+
+    if value in {"de", "deutsch", "german", "germany"}:
+        return "de"
+
+    return "en"
+
+
 @router.post(
     "/sessions",
     response_model=InterviewStartResponse,
@@ -40,7 +52,9 @@ async def create_interview_session(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    payload.language = current_user.ai_response_language or "english"
+    payload.language = normalize_interview_language(
+        current_user.ai_response_language
+    )
 
     return await start_interview_session(
         db=db,
