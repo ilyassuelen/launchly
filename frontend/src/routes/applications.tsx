@@ -12,23 +12,24 @@ import {
 import {
   AppShell,
   Card,
-  StatCard,
 } from "@/components/launchly/AppShell";
 
 import { useAuth } from "@/context/AuthContext";
 
 import {
-  Briefcase,
-  Plus,
   Bell,
+  Briefcase,
+  CalendarDays,
   CheckCircle2,
   Clock,
-  XCircle,
-  Send,
+  KanbanSquare,
   Loader2,
-  CalendarDays,
   Pencil,
+  Plus,
+  Send,
+  Sparkles,
   Trash2,
+  XCircle,
 } from "lucide-react";
 
 import {
@@ -40,9 +41,9 @@ import {
 } from "@/features/applications/modals/ApplicationModal";
 
 import type {
+  ApplicationCreatePayload,
   ApplicationItem,
   ApplicationStatus,
-  ApplicationCreatePayload,
   ApplicationUpdatePayload,
 } from "@/features/applications/types/application";
 
@@ -108,6 +109,14 @@ const statusAccentClassNames: Record<ApplicationStatus, string> = {
   rejected: "from-red-300/80 to-red-500/40",
 };
 
+const statusChipClassNames: Record<ApplicationStatus, string> = {
+  applied: "border-cyan-400/15 bg-cyan-400/[0.08] text-cyan-100",
+  phone_screen: "border-yellow-400/15 bg-yellow-400/[0.08] text-yellow-100",
+  onsite: "border-violet-400/15 bg-violet-400/[0.08] text-violet-100",
+  offer: "border-emerald-400/15 bg-emerald-400/[0.08] text-emerald-100",
+  rejected: "border-red-400/15 bg-red-400/[0.08] text-red-100",
+};
+
 const columnDropClassNames: Record<ApplicationStatus, string> = {
   applied: "border-cyan-400/30 bg-cyan-400/[0.04]",
   phone_screen: "border-yellow-400/30 bg-yellow-400/[0.04]",
@@ -144,10 +153,6 @@ function getFollowUpState(application: ApplicationItem) {
   if (diff <= 1) return { label: "Follow-up due soon", tone: "soon" as const };
 
   return null;
-}
-
-function isFollowUpDue(application: ApplicationItem) {
-  return getFollowUpState(application) !== null;
 }
 
 function getStatusDate(
@@ -248,14 +253,14 @@ function getEmptyColumnMessage(status: ApplicationStatus) {
   if (status === "phone_screen") {
     return {
       title: "No interviews yet.",
-      description: "Keep applying! Responses will appear here.",
+      description: "Responses will appear here once your pipeline warms up.",
     };
   }
 
   if (status === "onsite") {
     return {
       title: "No onsite rounds yet.",
-      description: "Strong matches will move here as your pipeline warms up.",
+      description: "Strong matches will move here as conversations progress.",
     };
   }
 
@@ -276,6 +281,50 @@ function getEmptyColumnMessage(status: ApplicationStatus) {
   return {
     title: "No applications yet.",
     description: "Add your first application to start tracking your search.",
+  };
+}
+
+function getStatusLabel(status: ApplicationStatus) {
+  return columns.find((column) => column.status === status)?.title || status;
+}
+
+function getPipelineProgress(status: ApplicationStatus) {
+  if (status === "applied") return 20;
+  if (status === "phone_screen") return 45;
+  if (status === "onsite") return 70;
+  if (status === "offer") return 100;
+  return 100;
+}
+
+function buildStatusUpdatePayload(
+  application: ApplicationItem,
+  status: ApplicationStatus,
+): ApplicationUpdatePayload {
+  const today = getTodayDateString();
+
+  return {
+    company_name: application.company_name,
+    job_title: application.job_title,
+    status,
+    applied_date: application.applied_date,
+    phone_screen_date:
+      status === "phone_screen"
+        ? application.phone_screen_date || today
+        : application.phone_screen_date || null,
+    onsite_date:
+      status === "onsite"
+        ? application.onsite_date || today
+        : application.onsite_date || null,
+    offer_date:
+      status === "offer"
+        ? application.offer_date || today
+        : application.offer_date || null,
+    rejected_date:
+      status === "rejected"
+        ? application.rejected_date || today
+        : application.rejected_date || null,
+    follow_up_date: application.follow_up_date || null,
+    notes: application.notes || "",
   };
 }
 
@@ -305,6 +354,7 @@ function Applications() {
     useState<ApplicationStatus | null>(null);
 
   const [draft, setDraft] = useState(emptyDraft);
+  const [showRejected, setShowRejected] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -342,8 +392,31 @@ function Applications() {
     );
   }, [applications]);
 
+  const visibleColumns = showRejected
+    ? columns
+    : columns.filter(
+        (column) => column.status !== "rejected",
+      );
+
+  const focusApplications = useMemo(() => {
+    return applications
+      .filter((application) => getFollowUpState(application))
+      .slice(0, 3);
+  }, [applications]);
+
+  const recentApplications = useMemo(() => {
+    return [...applications]
+      .sort(
+        (a, b) =>
+          getSortableDateValue(getStatusDate(b)) -
+          getSortableDateValue(getStatusDate(a)),
+      )
+      .slice(0, 4);
+  }, [applications]);
 
   const totalApplications = applications.length;
+  const interviewCount =
+    groupedApplications.phone_screen.length + groupedApplications.onsite.length;
 
   const handleOpenCreateModal = () => {
     setEditingApplication(null);
@@ -400,6 +473,18 @@ function Applications() {
     setDraft(emptyDraft);
   };
 
+  const handleMoveApplication = async (
+    application: ApplicationItem,
+    status: ApplicationStatus,
+  ) => {
+    if (application.status === status) return;
+
+    await updateApplication(
+      application.id,
+      buildStatusUpdatePayload(application, status),
+    );
+  };
+
   const handleDropApplication = async (status: ApplicationStatus) => {
     if (!draggedApplicationId) {
       setActiveDropStatus(null);
@@ -415,34 +500,7 @@ function Applications() {
 
     if (!application || application.status === status) return;
 
-    const today = getTodayDateString();
-
-    const payload: ApplicationUpdatePayload = {
-      company_name: application.company_name,
-      job_title: application.job_title,
-      status,
-      applied_date: application.applied_date,
-      phone_screen_date:
-        status === "phone_screen"
-          ? application.phone_screen_date || today
-          : application.phone_screen_date || null,
-      onsite_date:
-        status === "onsite"
-          ? application.onsite_date || today
-          : application.onsite_date || null,
-      offer_date:
-        status === "offer"
-          ? application.offer_date || today
-          : application.offer_date || null,
-      rejected_date:
-        status === "rejected"
-          ? application.rejected_date || today
-          : application.rejected_date || null,
-      follow_up_date: application.follow_up_date || null,
-      notes: application.notes || "",
-    };
-
-    await updateApplication(application.id, payload);
+    await handleMoveApplication(application, status);
   };
 
   if (loading) {
@@ -462,7 +520,7 @@ function Applications() {
   return (
     <AppShell
       title="Applications"
-      subtitle="Track every application, interview stage, offer and follow-up in one calm board."
+      subtitle="Track every application, stage, response and follow-up in one calm pipeline."
       action={
         <button
           onClick={handleOpenCreateModal}
@@ -473,40 +531,79 @@ function Applications() {
         </button>
       }
     >
-      <div className="space-y-4">
-        <div className="grid gap-4 md:grid-cols-4">
-          <StatCard
-            label="Active"
-            value={String(applicationStats.active)}
-            delta={`${totalApplications} total`}
-            icon={Briefcase}
-            tone="violet"
-          />
+      <div className="space-y-5">
+        <Card className="relative overflow-hidden border-cyan-300/10 bg-[linear-gradient(135deg,rgba(15,23,42,0.96),rgba(8,13,24,0.98)_52%,rgba(18,24,46,0.88))] p-0 shadow-[0_24px_80px_rgba(6,182,212,0.06)]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_0%,rgba(34,211,238,0.16),transparent_34%),radial-gradient(circle_at_86%_8%,rgba(168,85,247,0.16),transparent_36%),linear-gradient(180deg,rgba(255,255,255,0.035),transparent_40%)]" />
+          <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/65 to-transparent" />
 
-          <StatCard
-            label="Response rate"
-            value={`${applicationStats.response_rate}%`}
-            delta="includes rejections"
-            icon={Send}
-            tone="cyan"
-          />
+          <div className="relative p-6 lg:p-8">
+            <div className="min-w-0">
+              <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/10 bg-cyan-400/[0.06] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-100/70">
+                <KanbanSquare className="size-3.5 text-cyan-300" />
+                Application Pipeline
+              </div>
 
-          <StatCard
-            label="Offers"
-            value={String(applicationStats.offers)}
-            delta={applicationStats.offers > 0 ? "🎉" : "Keep going"}
-            icon={CheckCircle2}
-            tone="green"
-          />
+              <h1 className="mt-5 max-w-4xl text-3xl font-semibold tracking-tight text-white lg:text-4xl">
+                Manage every application from first send to final decision.
+              </h1>
 
-          <StatCard
-            label="Follow-ups due"
-            value={String(applicationStats.follow_ups_due)}
-            delta="applied only"
-            icon={Bell}
-            tone="pink"
-          />
-        </div>
+              <p className="mt-4 max-w-3xl text-sm leading-7 text-white/58 lg:text-[15px]">
+                Keep your job search organized with a focused board for applications, recruiter responses, interviews, offers and follow-ups.
+              </p>
+
+              <div className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <div className="rounded-2xl border border-white/7 bg-black/20 px-4 py-3">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/35">
+                    Active
+                  </div>
+                  <div className="mt-1 text-2xl font-semibold text-white">
+                    {applicationStats.active}
+                  </div>
+                  <div className="mt-1 text-xs text-emerald-100/55">
+                    {totalApplications} total
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-cyan-300/10 bg-cyan-400/[0.045] px-4 py-3">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-100/45">
+                    Interviews
+                  </div>
+                  <div className="mt-1 text-2xl font-semibold text-cyan-50">
+                    {interviewCount}
+                  </div>
+                  <div className="mt-1 text-xs text-cyan-100/50">
+                    phone + onsite
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-emerald-300/10 bg-emerald-400/[0.045] px-4 py-3">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-100/45">
+                    Offers
+                  </div>
+                  <div className="mt-1 text-2xl font-semibold text-emerald-50">
+                    {applicationStats.offers}
+                  </div>
+                  <div className="mt-1 text-xs text-emerald-100/50">
+                    keep going
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-orange-300/10 bg-orange-400/[0.045] px-4 py-3">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-orange-100/45">
+                    Follow-ups
+                  </div>
+                  <div className="mt-1 text-2xl font-semibold text-orange-50">
+                    {applicationStats.follow_ups_due}
+                  </div>
+                  <div className="mt-1 text-xs text-orange-100/50">
+                    need attention
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </Card>
 
         {error && (
           <div className="rounded-2xl border border-orange-400/10 bg-orange-400/[0.06] p-4 text-sm text-orange-200">
@@ -514,167 +611,233 @@ function Applications() {
           </div>
         )}
 
-        {isLoadingApplications ? (
-          <Card>
-            <div className="flex items-center gap-3 text-sm text-white/60">
-              <Loader2 className="size-4 animate-spin text-cyan-300" />
-              Loading your application board...
-            </div>
-          </Card>
-        ) : (
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-            {columns.map((column) => {
-              const Icon = column.icon;
-              const items = groupedApplications[column.status];
+        <Card className="relative overflow-hidden border-white/7 bg-[linear-gradient(145deg,rgba(15,23,42,0.94),rgba(8,13,24,0.98)_50%,rgba(20,18,48,0.70))] p-0 shadow-[0_24px_80px_rgba(6,182,212,0.05)]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.10),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.10),transparent_38%)]" />
+          <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/55 to-transparent" />
 
-              return (
-                <div
-                  key={column.status}
-                  onDragEnter={() => setActiveDropStatus(column.status)}
-                  onDragOver={(event) => {
-                    event.preventDefault();
-                    setActiveDropStatus(column.status);
-                  }}
-                  onDragLeave={() => setActiveDropStatus(null)}
-                  onDrop={() => handleDropApplication(column.status)}
-                  className={`rounded-2xl border border-white/10 glass p-3 shadow-card transition hover:bg-white/[0.035] ${
-                    activeDropStatus === column.status
-                      ? columnDropClassNames[column.status]
-                      : ""
-                  }`}
+          <div className="relative p-5 lg:p-6">
+            <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/10 bg-cyan-400/[0.06] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-100/70">
+                  <KanbanSquare className="size-3.5 text-cyan-300" />
+                  Pipeline Board
+                </div>
+
+                <h2 className="mt-4 text-2xl font-semibold tracking-tight text-white lg:text-3xl">
+                  Move opportunities through your hiring pipeline
+                </h2>
+
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-white/52">
+                  Drag cards between stages on desktop. On smaller screens, use the status menu inside each card.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowRejected((current) => !current)}
+                  className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-medium text-white/70 transition hover:bg-white/[0.08]"
                 >
-                  <div className="mb-3 flex items-start justify-between gap-3">
-                    <div>
-                      <div className="flex items-center gap-2 text-sm font-semibold">
-                        <Icon className="size-4 text-cyan-300" />
-                        {column.title}
+                  {showRejected
+                    ? `Hide rejected (${groupedApplications.rejected.length})`
+                    : `Show rejected (${groupedApplications.rejected.length})`}
+                </button>
+
+                <button
+                  onClick={handleOpenCreateModal}
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-violet-500 via-fuchsia-500 to-cyan-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-950/30 transition hover:scale-[1.01]"
+                >
+                  <Plus className="size-4" />
+                  Add application
+                </button>
+              </div>
+            </div>
+
+            {isLoadingApplications ? (
+              <div className="flex min-h-[260px] items-center gap-3 rounded-[2rem] border border-white/7 bg-black/20 p-6 text-sm text-white/60">
+                <Loader2 className="size-4 animate-spin text-cyan-300" />
+                Loading your application board...
+              </div>
+            ) : (
+              <div
+                className={`grid gap-4 md:grid-cols-2 ${
+                  showRejected
+                    ? "xl:grid-cols-5"
+                    : "xl:grid-cols-4"
+                }`}
+              >
+                {visibleColumns.map((column) => {
+                  const Icon = column.icon;
+                  const items = groupedApplications[column.status];
+
+                  return (
+                    <div
+                      key={column.status}
+                      onDragEnter={() => setActiveDropStatus(column.status)}
+                      onDragOver={(event) => {
+                        event.preventDefault();
+                        setActiveDropStatus(column.status);
+                      }}
+                      onDragLeave={() => setActiveDropStatus(null)}
+                      onDrop={() => handleDropApplication(column.status)}
+                      className={`rounded-[1.75rem] border border-white/10 bg-black/20 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition hover:bg-white/[0.035] ${
+                        activeDropStatus === column.status
+                          ? columnDropClassNames[column.status]
+                          : ""
+                      }`}
+                    >
+                      <div className="mb-4 flex items-start justify-between gap-3">
+                        <div>
+                          <div className="flex items-center gap-2 text-base font-semibold text-white">
+                            <Icon className="size-4 text-cyan-300" />
+                            {column.title}
+                          </div>
+
+                          <div className="mt-1 text-xs leading-5 text-white/45">
+                            {column.helper}
+                          </div>
+                        </div>
+
+                        <span className="rounded-full bg-white/5 px-2.5 py-1 text-xs text-white/45">
+                          {items.length}
+                        </span>
                       </div>
 
-                      <div className="mt-1 text-[11px] leading-5 text-muted-foreground">
-                        {column.helper}
+                      <div className="h-[68vh] min-h-[520px] space-y-3 overflow-y-auto pr-1">
+                        {items.length === 0 ? (
+                          <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.025] p-4 text-xs leading-6 text-white/40">
+                            <div className="font-semibold text-white/60">
+                              {getEmptyColumnMessage(column.status).title}
+                            </div>
+
+                            <div className="mt-1">
+                              {getEmptyColumnMessage(column.status).description}
+                            </div>
+                          </div>
+                        ) : (
+                          items.map((application) => (
+                            <ApplicationBoardCard
+                              key={application.id}
+                              application={application}
+                              onDragStart={() =>
+                                setDraggedApplicationId(application.id)
+                              }
+                              onDragEnd={() =>
+                                setDraggedApplicationId(null)
+                              }
+                              onEdit={() => handleOpenEditModal(application)}
+                              onDelete={() => deleteApplication(application.id)}
+                              onMove={(status) =>
+                                handleMoveApplication(application, status)
+                              }
+                            />
+                          ))
+                        )}
                       </div>
                     </div>
-
-                    <span className="rounded-full bg-white/5 px-2 py-0.5 text-xs text-muted-foreground">
-                      {items.length}
-                    </span>
-                  </div>
-
-                  <div className="h-[70vh] min-h-[420px] space-y-2 overflow-y-auto pr-1">
-                    {items.length === 0 ? (
-                      <div className="rounded-xl border border-dashed border-white/10 bg-white/[0.025] p-4 text-xs leading-6 text-white/40">
-                        <div className="font-semibold text-white/60">
-                          {getEmptyColumnMessage(column.status).title}
-                        </div>
-
-                        <div className="mt-1">
-                          {getEmptyColumnMessage(column.status).description}
-                        </div>
-                      </div>
-                    ) : (
-                      items.map((application) => (
-                        <div
-                          key={application.id}
-                          draggable
-                          onDragStart={() =>
-                            setDraggedApplicationId(application.id)
-                          }
-                          onDragEnd={() =>
-                            setDraggedApplicationId(null)
-                          }
-                          className="group relative cursor-grab overflow-hidden rounded-xl bg-white/[0.04] p-3 ring-1 ring-white/10 transition duration-200 hover:-translate-y-[1px] hover:bg-white/[0.08] hover:ring-white/20 hover:shadow-[0_14px_40px_rgba(34,211,238,0.08)] active:cursor-grabbing active:scale-[0.99]"
-                        >
-                          <div
-                            className={`absolute left-0 top-0 h-1 w-full bg-gradient-to-r ${statusAccentClassNames[application.status]}`}
-                          />
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="min-w-0">
-                              <div className="truncate text-sm font-semibold text-white">
-                                {application.company_name}
-                              </div>
-
-                              <div className="mt-1 truncate text-xs text-muted-foreground">
-                                {application.job_title}
-                              </div>
-                            </div>
-
-                            <div className="flex shrink-0 items-center gap-1 opacity-0 transition group-hover:opacity-100">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleOpenEditModal(application)
-                                }
-                                className="grid size-7 place-items-center rounded-lg bg-white/[0.05] text-white/55 transition hover:bg-white/[0.10] hover:text-white"
-                              >
-                                <Pencil className="size-3.5" />
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  deleteApplication(application.id)
-                                }
-                                className="grid size-7 place-items-center rounded-lg bg-red-400/[0.06] text-red-200/70 transition hover:bg-red-400/[0.12] hover:text-red-200"
-                              >
-                                <Trash2 className="size-3.5" />
-                              </button>
-                            </div>
-                          </div>
-
-                          <div className="mt-3 flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                            <CalendarDays className="size-3.5" />
-                            {formatDate(getStatusDate(application))}
-                          </div>
-
-                          {getFollowUpState(application) && (
-                            <div
-                              className={`mt-3 rounded-lg border px-2 py-1.5 text-[11px] font-medium ${
-                                getFollowUpState(application)?.tone === "overdue"
-                                  ? "border-red-400/15 bg-red-400/[0.08] text-red-200"
-                                  : "border-yellow-400/15 bg-yellow-400/[0.08] text-yellow-200"
-                              }`}
-                            >
-                              {getFollowUpState(application)?.label}
-                            </div>
-                          )}
-
-                          {application.notes && (
-                            <div className="mt-3 line-clamp-2 text-[11px] leading-5 text-white/45">
-                              {application.notes}
-                            </div>
-                          )}
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        <Card>
-          <div className="mb-3 text-sm font-semibold">
-            Pipeline analytics
-          </div>
-
-          <div className="grid gap-3 md:grid-cols-5 text-center text-xs">
-            {columns.map((column) => (
-              <div
-                key={column.status}
-                className="rounded-xl bg-white/5 p-4 ring-1 ring-white/10"
-              >
-                <div className="text-muted-foreground">
-                  {column.title}
-                </div>
-
-                <div className="mt-1 text-2xl font-semibold">
-                  {groupedApplications[column.status].length}
-                </div>
+                  );
+                })}
               </div>
-            ))}
+            )}
           </div>
         </Card>
+
+        <div className="grid gap-5 xl:grid-cols-2">
+          <Card className="relative overflow-hidden border-orange-300/10 bg-orange-400/[0.035]">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(249,115,22,0.10),transparent_42%)]" />
+
+            <div className="relative">
+              <div className="mb-4 flex items-start justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                    <Bell className="size-4 text-orange-300" />
+                    Follow-up center
+                  </div>
+                  <div className="mt-1 text-xs leading-5 text-white/45">
+                    Applications that need your attention.
+                  </div>
+                </div>
+
+                <div className="rounded-full border border-orange-300/10 bg-orange-400/[0.08] px-2.5 py-1 text-[11px] text-orange-100/75">
+                  {applicationStats.follow_ups_due} due
+                </div>
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-3">
+                {focusApplications.length ? (
+                  focusApplications.map((application) => (
+                    <button
+                      key={application.id}
+                      type="button"
+                      onClick={() => handleOpenEditModal(application)}
+                      className="rounded-2xl border border-white/7 bg-black/20 p-3 text-left transition hover:bg-white/[0.04]"
+                    >
+                      <div className="truncate text-sm font-semibold text-white/85">
+                        {application.company_name}
+                      </div>
+                      <div className="mt-1 truncate text-xs text-white/45">
+                        {application.job_title}
+                      </div>
+                      <div className="mt-2 inline-flex rounded-full border border-orange-300/15 bg-orange-400/[0.08] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-orange-100/75">
+                        {getFollowUpState(application)?.label}
+                      </div>
+                    </button>
+                  ))
+                ) : (
+                  <div className="rounded-2xl border border-white/7 bg-black/20 p-4 text-sm leading-6 text-white/45 md:col-span-3">
+                    No urgent follow-ups right now. Keep your pipeline moving.
+                  </div>
+                )}
+              </div>
+            </div>
+          </Card>
+
+          <Card className="relative overflow-hidden border-cyan-300/10 bg-white/[0.025]">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.10),transparent_38%)]" />
+
+            <div className="relative">
+              <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-white">
+                <Sparkles className="size-4 text-cyan-300" />
+                Recent pipeline activity
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-2">
+                {recentApplications.length ? (
+                  recentApplications.map((application) => (
+                    <div
+                      key={application.id}
+                      className="rounded-2xl border border-white/7 bg-white/[0.03] p-3"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="truncate text-sm font-semibold text-white/85">
+                            {application.company_name}
+                          </div>
+                          <div className="mt-1 truncate text-xs text-white/45">
+                            {application.job_title}
+                          </div>
+                        </div>
+
+                        <div className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${statusChipClassNames[application.status]}`}>
+                          {getStatusLabel(application.status)}
+                        </div>
+                      </div>
+
+                      <div className="mt-3 flex items-center gap-1.5 text-[11px] text-white/42">
+                        <CalendarDays className="size-3.5" />
+                        {formatDate(getStatusDate(application))}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="rounded-2xl border border-white/7 bg-black/20 p-4 text-sm text-white/45 md:col-span-2">
+                    Recent application activity will appear here.
+                  </div>
+                )}
+              </div>
+            </div>
+          </Card>
+        </div>
       </div>
 
       <ApplicationModal
@@ -702,6 +865,116 @@ function Applications() {
         }
       />
     </AppShell>
+  );
+}
+
+type ApplicationBoardCardProps = {
+  application: ApplicationItem;
+  onDragStart: () => void;
+  onDragEnd: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+  onMove: (status: ApplicationStatus) => void;
+};
+
+function ApplicationBoardCard({
+  application,
+  onDragStart,
+  onDragEnd,
+  onEdit,
+  onDelete,
+  onMove,
+}: ApplicationBoardCardProps) {
+  const followUpState = getFollowUpState(application);
+
+  return (
+    <div
+      draggable
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+      className="group relative cursor-grab overflow-hidden rounded-2xl bg-white/[0.045] p-4 ring-1 ring-white/10 transition duration-200 hover:-translate-y-[1px] hover:bg-white/[0.08] hover:ring-white/20 hover:shadow-[0_14px_40px_rgba(34,211,238,0.08)] active:cursor-grabbing active:scale-[0.99]"
+    >
+      <div
+        className={`absolute left-0 top-0 h-1 w-full bg-gradient-to-r ${statusAccentClassNames[application.status]}`}
+      />
+
+      <div className="flex items-start justify-between gap-0">
+        <div className="min-w-0">
+          <div className="line-clamp-3 text-sm font-medium leading-5 text-white">
+            {application.company_name}
+          </div>
+
+          <div className="line-clamp-2 text-xs text-white/48">
+            {application.job_title}
+          </div>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-1 opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100">
+          <button
+            type="button"
+            onClick={onEdit}
+            className="grid size-7 place-items-center rounded-lg bg-white/[0.05] text-white/55 transition hover:bg-white/[0.10] hover:text-white"
+          >
+            <Pencil className="size-3.5" />
+          </button>
+
+          <button
+            type="button"
+            onClick={onDelete}
+            className="grid size-7 place-items-center rounded-lg bg-red-400/[0.06] text-red-200/70 transition hover:bg-red-400/[0.12] hover:text-red-200"
+          >
+            <Trash2 className="size-3.5" />
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-3 flex items-center gap-1.5 text-[11px] text-white/42">
+        <CalendarDays className="size-3.5" />
+        {formatDate(getStatusDate(application))}
+      </div>
+
+      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
+        <div
+          className={`h-full rounded-full bg-gradient-to-r ${statusAccentClassNames[application.status]}`}
+          style={{ width: `${getPipelineProgress(application.status)}%` }}
+        />
+      </div>
+
+      <div className="mt-3 sm:hidden">
+        <select
+          value={application.status}
+          onChange={(event) => onMove(event.target.value as ApplicationStatus)}
+          className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-white/75 outline-none focus:border-cyan-300/30"
+        >
+          {columns.map((column) => (
+            <option
+              key={column.status}
+              value={column.status}
+            >
+              Move to {column.title}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {followUpState && (
+        <div
+          className={`mt-3 rounded-xl border px-2 py-1.5 text-[11px] font-medium ${
+            followUpState.tone === "overdue"
+              ? "border-red-400/15 bg-red-400/[0.08] text-red-200"
+              : "border-yellow-400/15 bg-yellow-400/[0.08] text-yellow-200"
+          }`}
+        >
+          {followUpState.label}
+        </div>
+      )}
+
+      {application.notes && (
+        <div className="mt-3 line-clamp-2 text-[11px] leading-5 text-white/45">
+          {application.notes}
+        </div>
+      )}
+    </div>
   );
 }
 
