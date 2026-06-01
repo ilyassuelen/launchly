@@ -50,6 +50,10 @@ IMPORTANT:
 - Return valid JSON only.
 - Always follow the requested output language.
 - Never mix languages.
+- ALL text values in roadmap.tasks must be written in the requested output language.
+- ALL text values in application_strategy.action_items must be written in the requested output language.
+- ALL titles, descriptions, reasons, summaries, skill names and task/action labels must follow the requested output language.
+- Do not keep English fallback wording when German is requested.
 - Write in a personal, motivating, direct coaching tone.
 - Address the user directly, not in third person.
 - In English, use "you" and "your".
