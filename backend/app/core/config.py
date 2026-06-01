@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     FRONTEND_URL: str
 
     OPENAI_API_KEY: str
+    GITHUB_TOKEN: str | None = None
 
     R2_ACCOUNT_ID: str | None = None
     R2_ACCESS_KEY_ID: str | None = None

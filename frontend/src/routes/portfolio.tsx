@@ -189,70 +189,224 @@ function Portfolio() {
   return (
     <AppShell
       title="Portfolio Analyzer"
-      subtitle="An honest review of your public GitHub repos — through a senior engineer's eyes."
-      action={
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={handleAnalyzePortfolio}
-            disabled={!canAnalyze || isAnalyzing || isLoadingProfile}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-sm font-semibold text-primary-foreground glow transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isAnalyzing ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <Github className="size-4" />
-            )}
-
-            {isAnalyzing
-              ? "Scanning GitHub..."
-              : analysis
-                ? "Re-scan GitHub"
-                : "Scan GitHub"}
-          </button>
-        </div>
-      }
+      subtitle="Transform your GitHub into a portfolio recruiters actually notice."
     >
       <div className="space-y-4">
-        <Card className="relative overflow-hidden border-white/5 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.10),transparent_34%)]">
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),transparent)]" />
+        <Card className="relative overflow-hidden border-cyan-300/15 bg-[linear-gradient(135deg,rgba(15,23,42,0.98),rgba(8,13,24,0.98)_48%,rgba(18,32,58,0.88))] shadow-[0_28px_90px_rgba(6,182,212,0.10),0_0_0_1px_rgba(255,255,255,0.03)]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_0%,rgba(34,211,238,0.20),transparent_34%),radial-gradient(circle_at_86%_10%,rgba(139,92,246,0.16),transparent_36%),linear-gradient(180deg,rgba(255,255,255,0.045),transparent_34%)]" />
+          <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/70 to-transparent" />
 
-          <div className="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-2xl">
-              <div className="flex items-center gap-2 text-sm font-semibold text-white">
-                <Github className="size-4 text-cyan-300" />
-                GitHub portfolio scan
-              </div>
+          <div className="relative grid gap-6 xl:grid-cols-[270px_minmax(0,1fr)_minmax(320px,0.72fr)]">
+            <div className="relative overflow-hidden rounded-[2rem] border border-cyan-300/15 bg-black/25 p-6 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_24px_80px_rgba(0,0,0,0.26)]">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.22),transparent_58%)]" />
 
-              <div className="mt-2 text-sm leading-7 text-white/55">
-                Enter a public GitHub username. Launchly fetches public repositories,
-                README files and repo metadata, then evaluates recruiter signal,
-                project maturity and improvement opportunities.
+              <div className="relative">
+                <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/15 bg-cyan-300/[0.08] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-100/75">
+                  <Github className="size-3.5 text-cyan-300" />
+                  Portfolio quality
+                </div>
+
+                <div className="relative isolate mx-auto mt-6 grid size-40 place-items-center overflow-hidden rounded-full border border-cyan-300/20 bg-white/[0.045] shadow-[0_28px_85px_rgba(34,211,238,0.16)]">
+                  <div className="pointer-events-none absolute inset-4 rounded-full border border-violet-300/10" />
+                  <div className="pointer-events-none absolute inset-8 rounded-full bg-black/20" />
+
+                  <div className="relative z-10 text-center">
+                    <div className="text-6xl font-semibold tracking-[-0.04em] text-white">
+                      {portfolioScore}
+                    </div>
+
+                    <div className="mt-1 text-[10px] uppercase tracking-[0.24em] text-cyan-100/70">
+                      /100
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-5">
+                  <Progress value={portfolioScore} />
+                </div>
+
+                <div className="mt-5 inline-flex items-center justify-center gap-2 rounded-full border border-emerald-300/15 bg-emerald-400/[0.08] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-100">
+                  <Check className="size-3.5 text-emerald-300" />
+                  {portfolioScore >= 80
+                    ? "Recruiter signal"
+                    : portfolioScore >= 65
+                      ? "Solid foundation"
+                      : portfolioScore > 0
+                        ? "Needs polish"
+                        : "Awaiting scan"}
+                </div>
+
+                <div className="mt-4 text-xs leading-5 text-white/55">
+                  {analysis
+                    ? `Based on ${repos.length} public repositories.`
+                    : isLoadingProfile
+                      ? "Loading your saved portfolio analysis..."
+                      : "Run a GitHub scan to calculate portfolio quality."}
+                </div>
               </div>
             </div>
 
-            <div className="flex w-full flex-col gap-3 lg:max-w-md">
-              <div className="relative">
-                <Github className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-white/35" />
-
-                <input
-                  value={githubUsername}
-                  onChange={(event) =>
-                    handleUsernameChange(event.target.value)
-                  }
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      event.preventDefault();
-                      handleAnalyzePortfolio();
-                    }
-                  }}
-                  placeholder="GitHub username, e.g. suelen-ilyas"
-                  className="w-full rounded-2xl border border-white/10 bg-black/20 py-3 pl-11 pr-4 text-sm text-white/80 outline-none transition placeholder:text-white/30 focus:border-cyan-300/30"
-                />
+            <div className="min-w-0">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/55">
+                GitHub readiness
               </div>
 
-              {error && (
-                <div className="rounded-2xl border border-orange-400/10 bg-orange-400/[0.06] p-3 text-xs text-orange-200">
-                  {error}
+              <div className="mt-4 text-3xl font-semibold tracking-tight text-white">
+                Turn your GitHub into a recruiter-ready portfolio.
+              </div>
+
+              <div className="mt-2 max-w-2xl text-sm leading-6 text-white/55">
+                Launchly reviews public repositories, README quality, architecture depth and project maturity through a senior-engineer lens.
+              </div>
+
+              <div className="mt-6 grid gap-3 md:grid-cols-2">
+                <div className="rounded-2xl border border-white/7 bg-white/[0.035] p-4">
+                  <Progress
+                    label="Technical depth"
+                    value={signals?.technical_depth || 0}
+                    color={getProgressColor(signals?.technical_depth || 0)}
+                  />
+                </div>
+
+                <div className="rounded-2xl border border-white/7 bg-white/[0.035] p-4">
+                  <Progress
+                    label="Architecture"
+                    value={signals?.architecture || 0}
+                    color={getProgressColor(signals?.architecture || 0)}
+                  />
+                </div>
+
+                <div className="rounded-2xl border border-white/7 bg-white/[0.035] p-4">
+                  <Progress
+                    label="README quality"
+                    value={signals?.readme_quality || 0}
+                    color={getProgressColor(signals?.readme_quality || 0)}
+                  />
+                </div>
+
+                <div className="rounded-2xl border border-white/7 bg-white/[0.035] p-4">
+                  <Progress
+                    label="Business impact"
+                    value={signals?.business_impact || 0}
+                    color={getProgressColor(signals?.business_impact || 0)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-white/7 bg-black/20 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+              <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                <Search className="size-4 text-violet-300" />
+                Scan GitHub profile
+              </div>
+
+              <div className="mt-1 text-xs leading-5 text-white/45">
+                Enter a public GitHub username to scan repos, READMEs and profile metadata.
+              </div>
+
+              <div className="mt-5 space-y-3">
+                <div className="relative">
+                  <Github className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-white/35" />
+
+                  <input
+                    value={githubUsername}
+                    onChange={(event) =>
+                      handleUsernameChange(event.target.value)
+                    }
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        handleAnalyzePortfolio();
+                      }
+                    }}
+                    placeholder="GitHub username, e.g. suelen-ilyas"
+                    className="w-full rounded-2xl border border-white/10 bg-black/25 py-3 pl-11 pr-4 text-sm text-white/80 outline-none transition placeholder:text-white/30 focus:border-cyan-300/30"
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleAnalyzePortfolio}
+                  disabled={!canAnalyze || isAnalyzing || isLoadingProfile}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-brand px-4 py-3 text-sm font-semibold text-primary-foreground glow transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isAnalyzing ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Github className="size-4" />
+                  )}
+
+                  {isAnalyzing
+                    ? "Scanning GitHub..."
+                    : analysis
+                      ? "Re-scan GitHub"
+                      : "Scan GitHub"}
+                </button>
+
+                {error && (
+                  <div className="rounded-2xl border border-orange-400/10 bg-orange-400/[0.06] p-3 text-xs text-orange-200">
+                    {error}
+                  </div>
+                )}
+              </div>
+
+              {analysis?.github_profile && (
+                <div className="mt-5 rounded-[1.75rem] border border-cyan-300/10 bg-white/[0.035] p-4">
+                  <div className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-cyan-100/60">
+                    Connected profile
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={analysis.github_profile.avatar_url}
+                      alt={analysis.github_profile.username}
+                      className="size-12 rounded-2xl border border-white/10 object-cover shadow-[0_12px_34px_rgba(0,0,0,0.28)]"
+                    />
+
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-semibold text-white">
+                        {analysis.github_profile.name || analysis.github_profile.username}
+                      </div>
+
+                      <a
+                        href={analysis.github_profile.html_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-1 inline-flex items-center gap-1 rounded-full border border-cyan-300/10 bg-cyan-300/[0.06] px-2.5 py-1 text-[11px] text-cyan-100/75 transition hover:bg-cyan-300/[0.10]"
+                      >
+                        @{analysis.github_profile.username}
+                        <ExternalLink className="size-3" />
+                      </a>
+                    </div>
+                  </div>
+
+                  {analysis.github_profile.bio && (
+                    <div className="mt-3 line-clamp-2 text-xs leading-5 text-white/50">
+                      {analysis.github_profile.bio}
+                    </div>
+                  )}
+
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    <div className="rounded-2xl border border-white/5 bg-black/20 px-3 py-2.5">
+                      <div className="text-[10px] uppercase tracking-[0.14em] text-white/35">
+                        Followers
+                      </div>
+
+                      <div className="mt-1 text-lg font-semibold text-white">
+                        {analysis.github_profile.followers}
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-white/5 bg-black/20 px-3 py-2.5">
+                      <div className="text-[10px] uppercase tracking-[0.14em] text-white/35">
+                        Following
+                      </div>
+
+                      <div className="mt-1 text-lg font-semibold text-white">
+                        {analysis.github_profile.following}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -263,158 +417,11 @@ function Portfolio() {
           <PortfolioScanLoader />
         )}
 
-        {analysis?.github_profile && (
-          <Card className="relative overflow-hidden border-white/5 bg-[radial-gradient(circle_at_top_left,rgba(168,85,247,0.10),transparent_34%)]">
-            <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div className="flex items-center gap-4">
-                <img
-                  src={analysis.github_profile.avatar_url}
-                  alt={analysis.github_profile.username}
-                  className="size-16 rounded-2xl border border-white/10 object-cover"
-                />
 
-                <div>
-                  <div className="text-lg font-semibold text-white">
-                    {analysis.github_profile.name || analysis.github_profile.username}
-                  </div>
 
-                  <a
-                    href={analysis.github_profile.html_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-1 inline-flex items-center gap-1 text-sm text-cyan-200/80 transition hover:text-cyan-100"
-                  >
-                    @{analysis.github_profile.username}
-                    <ExternalLink className="size-3.5" />
-                  </a>
 
-                  {analysis.github_profile.bio && (
-                    <div className="mt-2 max-w-2xl text-sm leading-6 text-white/55">
-                      {analysis.github_profile.bio}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-2xl border border-white/5 bg-white/[0.03] px-4 py-3">
-                  <div className="text-xs text-muted-foreground">
-                    Followers
-                  </div>
-
-                  <div className="mt-1 text-lg font-semibold text-white">
-                    {analysis.github_profile.followers}
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-white/5 bg-white/[0.03] px-4 py-3">
-                  <div className="text-xs text-muted-foreground">
-                    Following
-                  </div>
-
-                  <div className="mt-1 text-lg font-semibold text-white">
-                    {analysis.github_profile.following}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        <div className="grid gap-4 lg:grid-cols-3">
-          <Card className="relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.08),transparent_40%)]" />
-
-            <div className="relative">
-              <div className="text-xs text-muted-foreground">
-                Portfolio Quality
-              </div>
-
-              <div className="mt-2 flex items-end gap-2">
-                <div className="text-5xl font-semibold tracking-tight text-gradient">
-                  {portfolioScore}
-                </div>
-
-                <div className="mb-2 text-sm text-muted-foreground">
-                  /100
-                </div>
-              </div>
-
-              <div className="mt-3">
-                <Progress value={portfolioScore} />
-              </div>
-
-              <div className="mt-3 text-xs text-muted-foreground">
-                {analysis
-                  ? `Based on ${repos.length} public repositories.`
-                  : isLoadingProfile
-                        ? "Loading your saved portfolio analysis..."
-                        : "Run a GitHub scan to calculate portfolio quality."}
-              </div>
-            </div>
-          </Card>
-
-          <Card>
-            <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
-              <ShieldCheck className="size-4 text-cyan-300" />
-              Recruiter impression
-            </div>
-
-            <div className="space-y-3">
-              <Progress
-                label="Technical depth"
-                value={signals?.technical_depth || 0}
-                color={getProgressColor(signals?.technical_depth || 0)}
-              />
-
-              <Progress
-                label="Architecture"
-                value={signals?.architecture || 0}
-                color={getProgressColor(signals?.architecture || 0)}
-              />
-
-              <Progress
-                label="README quality"
-                value={signals?.readme_quality || 0}
-                color={getProgressColor(signals?.readme_quality || 0)}
-              />
-
-              <Progress
-                label="Business impact"
-                value={signals?.business_impact || 0}
-                color={getProgressColor(signals?.business_impact || 0)}
-              />
-            </div>
-          </Card>
-
-          <Card>
-            <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
-              <Sparkles className="size-4 text-[oklch(0.85_0.14_250)]" />
-              Top wins
-            </div>
-
-            <ul className="space-y-2 text-sm">
-              {analysis?.top_wins?.length ? (
-                analysis.top_wins.map((item) => (
-                  <li
-                    key={item}
-                    className="flex gap-2 text-white/75"
-                  >
-                    <Check className="mt-0.5 size-4 shrink-0 text-[oklch(0.78_0.17_155)]" />
-                    <span>{item}</span>
-                  </li>
-                ))
-              ) : (
-                <li className="text-sm text-white/45">
-                  Strongest portfolio signals will appear here after the scan.
-                </li>
-              )}
-            </ul>
-          </Card>
-        </div>
-
-        <div className="grid gap-4 lg:grid-cols-12">
-          <Card className="relative overflow-hidden lg:col-span-7">
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(360px,0.8fr)]">
+          <Card className="relative overflow-hidden border-cyan-300/10 bg-[linear-gradient(145deg,rgba(15,23,42,0.96),rgba(8,13,24,0.98)_52%,rgba(24,18,54,0.78))] shadow-[0_24px_80px_rgba(6,182,212,0.08)]">
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.025),transparent)]" />
 
             <div className="relative">
@@ -450,13 +457,8 @@ function Portfolio() {
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-2">
                             <Github className="size-4 text-muted-foreground" />
-
                             <span className="font-semibold text-white">
                               {repo.name}
-                            </span>
-
-                            <span className={`rounded-full border px-2 py-0.5 text-[10px] ${getTagClassName(repo.tag)}`}>
-                              {repo.tag}
                             </span>
                           </div>
 
@@ -494,12 +496,45 @@ function Portfolio() {
                           </div>
                         </div>
 
-                        <div className="md:w-64">
-                          <Progress
-                            value={repo.score}
-                            color={getProgressColor(repo.score)}
-                            label="Score"
-                          />
+                        <div className="w-full rounded-2xl border border-white/7 bg-black/20 p-4 md:w-72">
+                          <div className="mb-3 flex items-center justify-between gap-3">
+                            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-white/45">
+                              Repo score
+                            </div>
+
+                            <div className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${getTagClassName(repo.tag)}`}>
+                              {repo.tag}
+                            </div>
+                          </div>
+
+                          <div className="flex items-end justify-between gap-4">
+                            <div className="flex items-end gap-1">
+                              <div className="text-4xl font-semibold tracking-tight text-white">
+                                {repo.score}
+                              </div>
+
+                              <div className="mb-1.5 text-xs text-white/45">
+                                /100
+                              </div>
+                            </div>
+
+                            <div className="text-right text-xs text-white/45">
+                              {repo.score >= 80
+                                ? "Strong signal"
+                                : repo.score >= 65
+                                  ? "Solid project"
+                                  : repo.score >= 50
+                                    ? "Needs polish"
+                                    : "Low signal"}
+                            </div>
+                          </div>
+
+                          <div className="mt-3">
+                            <Progress
+                              value={repo.score}
+                              color={getProgressColor(repo.score)}
+                            />
+                          </div>
                         </div>
                       </div>
 
@@ -583,8 +618,36 @@ function Portfolio() {
             </div>
           </Card>
 
-          <div className="space-y-4 lg:col-span-5">
-            <Card className="relative overflow-hidden">
+          <div className="space-y-5">
+            <Card className="relative overflow-hidden border-white/7 bg-white/[0.025]">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(168,85,247,0.10),transparent_40%)]" />
+
+              <div className="relative">
+                <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-white">
+                  <Sparkles className="size-4 text-[oklch(0.85_0.14_250)]" />
+                  Top wins
+                </div>
+
+                <ul className="space-y-3 text-sm">
+                  {analysis?.top_wins?.length ? (
+                    analysis.top_wins.map((item) => (
+                      <li
+                        key={item}
+                        className="flex gap-2 text-white/70"
+                      >
+                        <Check className="mt-0.5 size-4 shrink-0 text-[oklch(0.78_0.17_155)]" />
+                        <span>{item}</span>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-sm text-white/45">
+                      Strongest portfolio signals will appear here after the scan.
+                    </li>
+                  )}
+                </ul>
+              </div>
+            </Card>
+            <Card className="relative overflow-hidden border-white/7 bg-white/[0.025]">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(249,115,22,0.08),transparent_42%)]" />
 
               <div className="relative">
@@ -631,7 +694,7 @@ function Portfolio() {
                 </div>
               </div>
             </Card>
-            <Card className="relative overflow-hidden">
+            <Card className="relative overflow-hidden border-orange-400/10 bg-orange-400/[0.035]">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(168,85,247,0.08),transparent_40%)]" />
 
               <div className="relative">
@@ -660,7 +723,7 @@ function Portfolio() {
               </div>
             </Card>
 
-            <Card className="relative overflow-hidden">
+            <Card className="relative overflow-hidden border-emerald-400/10 bg-emerald-400/[0.035]">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.08),transparent_45%)]" />
 
               <div className="relative">
