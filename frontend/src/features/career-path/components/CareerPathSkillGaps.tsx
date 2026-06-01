@@ -1,6 +1,10 @@
 import {
   AlertTriangle,
+  ArrowRight,
+  CheckCircle2,
   Layers3,
+  ShieldAlert,
+  Target,
 } from "lucide-react";
 
 import { Card } from "@/components/launchly/AppShell";
@@ -24,6 +28,34 @@ function getPriorityStrength(priority: string) {
   return 38;
 }
 
+function getPriorityClassName(priority: string) {
+  const normalized = priority.toLowerCase();
+
+  if (normalized === "high") {
+    return "border-orange-400/15 bg-orange-400/[0.08] text-orange-100";
+  }
+
+  if (normalized === "medium") {
+    return "border-cyan-400/15 bg-cyan-400/[0.08] text-cyan-100";
+  }
+
+  return "border-white/10 bg-white/[0.04] text-white/55";
+}
+
+function getProgressClassName(priority: string) {
+  const normalized = priority.toLowerCase();
+
+  if (normalized === "high") {
+    return "from-orange-400 via-violet-400 to-cyan-300 shadow-[0_0_24px_rgba(249,115,22,0.18)]";
+  }
+
+  if (normalized === "medium") {
+    return "from-cyan-300 via-violet-300 to-emerald-300 shadow-[0_0_22px_rgba(34,211,238,0.16)]";
+  }
+
+  return "from-white/40 to-white/20";
+}
+
 export function CareerPathSkillGaps({
   skillGaps,
 }: CareerPathSkillGapsProps) {
@@ -31,104 +63,154 @@ export function CareerPathSkillGaps({
     (gap) => gap.priority.toLowerCase() === "high",
   ).length;
 
+  const nextFocus = skillGaps[0]?.skill || "No focus selected";
+
   return (
-    <Card className="p-5 lg:p-6">
-      <div className="mb-5 flex items-start justify-between gap-4">
-        <div>
-          <div className="mb-2 inline-flex items-center gap-2 text-xs font-medium text-white/45">
-            <Layers3 className="h-3.5 w-3.5 text-amber-300/85" />
-            Skill gaps
+    <Card className="relative overflow-hidden border-cyan-300/10 bg-[linear-gradient(145deg,rgba(15,23,42,0.94),rgba(8,13,24,0.98)_52%,rgba(22,38,48,0.62))] shadow-[0_24px_80px_rgba(6,182,212,0.05)]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.10),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.10),transparent_38%)]" />
+      <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/55 to-transparent" />
+
+      <div className="relative">
+        <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/10 bg-cyan-400/[0.06] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-100/70">
+              <Layers3 className="size-3.5 text-cyan-300" />
+              Skill Gap Matrix
+            </div>
+
+            <h2 className="mt-4 text-2xl font-semibold tracking-tight text-white lg:text-3xl">
+              What to improve next
+            </h2>
+
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-white/55">
+              A view of the gaps between your current evidence and what recruiters expect for your target role.
+            </p>
           </div>
 
-          <h2 className="text-xl font-semibold text-white">
-            What to improve next
-          </h2>
+          <div className="grid gap-2 sm:grid-cols-2 lg:min-w-[420px]">
+            <div className="rounded-2xl border border-white/7 bg-black/20 px-4 py-3">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/35">
+                Gaps found
+              </div>
 
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-white/50">
-            The most relevant gaps between your current profile and your target
-            role.
-          </p>
+              <div className="mt-1 text-xl font-semibold text-white">
+                {skillGaps.length}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-orange-300/10 bg-orange-400/[0.045] px-4 py-3">
+              <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-orange-100/55">
+                <ShieldAlert className="size-3.5" />
+                High priority
+              </div>
+
+              <div className="mt-1 text-xl font-semibold text-orange-100">
+                {highPriorityCount}
+              </div>
+            </div>
+
+
+          </div>
         </div>
 
-        <div className="rounded-full bg-amber-400/[0.07] px-3 py-1 text-xs font-medium text-amber-100/65">
-          {highPriorityCount} urgent
-        </div>
-      </div>
-
-      <div className="space-y-3">
         {skillGaps.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.03] p-6 text-sm text-white/50">
+          <div className="rounded-[2rem] border border-dashed border-white/10 bg-white/[0.03] p-8 text-sm text-white/50">
             No skill gaps available yet.
           </div>
         ) : (
-          skillGaps.map((gap, index) => {
-            const strength = getPriorityStrength(gap.priority);
+          <div className="overflow-hidden rounded-[2rem] border border-white/7 bg-black/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+            <div className="hidden grid-cols-[minmax(0,1.2fr)_minmax(0,1.3fr)_180px] border-b border-white/5 bg-white/[0.025] px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/35 lg:grid">
+              <div>Skill</div>
+              <div>Current → Target</div>
+              <div className="text-right">Focus intensity</div>
+            </div>
 
-            return (
-              <div
-                key={`${gap.skill}-${index}`}
-                className="rounded-3xl border border-white/10 bg-black/20 p-5 transition hover:border-amber-300/18 hover:bg-white/[0.03]"
-              >
-                <div className="mb-4 flex items-start justify-between gap-3">
-                  <div className="flex min-w-0 gap-3">
-                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-400/[0.08] text-amber-200/85">
-                      <AlertTriangle className="h-4 w-4" />
-                    </div>
+            <div className="divide-y divide-white/[0.055]">
+              {skillGaps.map((gap, index) => {
+                const strength = getPriorityStrength(gap.priority);
+
+                return (
+                  <div
+                    key={`${gap.skill}-${index}`}
+                    className="group relative grid gap-4 px-5 py-5 transition duration-300 hover:bg-white/[0.035] lg:grid-cols-[minmax(0,1.0fr)_minmax(0,1.3fr)_180px] lg:items-center"
+                  >
+                    <div className="absolute inset-y-4 left-0 w-1 rounded-r-full bg-transparent transition group-hover:bg-cyan-300/35" />
 
                     <div className="min-w-0">
-                      <h3 className="text-base font-semibold text-white">
+                      <div className="mb-2 flex flex-wrap items-center gap-2">
+                        <div className="grid size-8 place-items-center rounded-xl border border-cyan-300/10 bg-cyan-400/[0.055] text-cyan-100">
+                          <AlertTriangle className="size-4" />
+                        </div>
+
+                        <div className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/45">
+                          Gap {index + 1}
+                        </div>
+
+                        <div className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${getPriorityClassName(gap.priority)}`}>
+                          {getPriorityLabel(gap.priority)}
+                        </div>
+                      </div>
+
+                      <h3 className="truncate text-base font-semibold tracking-tight text-white/92">
                         {gap.skill}
                       </h3>
 
-                      <p className="mt-1 text-xs text-white/35">
-                        {getPriorityLabel(gap.priority)} priority
+                      <p className="mt-2 line-clamp-2 text-xs leading-5 text-white/45">
+                        {gap.reason}
                       </p>
                     </div>
-                  </div>
-                </div>
 
-                <div className="mb-4 grid gap-3 md:grid-cols-2">
-                  <div className="rounded-2xl bg-white/[0.025] p-3">
-                    <p className="text-xs uppercase tracking-[0.16em] text-white/30">
-                      Current
-                    </p>
-                    <p className="mt-1 text-sm font-medium text-white/70">
-                      {gap.current_level}
-                    </p>
-                  </div>
+                    <div className="rounded-2xl border border-white/5 bg-white/[0.025] p-3">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                        <div className="min-w-0 flex-1 rounded-xl border border-white/5 bg-black/20 px-3 py-2">
+                          <div className="mb-1 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35">
+                            <Target className="size-3" />
+                            Current
+                          </div>
 
-                  <div className="rounded-2xl bg-violet-400/[0.065] p-3">
-                    <p className="text-xs uppercase tracking-[0.16em] text-violet-200/50">
-                      Target
-                    </p>
-                    <p className="mt-1 text-sm font-medium text-violet-100">
-                      {gap.target_level}
-                    </p>
-                  </div>
-                </div>
+                          <div className="truncate text-sm font-medium text-white/70">
+                            {gap.current_level}
+                          </div>
+                        </div>
 
-                <div className="mb-4">
-                  <div className="mb-2 flex items-center justify-between text-xs">
-                    <span className="text-white/35">Focus level</span>
-                    <span className="font-medium text-white/55">
-                      {strength}%
-                    </span>
-                  </div>
+                        <ArrowRight className="hidden size-4 shrink-0 text-white/25 sm:block" />
 
-                  <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-violet-400 to-cyan-300"
-                      style={{ width: `${strength}%` }}
-                    />
-                  </div>
-                </div>
+                        <div className="min-w-0 flex-1 rounded-xl border border-cyan-300/10 bg-cyan-400/[0.055] px-3 py-2">
+                          <div className="mb-1 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100/50">
+                            <CheckCircle2 className="size-3" />
+                            Target
+                          </div>
 
-                <p className="text-sm leading-6 text-white/50">
-                  {gap.reason}
-                </p>
-              </div>
-            );
-          })
+                          <div className="truncate text-sm font-medium text-cyan-50/85">
+                            {gap.target_level}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="mb-2 flex items-center justify-between text-xs">
+                        <span className="font-semibold uppercase tracking-[0.14em] text-white/35">
+                          Focus
+                        </span>
+
+                        <span className="font-semibold text-white/65">
+                          {strength}%
+                        </span>
+                      </div>
+
+                      <div className="h-2 overflow-hidden rounded-full bg-white/10">
+                        <div
+                          className={`h-full rounded-full bg-gradient-to-r ${getProgressClassName(gap.priority)}`}
+                          style={{ width: `${strength}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         )}
       </div>
     </Card>
