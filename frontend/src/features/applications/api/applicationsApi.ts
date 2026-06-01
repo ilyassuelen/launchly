@@ -23,6 +23,34 @@ function getAuthHeaders() {
   };
 }
 
+async function handleResponse<T>(
+  response: Response,
+  defaultMessage: string,
+): Promise<T> {
+  if (!response.ok) {
+    let message = defaultMessage;
+
+    try {
+      const errorData = await response.json();
+
+      message =
+        errorData?.detail ||
+        errorData?.message ||
+        defaultMessage;
+    } catch {
+      // Ignore parsing errors and keep fallback message.
+    }
+
+    throw new Error(message);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  return response.json();
+}
+
 export async function fetchApplications(): Promise<ApplicationListResponse> {
   const response = await fetch(
     `${API_BASE}/applications`,
@@ -32,13 +60,10 @@ export async function fetchApplications(): Promise<ApplicationListResponse> {
     },
   );
 
-  if (!response.ok) {
-    throw new Error(
-      "Failed to load applications",
-    );
-  }
-
-  return response.json();
+  return handleResponse<ApplicationListResponse>(
+    response,
+    "Failed to load applications",
+  );
 }
 
 export async function createApplication(
@@ -53,13 +78,10 @@ export async function createApplication(
     },
   );
 
-  if (!response.ok) {
-    throw new Error(
-      "Failed to create application",
-    );
-  }
-
-  return response.json();
+  return handleResponse<ApplicationItem>(
+    response,
+    "Failed to create application",
+  );
 }
 
 export async function updateApplication(
@@ -75,13 +97,10 @@ export async function updateApplication(
     },
   );
 
-  if (!response.ok) {
-    throw new Error(
-      "Failed to update application",
-    );
-  }
-
-  return response.json();
+  return handleResponse<ApplicationItem>(
+    response,
+    "Failed to update application",
+  );
 }
 
 export async function deleteApplication(
@@ -95,9 +114,8 @@ export async function deleteApplication(
     },
   );
 
-  if (!response.ok) {
-    throw new Error(
-      "Failed to delete application",
-    );
-  }
+  await handleResponse<void>(
+    response,
+    "Failed to delete application",
+  );
 }

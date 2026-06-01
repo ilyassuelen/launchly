@@ -12,7 +12,6 @@ import type {
   ApplicationItem,
   ApplicationListResponse,
   ApplicationStats,
-  ApplicationStatus,
   ApplicationUpdatePayload,
 } from "@/features/applications/types/application";
 
@@ -175,14 +174,6 @@ export function useApplications() {
     createApplication: createNewApplication,
     updateApplication: updateExistingApplication,
 
-    updateApplicationStatus: async (
-        applicationId: number,
-        status: ApplicationStatus,
-    ) => {
-        await updateExistingApplication(applicationId, {
-            status,
-        });
-    },
     deleteApplication: deleteExistingApplication,
     setApplications,
     setStats,
