@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 
 class CareerPathGenerateRequest(BaseModel):
-    language: str = Field(default="english", max_length=20)
+    language: str = Field(default="en", max_length=20)
     target_role: str = Field(..., min_length=2, max_length=120)
     current_level: Optional[str] = Field(default=None, max_length=80)
     timeframe_months: Optional[int] = Field(default=6, ge=1, le=36)

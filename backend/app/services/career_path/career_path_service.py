@@ -30,6 +30,31 @@ def _safe_list(value: Any) -> list[dict[str, Any]]:
     return []
 
 
+def _safe_text(
+    value: Any,
+    default: str,
+) -> str:
+    if isinstance(value, str) and value.strip():
+        return value.strip()
+
+    return default
+
+
+def _safe_string_list(
+    value: Any,
+    fallback: list[str],
+) -> list[str]:
+    if not isinstance(value, list):
+        return fallback
+
+    items = [
+        str(item).strip()
+        for item in value
+        if str(item).strip()
+    ]
+
+    return items or fallback
+
 
 def _safe_int(value: Any, default: int = 70, minimum: int = 0, maximum: int = 100) -> int:
     """
@@ -197,6 +222,75 @@ def _fallback_payload(request: CareerPathGenerateRequest) -> dict[str, Any]:
     }
 
 
+def _normalize_milestone(
+    item: dict[str, Any],
+    fallback: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        "title": _safe_text(item.get("title"), fallback["title"]),
+        "description": _safe_text(item.get("description"), fallback["description"]),
+        "timeframe": _safe_text(item.get("timeframe"), fallback["timeframe"]),
+        "priority": _safe_text(item.get("priority"), fallback["priority"]),
+        "tasks": _safe_string_list(item.get("tasks"), fallback["tasks"]),
+    }
+
+
+def _normalize_skill_gap(
+    item: dict[str, Any],
+    fallback: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        "skill": _safe_text(item.get("skill"), fallback["skill"]),
+        "current_level": _safe_text(item.get("current_level"), fallback["current_level"]),
+        "target_level": _safe_text(item.get("target_level"), fallback["target_level"]),
+        "reason": _safe_text(item.get("reason"), fallback["reason"]),
+        "priority": _safe_text(item.get("priority"), fallback["priority"]),
+    }
+
+
+def _normalize_learning_item(
+    item: dict[str, Any],
+    fallback: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        "title": _safe_text(item.get("title"), fallback["title"]),
+        "description": _safe_text(item.get("description"), fallback["description"]),
+        "type": _safe_text(item.get("type"), fallback["type"]),
+        "estimated_time": _safe_text(item.get("estimated_time"), fallback["estimated_time"]),
+        "priority": _safe_text(item.get("priority"), fallback["priority"]),
+    }
+
+
+def _normalize_project_item(
+    item: dict[str, Any],
+    fallback: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        "title": _safe_text(item.get("title"), fallback["title"]),
+        "description": _safe_text(item.get("description"), fallback["description"]),
+        "skills_practiced": _safe_string_list(
+            item.get("skills_practiced"),
+            fallback["skills_practiced"],
+        ),
+        "portfolio_value": _safe_text(item.get("portfolio_value"), fallback["portfolio_value"]),
+        "difficulty": _safe_text(item.get("difficulty"), fallback["difficulty"]),
+    }
+
+
+def _normalize_application_strategy_item(
+    item: dict[str, Any],
+    fallback: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        "title": _safe_text(item.get("title"), fallback["title"]),
+        "description": _safe_text(item.get("description"), fallback["description"]),
+        "action_items": _safe_string_list(
+            item.get("action_items"),
+            fallback["action_items"],
+        ),
+    }
+
+
 def _normalize_payload(
     raw_payload: dict[str, Any],
     request: CareerPathGenerateRequest,
@@ -207,8 +301,19 @@ def _normalize_payload(
     """
     fallback = _fallback_payload(request)
 
+    raw_roadmap = _safe_list(raw_payload.get("roadmap"))
+    raw_skill_gaps = _safe_list(raw_payload.get("skill_gaps"))
+    raw_learning_plan = _safe_list(raw_payload.get("learning_plan"))
+    raw_project_plan = _safe_list(raw_payload.get("project_plan"))
+    raw_application_strategy = _safe_list(
+        raw_payload.get("application_strategy"),
+    )
+
     return {
-        "summary": raw_payload.get("summary") or fallback["summary"],
+        "summary": _safe_text(
+            raw_payload.get("summary"),
+            fallback["summary"],
+        ),
         "confidence_score": _safe_int(
             raw_payload.get("confidence_score"),
             default=fallback["confidence_score"],
@@ -217,20 +322,55 @@ def _normalize_payload(
             raw_payload.get("role_fit"),
             default=fallback["role_fit"],
         ),
-        "role_fit_summary": (
-            raw_payload.get("role_fit_summary")
-            if isinstance(raw_payload.get("role_fit_summary"), str)
-            and raw_payload.get("role_fit_summary", "").strip()
-            else fallback["role_fit_summary"]
+        "role_fit_summary": _safe_text(
+            raw_payload.get("role_fit_summary"),
+            fallback["role_fit_summary"],
         ),
-        "roadmap": _safe_list(raw_payload.get("roadmap")) or fallback["roadmap"],
-        "skill_gaps": _safe_list(raw_payload.get("skill_gaps")) or fallback["skill_gaps"],
-        "learning_plan": _safe_list(raw_payload.get("learning_plan")) or fallback["learning_plan"],
-        "project_plan": _safe_list(raw_payload.get("project_plan")) or fallback["project_plan"],
-        "application_strategy": (
-            _safe_list(raw_payload.get("application_strategy"))
-            or fallback["application_strategy"]
-        ),
+        "roadmap": [
+            _normalize_milestone(
+                item,
+                fallback["roadmap"][
+                    min(index, len(fallback["roadmap"]) - 1)
+                ],
+            )
+            for index, item in enumerate(raw_roadmap)
+        ] or fallback["roadmap"],
+        "skill_gaps": [
+            _normalize_skill_gap(
+                item,
+                fallback["skill_gaps"][
+                    min(index, len(fallback["skill_gaps"]) - 1)
+                ],
+            )
+            for index, item in enumerate(raw_skill_gaps)
+        ] or fallback["skill_gaps"],
+        "learning_plan": [
+            _normalize_learning_item(
+                item,
+                fallback["learning_plan"][
+                    min(index, len(fallback["learning_plan"]) - 1)
+                ],
+            )
+            for index, item in enumerate(raw_learning_plan)
+        ] or fallback["learning_plan"],
+        "project_plan": [
+            _normalize_project_item(
+                item,
+                fallback["project_plan"][
+                    min(index, len(fallback["project_plan"]) - 1)
+                ],
+            )
+            for index, item in enumerate(raw_project_plan)
+        ] or fallback["project_plan"],
+        "application_strategy": [
+            _normalize_application_strategy_item(
+                item,
+                fallback["application_strategy"][
+                    min(index, len(fallback["application_strategy"]) - 1)
+                ],
+            )
+            for index, item in enumerate(raw_application_strategy)
+        ] or fallback["application_strategy"],
     }
 
 
@@ -247,7 +387,9 @@ async def _generate_ai_payload(
             "Career path generation using fallback because OPENAI_API_KEY is missing target_role=%s",
             request.target_role,
         )
-        return _fallback_payload(request)
+        fallback = _fallback_payload(request)
+        fallback["generation_mode"] = "fallback"
+        return fallback
 
     client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
 
@@ -278,7 +420,20 @@ async def _generate_ai_payload(
             ],
         )
 
-        content = response.choices[0].message.content or "{}"
+        content = (
+                response.choices[0].message.content
+                or ""
+        ).strip()
+
+        if not content:
+            logger.error(
+                "Career path AI response was empty target_role=%s",
+                request.target_role,
+            )
+
+            fallback = _fallback_payload(request)
+            fallback["generation_mode"] = "fallback"
+            return fallback
 
         try:
             parsed = json.loads(content)
@@ -288,7 +443,9 @@ async def _generate_ai_payload(
                 request.target_role,
                 content[:500],
             )
-            return _fallback_payload(request)
+            fallback = _fallback_payload(request)
+            fallback["generation_mode"] = "fallback"
+            return fallback
 
         if not isinstance(parsed, dict):
             logger.error(
@@ -296,9 +453,13 @@ async def _generate_ai_payload(
                 request.target_role,
                 type(parsed).__name__,
             )
-            return _fallback_payload(request)
+            fallback = _fallback_payload(request)
+            fallback["generation_mode"] = "fallback"
+            return fallback
 
-        return _normalize_payload(parsed, request)
+        payload = _normalize_payload(parsed, request)
+        payload["generation_mode"] = "ai"
+        return payload
 
     except Exception:
         logger.exception(
@@ -307,7 +468,9 @@ async def _generate_ai_payload(
             request.current_level,
             request.timeframe_months,
         )
-        return _fallback_payload(request)
+        fallback = _fallback_payload(request)
+        fallback["generation_mode"] = "fallback"
+        return fallback
 
 
 async def generate_career_path(
@@ -330,6 +493,7 @@ async def generate_career_path(
     )
 
     input_snapshot = {
+        "generation_mode": payload.get("generation_mode", "ai"),
         "request": {
             "target_role": request.target_role,
             "current_level": request.current_level,
@@ -354,7 +518,11 @@ async def generate_career_path(
         confidence_score=payload["confidence_score"],
         role_fit=payload["role_fit"],
         role_fit_summary=payload["role_fit_summary"],
-        status="completed",
+        status=(
+            "fallback"
+            if payload.get("generation_mode") == "fallback"
+            else "completed"
+        ),
     )
 
     try:

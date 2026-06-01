@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import {
   deleteCareerPath,
@@ -169,10 +169,6 @@ export function useCareerPath(): UseCareerPathResult {
   const selectCareerPath = useCallback((careerPath: CareerPath | null) => {
     setSelectedCareerPath(careerPath);
   }, []);
-
-  useEffect(() => {
-    void loadCareerPaths();
-  }, [loadCareerPaths]);
 
   return {
     careerPaths,

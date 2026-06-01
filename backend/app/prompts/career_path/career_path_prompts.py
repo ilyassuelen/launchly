@@ -78,7 +78,7 @@ def build_career_path_prompt(
 
     language_instruction = (
         "IMPORTANT: You MUST write ALL output in German."
-        if normalized_language in ["german", "de", "deutsch"]
+        if normalized_language == "de"
         else "IMPORTANT: You MUST write ALL output in English."
     )
 

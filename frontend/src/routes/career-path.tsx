@@ -2,13 +2,10 @@ import { useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   AlertTriangle,
-  ArrowRight,
   BrainCircuit,
   CheckCircle2,
   Loader2,
-  Map,
   Sparkles,
-  Target,
   TrendingUp,
 } from "lucide-react";
 
@@ -97,6 +94,7 @@ function CareerPath() {
     isGenerating,
     error,
     createCareerPath,
+    loadCareerPaths,
     clearError,
   } = useCareerPath();
 
@@ -105,6 +103,12 @@ function CareerPath() {
       navigate({ to: "/login" });
     }
   }, [user, loading, navigate]);
+
+  useEffect(() => {
+      if (!loading && user) {
+        void loadCareerPaths();
+      }
+  }, [user, loading, loadCareerPaths]);
 
   const handleGenerateCareerPath = async (
     payload: CareerPathGenerateRequest,

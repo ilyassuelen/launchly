@@ -21,6 +21,18 @@ from backend.app.services.career_path.career_path_service import (
 router = APIRouter(prefix="/career-path", tags=["career-path"])
 
 
+def normalize_career_path_language(value: str | None) -> str:
+    if not value:
+        return "en"
+
+    value = value.lower().strip()
+
+    if value in {"de", "deutsch", "german", "germany"}:
+        return "de"
+
+    return "en"
+
+
 @router.post(
     "/generate",
     response_model=CareerPathResponse,
@@ -31,7 +43,9 @@ async def generate_user_career_path(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    request.language = current_user.ai_response_language or "english"
+    request.language = normalize_career_path_language(
+        current_user.ai_response_language,
+    )
 
     return await generate_career_path(
         db=db,

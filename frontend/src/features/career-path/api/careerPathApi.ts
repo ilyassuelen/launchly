@@ -26,17 +26,21 @@ async function handleResponse<T>(
   defaultMessage: string,
 ): Promise<T> {
   if (!response.ok) {
+    let message = defaultMessage;
+
     try {
       const errorData = await response.json();
 
-      throw new Error(
+      message =
         errorData?.detail ||
-          errorData?.message ||
-          defaultMessage,
-      );
+        errorData?.message ||
+        defaultMessage;
+
     } catch {
-      throw new Error(defaultMessage);
+        // Keep default message if response body is not JSON.
     }
+
+    throw new Error(message);
   }
 
   if (response.status === 204) {
