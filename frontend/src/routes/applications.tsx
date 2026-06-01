@@ -29,8 +29,6 @@ import {
   CalendarDays,
   Pencil,
   Trash2,
-  ArrowRight,
-  TrendingUp,
 } from "lucide-react";
 
 import {
@@ -44,7 +42,8 @@ import {
 import type {
   ApplicationItem,
   ApplicationStatus,
-  ApplicationPayload,
+  ApplicationCreatePayload,
+  ApplicationUpdatePayload,
 } from "@/features/applications/types/application";
 
 export const Route = createFileRoute("/applications")({
@@ -286,13 +285,13 @@ function Applications() {
 
   const {
     applications,
+    stats: applicationStats,
     isLoadingApplications,
     isSavingApplication,
     error,
     loadApplications,
     createApplication,
     updateApplication,
-    updateApplicationStatus,
     deleteApplication,
   } = useApplications();
 
@@ -343,34 +342,8 @@ function Applications() {
     );
   }, [applications]);
 
-  const stats = useMemo(() => {
-    const total = applications.length;
-    const active = applications.filter(
-      (application) => application.status !== "rejected",
-    ).length;
-    const responded = applications.filter(
-      (application) =>
-        application.status === "phone_screen" ||
-        application.status === "onsite" ||
-        application.status === "offer" ||
-        application.status === "rejected",
-    ).length;
-    const offers = applications.filter(
-      (application) => application.status === "offer",
-    ).length;
-    const followUpsDue = applications.filter(isFollowUpDue).length;
 
-    return {
-      active,
-      responseRate:
-        total > 0
-          ? Math.round((responded / total) * 100)
-          : 0,
-      offers,
-      followUpsDue,
-      total,
-    };
-  }, [applications]);
+  const totalApplications = applications.length;
 
   const handleOpenCreateModal = () => {
     setEditingApplication(null);
@@ -404,7 +377,7 @@ function Applications() {
   };
 
   const handleSaveApplication = async () => {
-    const payload: ApplicationPayload = {
+    const payload: ApplicationCreatePayload = {
       company_name: draft.company_name,
       job_title: draft.job_title,
       status: editingApplication ? editingApplication.status : "applied",
@@ -420,7 +393,7 @@ function Applications() {
     if (editingApplication) {
       await updateApplication(editingApplication.id, payload);
     } else {
-        await createApplication(payload);
+      await createApplication(payload);
     }
     setModalOpen(false);
     setEditingApplication(null);
@@ -428,48 +401,48 @@ function Applications() {
   };
 
   const handleDropApplication = async (status: ApplicationStatus) => {
-      if (!draggedApplicationId) {
-        setActiveDropStatus(null);
-        return;
-      }
-
-      const application = applications.find(
-        (item) => item.id === draggedApplicationId,
-      );
-
-      setDraggedApplicationId(null);
+    if (!draggedApplicationId) {
       setActiveDropStatus(null);
+      return;
+    }
 
-      if (!application || application.status === status) return;
+    const application = applications.find(
+      (item) => item.id === draggedApplicationId,
+    );
 
-      const today = getTodayDateString();
+    setDraggedApplicationId(null);
+    setActiveDropStatus(null);
 
-      const payload: ApplicationPayload = {
-        company_name: application.company_name,
-        job_title: application.job_title,
-        status,
-        applied_date: application.applied_date,
-        phone_screen_date:
-          status === "phone_screen"
-            ? application.phone_screen_date || today
-            : application.phone_screen_date || null,
-        onsite_date:
-          status === "onsite"
-            ? application.onsite_date || today
-            : application.onsite_date || null,
-        offer_date:
-          status === "offer"
-            ? application.offer_date || today
-            : application.offer_date || null,
-        rejected_date:
-          status === "rejected"
-            ? application.rejected_date || today
-            : application.rejected_date || null,
-        follow_up_date: application.follow_up_date || null,
-        notes: application.notes || "",
-      };
+    if (!application || application.status === status) return;
 
-      await updateApplication(application.id, payload);
+    const today = getTodayDateString();
+
+    const payload: ApplicationUpdatePayload = {
+      company_name: application.company_name,
+      job_title: application.job_title,
+      status,
+      applied_date: application.applied_date,
+      phone_screen_date:
+        status === "phone_screen"
+          ? application.phone_screen_date || today
+          : application.phone_screen_date || null,
+      onsite_date:
+        status === "onsite"
+          ? application.onsite_date || today
+          : application.onsite_date || null,
+      offer_date:
+        status === "offer"
+          ? application.offer_date || today
+          : application.offer_date || null,
+      rejected_date:
+        status === "rejected"
+          ? application.rejected_date || today
+          : application.rejected_date || null,
+      follow_up_date: application.follow_up_date || null,
+      notes: application.notes || "",
+    };
+
+    await updateApplication(application.id, payload);
   };
 
   if (loading) {
@@ -504,15 +477,15 @@ function Applications() {
         <div className="grid gap-4 md:grid-cols-4">
           <StatCard
             label="Active"
-            value={String(stats.active)}
-            delta={`${stats.total} total`}
+            value={String(applicationStats.active)}
+            delta={`${totalApplications} total`}
             icon={Briefcase}
             tone="violet"
           />
 
           <StatCard
             label="Response rate"
-            value={`${stats.responseRate}%`}
+            value={`${applicationStats.response_rate}%`}
             delta="includes rejections"
             icon={Send}
             tone="cyan"
@@ -520,15 +493,15 @@ function Applications() {
 
           <StatCard
             label="Offers"
-            value={String(stats.offers)}
-            delta={stats.offers > 0 ? "🎉" : "Keep going"}
+            value={String(applicationStats.offers)}
+            delta={applicationStats.offers > 0 ? "🎉" : "Keep going"}
             icon={CheckCircle2}
             tone="green"
           />
 
           <StatCard
             label="Follow-ups due"
-            value={String(stats.followUpsDue)}
+            value={String(applicationStats.follow_ups_due)}
             delta="applied only"
             icon={Bell}
             tone="pink"
