@@ -1,3 +1,5 @@
+from datetime import timezone
+
 from sqlalchemy.orm import Session
 
 from backend.app.models.dashboard.dashboard_snapshot import DashboardSnapshot
@@ -18,6 +20,16 @@ from backend.app.schemas.dashboard.dashboard import (
 
 from backend.app.services.dashboard.dashboard_review_service import build_dashboard_review
 from backend.app.services.dashboard.dashboard_scoring_service import score_to_grade
+
+
+def _to_naive_utc(value):
+    if not value:
+        return None
+
+    if value.tzinfo is not None:
+        return value.astimezone(timezone.utc).replace(tzinfo=None)
+
+    return value
 
 
 async def get_latest_dashboard_summary(
@@ -51,10 +63,18 @@ async def get_latest_dashboard_summary(
         .first()
     )
 
+    latest_application_updated_at = _to_naive_utc(
+        latest_application.updated_at if latest_application else None
+    )
+
+    latest_snapshot_created_at = _to_naive_utc(
+        latest_snapshot.created_at
+    )
+
     if (
-        latest_application
-        and latest_application.updated_at
-        and latest_application.updated_at > latest_snapshot.created_at
+            latest_application_updated_at
+            and latest_snapshot_created_at
+            and latest_application_updated_at > latest_snapshot_created_at
     ):
         return await build_dashboard_review(
             db=db,
