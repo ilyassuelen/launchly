@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from backend.app.models.dashboard.dashboard_snapshot import DashboardSnapshot
+from backend.app.models.applications.application import Application
 
 from backend.app.schemas.dashboard.dashboard import (
     CareerGrowthPoint,
@@ -36,6 +37,25 @@ async def get_latest_dashboard_summary(
     )
 
     if not latest_snapshot:
+        return await build_dashboard_review(
+            db=db,
+            user_id=user_id,
+            language=language,
+            persist=True,
+        )
+
+    latest_application = (
+        db.query(Application)
+        .filter(Application.user_id == user_id)
+        .order_by(Application.updated_at.desc())
+        .first()
+    )
+
+    if (
+        latest_application
+        and latest_application.updated_at
+        and latest_application.updated_at > latest_snapshot.created_at
+    ):
         return await build_dashboard_review(
             db=db,
             user_id=user_id,

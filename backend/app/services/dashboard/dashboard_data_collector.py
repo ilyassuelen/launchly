@@ -241,7 +241,7 @@ def collect_dashboard_data(
 
     recent_applications = sorted(
         applications,
-        key=lambda item: item.applied_date or today,
+        key=lambda item: item.updated_at or item.created_at,
         reverse=True,
     )[:4]
 
