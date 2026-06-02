@@ -43,77 +43,77 @@ export function MarketFitPanel({
     <Card className="relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.10),transparent_35%)]" />
 
-      <div className="relative flex items-start justify-between">
-        <div>
+      <div className="relative flex items-start justify-between gap-4">
+        <div className="min-w-0">
           <div className="flex items-center gap-2 text-sm font-semibold">
             <Radar className="size-4 text-cyan-300" />
             {t("dashboard.marketFitAnalysisTitle")}
           </div>
 
-          <div className="mt-1 text-xs text-muted-foreground">
+          <div className="mt-1 text-xs leading-5 text-muted-foreground">
             {t("dashboard.marketFitAnalysisDescription")}
           </div>
         </div>
 
-        <div className="rounded-full border border-cyan-300/15 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100">
+        <div className="shrink-0 rounded-full border border-cyan-300/15 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100">
           {marketFit?.label || t("dashboard.pending")}
         </div>
       </div>
 
-      <div className="relative mt-6 flex items-center gap-6">
-        <div className="relative flex size-36 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.04]">
-          <div className="absolute inset-3 rounded-full border border-cyan-300/15" />
+      <div className="relative mt-5 rounded-2xl border border-white/5 bg-white/[0.03] p-3.5">
+        <div className="flex items-start justify-between gap-4 text-xs">
+          <span className="inline-flex shrink-0 items-center gap-2 pt-1 text-muted-foreground">
+            <Target className="size-3.5 shrink-0 text-cyan-200/80" />
+            <span className="leading-4">{t("dashboard.careerGoal")}</span>
+          </span>
 
-          <div className="text-center">
-            <div className="text-4xl font-semibold text-white">
-              {score}
-            </div>
+          <span className="min-w-0 max-w-[230px] text-right text-sm font-semibold leading-5 text-cyan-200">
+            {marketFit?.best_role_match || t("dashboard.notEnoughData")}
+          </span>
+        </div>
+      </div>
 
-            <div className="mt-1 text-[10px] uppercase tracking-[0.2em] text-cyan-200/70">
-              {t("dashboard.fitScore")}
+      <div className="relative mt-5 grid grid-cols-[140px_minmax(0,1fr)] gap-4">
+        <div className="pt-8">
+          <div className="relative flex size-36 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.04]">
+            <div className="absolute inset-3 rounded-full border border-cyan-300/15" />
+
+            <div className="text-center">
+              <div className="text-4xl font-semibold text-white">
+                {score}
+              </div>
+
+              <div className="mt-1 text-[10px] uppercase tracking-[0.2em] text-cyan-200/70">
+                {t("dashboard.fitScore")}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="flex-1 space-y-3">
-          <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-3">
-            <div className="flex items-center justify-between gap-3 text-xs">
-              <span className="inline-flex min-w-0 items-center gap-1 text-muted-foreground">
-                <Target className="size-3 shrink-0" />
-                <span className="leading-4">{t("dashboard.careerGoal")}</span>
-              </span>
+        <div className="grid min-w-0 grid-cols-2 gap-3">
+          <MetricCard
+            icon={Eye}
+            label={t("dashboard.recruiterConfidence")}
+            value={recruiterConfidence}
+          />
 
-              <span className="max-w-[120px] text-right font-semibold leading-4 text-cyan-200">
-                {marketFit?.best_role_match || t("dashboard.notEnoughData")}
-              </span>
-            </div>
-          </div>
+          <MetricCard
+            icon={Sparkles}
+            label={t("dashboard.positioning")}
+            value={positioning}
+          />
 
-          <div className="grid grid-cols-2 gap-2">
-            <MetricCard
-              icon={Eye}
-              label={t("dashboard.recruiterConfidence")}
-              value={recruiterConfidence}
-            />
+          <MetricCard
+            icon={Briefcase}
+            label={t("dashboard.portfolioMatch")}
+            value={portfolioMatch}
+          />
 
-            <MetricCard
-              icon={Sparkles}
-              label={t("dashboard.positioning")}
-              value={positioning}
-            />
-
-            <MetricCard
-              icon={Briefcase}
-              label={t("dashboard.portfolioMatch")}
-              value={portfolioMatch}
-            />
-
-            <MetricCard
-              icon={ArrowUpRight}
-              label={t("dashboard.skills")}
-              value={skills}
-            />
-          </div>
+          <MetricCard
+            icon={ArrowUpRight}
+            label={t("dashboard.skills")}
+            value={skills}
+          />
         </div>
       </div>
 
@@ -151,16 +151,16 @@ function MetricCard({
   value,
 }: MetricCardProps) {
   return (
-    <div className="flex min-h-[96px] min-w-0 flex-col items-center justify-center rounded-2xl border border-white/5 bg-white/[0.03] px-2.5 py-3 text-center">
-      <div className="flex max-w-full flex-col items-center gap-1 text-[11px] leading-4 text-muted-foreground">
-        <Icon className="size-3 shrink-0" />
+    <div className="flex min-h-[96px] min-w-0 flex-col justify-between rounded-2xl border border-white/5 bg-white/[0.03] px-3.5 py-3.5">
+      <div className="flex min-w-0 items-start gap-1.5 text-[11px] leading-4 text-muted-foreground">
+        <Icon className="mt-0.5 size-3 shrink-0 text-cyan-200/75" />
 
-        <span className="max-w-[92px] whitespace-normal break-words leading-4">
+        <span className="min-w-0 truncate">
           {label}
         </span>
       </div>
 
-      <div className="mt-3 text-[1.65rem] font-semibold leading-none tracking-tight text-white/85">
+      <div className="mt-3 text-[1.7rem] font-semibold leading-none tracking-tight text-white/85">
         {value}%
       </div>
     </div>
@@ -177,12 +177,12 @@ function InfoCard({
   value,
 }: InfoCardProps) {
   return (
-    <div className="flex min-h-[72px] flex-col items-center justify-center rounded-2xl border border-white/5 bg-white/[0.03] p-3 text-center">
-      <div className="text-[11px] leading-4 text-muted-foreground">
+    <div className="flex min-h-[72px] min-w-0 flex-col items-center justify-center rounded-2xl border border-white/5 bg-white/[0.03] px-3 py-3 text-center">
+      <div className="max-w-full text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
         {label}
       </div>
 
-      <div className="mt-1.5 text-sm font-semibold leading-none text-white/85">
+      <div className="mt-1.5 max-w-full truncate text-sm font-semibold leading-none text-white/85">
         {value}
       </div>
     </div>
