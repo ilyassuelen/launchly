@@ -6,6 +6,7 @@ import { ResumeEditModal } from "@/features/resume/components/ui/ResumeEditModal
 import { ResumeInput } from "@/features/resume/components/ui/ResumeInput";
 import { ResumeFieldGroup } from "@/features/resume/components/ui/ResumeFieldGroup";
 import { ResumeActionButton } from "@/features/resume/components/ui/ResumeActionButton";
+import { useI18n } from "@/i18n/I18nContext";
 
 type SoftSkillItem = {
   id: string | number;
@@ -34,6 +35,7 @@ export function SoftSkillEditModal({
   onSave,
   onChange,
 }: SoftSkillEditModalProps) {
+  const { t } = useI18n();
   if (!softSkill) {
     return null;
   }
@@ -41,8 +43,8 @@ export function SoftSkillEditModal({
   return (
     <ResumeEditModal
       open={open}
-      title="Edit Soft Skill"
-      subtitle="Manage your soft skill information."
+      title={t("resume.editSoftSkill")}
+      subtitle={t("resume.softSkillModalSubtitle")}
       onClose={onClose}
       footer={
         <div className="flex items-center justify-end gap-3">
@@ -50,7 +52,7 @@ export function SoftSkillEditModal({
             variant="ghost"
             onClick={onClose}
           >
-            Cancel
+            {t("common.cancel")}
           </ResumeActionButton>
 
           <ResumeActionButton
@@ -58,14 +60,14 @@ export function SoftSkillEditModal({
             variant="primary"
             onClick={onSave}
           >
-            Save Changes
+            {t("common.saveChanges")}
           </ResumeActionButton>
         </div>
       }
     >
       <div className="space-y-6">
 
-        <ResumeFieldGroup label="Soft Skill">
+        <ResumeFieldGroup label={t("resume.softSkill")}>
           <ResumeInput
             value={softSkill.name}
             onChange={(e) =>
@@ -74,7 +76,7 @@ export function SoftSkillEditModal({
                 e.target.value,
               )
             }
-            placeholder="e.g. Communication"
+            placeholder={t("resume.softSkillPlaceholder")}
           />
         </ResumeFieldGroup>
 

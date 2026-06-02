@@ -12,6 +12,8 @@ import {
   Progress,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 type CareerSystemHealthProps = {
   profileStrength: Record<string, number>;
   interviewReadiness: number;
@@ -34,6 +36,7 @@ export function CareerSystemHealth({
   profileStrength,
   interviewReadiness,
 }: CareerSystemHealthProps) {
+  const { t } = useI18n();
   const resumeScore = getScore(profileStrength, "Resume");
   const recruiterScore = getScore(profileStrength, "Recruiter View");
   const linkedInScore = getScore(profileStrength, "LinkedIn");
@@ -47,44 +50,44 @@ export function CareerSystemHealth({
       <div className="relative mb-4">
         <div className="flex items-center gap-2 text-sm font-semibold">
           <Activity className="size-4 text-violet-300" />
-          Career system health
+          {t("dashboard.careerSystemHealthTitle")}
         </div>
 
         <div className="mt-1 text-xs text-muted-foreground">
-          Your core career assets based on saved analyses.
+          {t("dashboard.careerSystemHealthDescription")}
         </div>
       </div>
 
       <div className="relative space-y-3">
         <Progress
-          label="Resume"
+          label={t("dashboard.resume")}
           value={resumeScore}
           color={resumeScore >= 75 ? "green" : undefined}
         />
 
         <Progress
-          label="Recruiter View"
+          label={t("dashboard.recruiterView")}
           value={recruiterScore}
         />
 
         <Progress
-          label="LinkedIn"
+          label={t("dashboard.linkedIn")}
           value={linkedInScore}
         />
 
         <Progress
-          label="Portfolio"
+          label={t("dashboard.portfolio")}
           value={portfolioScore}
           color={portfolioScore < 70 ? "pink" : undefined}
         />
 
         <Progress
-          label="Applications"
+          label={t("dashboard.applications")}
           value={applicationsScore}
         />
 
         <Progress
-          label="Interviewing"
+          label={t("dashboard.interviewing")}
           value={interviewReadiness}
         />
       </div>
@@ -92,32 +95,32 @@ export function CareerSystemHealth({
       <div className="relative mt-5 grid grid-cols-3 gap-2 text-center">
         {[
           {
-            label: "Resume",
+            label: t("dashboard.resume"),
             value: resumeScore,
             icon: FileText,
           },
           {
-            label: "Recruiter",
+            label: t("dashboard.recruiter"),
             value: recruiterScore,
             icon: Eye,
           },
           {
-            label: "LinkedIn",
+            label: t("dashboard.linkedIn"),
             value: linkedInScore,
             icon: Linkedin,
           },
           {
-            label: "Portfolio",
+            label: t("dashboard.portfolio"),
             value: portfolioScore,
             icon: Github,
           },
           {
-            label: "Apps",
+            label: t("dashboard.apps"),
             value: applicationsScore,
             icon: Briefcase,
           },
           {
-            label: "Practice",
+            label: t("dashboard.practice"),
             value: interviewReadiness,
             icon: Activity,
           },

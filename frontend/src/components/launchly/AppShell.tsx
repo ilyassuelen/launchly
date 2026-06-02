@@ -8,6 +8,7 @@ import logo from "../../../static/logo.png";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/context/AuthContext";
+import { useI18n } from "@/i18n/I18nContext";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger,
@@ -15,15 +16,15 @@ import {
 } from "@/components/ui/sidebar";
 
 const items = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Resume Builder", url: "/resumes", icon: FileText },
-  { title: "Cover Letters", url: "/cover-letters", icon: Mail },
-  { title: "Recruiter View", url: "/recruiter-view", icon: Sparkles },
-  { title: "Interview Simulator", url: "/interview", icon: Mic },
-  { title: "LinkedIn Analyzer", url: "/linkedin", icon: Linkedin },
-  { title: "Portfolio Analyzer", url: "/portfolio", icon: Github },
-  { title: "Career Path", url: "/career-path", icon: Map },
-  { title: "Applications", url: "/applications", icon: Briefcase },
+  { titleKey: "nav.dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { titleKey: "nav.resumeBuilder", url: "/resumes", icon: FileText },
+  { titleKey: "nav.coverLetters", url: "/cover-letters", icon: Mail },
+  { titleKey: "nav.recruiterView", url: "/recruiter-view", icon: Sparkles },
+  { titleKey: "nav.interviewSimulator", url: "/interview", icon: Mic },
+  { titleKey: "nav.linkedInAnalyzer", url: "/linkedin", icon: Linkedin },
+  { titleKey: "nav.portfolioAnalyzer", url: "/portfolio", icon: Github },
+  { titleKey: "nav.careerPath", url: "/career-path", icon: Map },
+  { titleKey: "nav.applications", url: "/applications", icon: Briefcase },
 ];
 
 function AppSidebar({
@@ -32,6 +33,7 @@ function AppSidebar({
   defaultCollapsed?: boolean;
 }) {
   const { state, setOpen } = useSidebar();
+  const { t } = useI18n();
   const collapsed = state === "collapsed";
 
   useEffect(() => {
@@ -55,16 +57,16 @@ function AppSidebar({
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          {!collapsed && <SidebarGroupLabel>Workspace</SidebarGroupLabel>}
+          {!collapsed && <SidebarGroupLabel>{t("nav.workspace")}</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map(item => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.titleKey}>
                   <SidebarMenuButton asChild isActive={isActive(item.url)}
                     className={`${isActive(item.url) ? "bg-gradient-brand-soft text-foreground ring-1 ring-white/10" : ""}`}>
                     <Link to={item.url} className="flex items-center gap-2">
                       <item.icon className="size-4" />
-                      {!collapsed && <span>{item.title}</span>}
+                      {!collapsed && <span>{t(item.titleKey)}</span>}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -77,7 +79,7 @@ function AppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild isActive={isActive("/settings")}>
-              <Link to="/settings"><Settings className="size-4" />{!collapsed && <span>Settings</span>}</Link>
+              <Link to="/settings"><Settings className="size-4" />{!collapsed && <span>{t("nav.settings")}</span>}</Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -103,6 +105,7 @@ export function AppShell({
   const menuRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
   const { logoutUser } = useAuth();
+  const { t } = useI18n();
 
   function handleLogout() {
     logoutUser();
@@ -163,7 +166,7 @@ export function AppShell({
                       className="flex w-full items-center gap-3 px-4 py-3 text-sm text-white/80 transition hover:bg-white/[0.05] hover:text-white"
                     >
                       <Settings className="size-4" />
-                      Settings
+                      {t("common.settings")}
                     </button>
 
                     <div className="h-px bg-white/5" />
@@ -173,7 +176,7 @@ export function AppShell({
                       className="flex w-full items-center gap-3 px-4 py-3 text-sm text-red-200 transition hover:bg-red-400/10"
                     >
                       <LogOut className="size-4" />
-                      Logout
+                      {t("common.logout")}
                     </button>
                   </div>
                 )}

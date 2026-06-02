@@ -9,6 +9,8 @@ import {
   Card,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import { ClassicCoverLetter } from "@/components/cover-letter/templates/ClassicCoverLetter";
 
 import type { CoverLetter } from "@/features/cover-letter/types/coverLetter";
@@ -49,6 +51,7 @@ export function CoverLetterPreviewPanel({
 
   printRef,
 }: Props) {
+  const { t } = useI18n();
   return (
     <Card className="relative overflow-hidden border-white/5 bg-[#050816] p-0">
 
@@ -72,11 +75,11 @@ export function CoverLetterPreviewPanel({
 
           <div>
             <div className="text-sm font-semibold text-white">
-              Live letter preview
+              {t("coverLetter.liveLetterPreview")}
             </div>
 
             <div className="mt-1 text-xs text-muted-foreground">
-              Real-time recruiter-ready formatting with document-style preview.
+              {t("coverLetter.liveLetterPreviewDescription")}
             </div>
           </div>
 
@@ -145,11 +148,11 @@ export function CoverLetterPreviewPanel({
               >
                 {saveStatus ===
                 "saving"
-                  ? "Saving..."
+                  ? t("common.saving")
                   : saveStatus ===
                       "saved"
-                    ? "Saved"
-                    : "Save"}
+                    ? t("resume.saved")
+                    : t("common.save")}
               </button>
 
             </div>

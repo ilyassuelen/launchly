@@ -1,3 +1,5 @@
+import { useI18n } from "@/i18n/I18nContext";
+
 type SkillEditorModalProps = {
   editingSkillId: string | null;
 
@@ -45,6 +47,8 @@ export function SkillEditorModal({
 
   setEditingSkillId,
 }: SkillEditorModalProps) {
+  const { t } = useI18n();
+
   if (!editingSkillId) {
     return null;
   }
@@ -60,15 +64,11 @@ export function SkillEditorModal({
 
             <div>
               <div className="text-2xl font-bold text-white">
-                Edit technical skill
+                {t("resume.editTechnicalSkill")}
               </div>
 
               <div className="mt-2 text-sm leading-7 text-white/50">
-                Create professional
-                skill groups and
-                organize
-                recruiter-relevant
-                keywords.
+                {t("resume.editTechnicalSkillDescription")}
               </div>
             </div>
 
@@ -91,7 +91,7 @@ export function SkillEditorModal({
 
             <div>
               <div className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-white/60">
-                Skill category
+                {t("resume.skillCategory")}
               </div>
 
               <input
@@ -103,7 +103,7 @@ export function SkillEditorModal({
                     e.target.value,
                   )
                 }
-                placeholder="e.g. Backend & APIs"
+                placeholder={t("resume.skillCategoryPlaceholder")}
                 className="w-full rounded-2xl border border-white/10 bg-black/30 px-5 py-3.5 text-base text-white outline-none transition focus:border-violet-400/40"
               />
             </div>
@@ -111,7 +111,7 @@ export function SkillEditorModal({
             <div className="mt-7">
 
               <div className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-white/60">
-                Keywords
+                {t("resume.keywords")}
               </div>
 
               <input
@@ -133,14 +133,12 @@ export function SkillEditorModal({
                     addSkillKeyword();
                   }
                 }}
-                placeholder="Type a keyword and press Enter"
+                placeholder={t("resume.keywordInputPlaceholder")}
                 className="w-full rounded-2xl border border-white/10 bg-black/30 px-5 py-3.5 text-sm text-white outline-none transition focus:border-violet-400/40"
               />
 
               <div className="mt-3 text-sm text-white/40">
-                Add technologies,
-                frameworks and tools
-                individually.
+                {t("resume.keywordHelperText")}
               </div>
 
               <div className="mt-5 flex flex-wrap gap-3">
@@ -183,7 +181,7 @@ export function SkillEditorModal({
             }
             className="rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-3 text-sm text-white/70 transition hover:bg-white/[0.06]"
           >
-            Cancel
+            {t("common.cancel")}
           </button>
 
           <button
@@ -192,7 +190,7 @@ export function SkillEditorModal({
             }
             className="rounded-2xl bg-gradient-brand px-7 py-3 text-sm font-semibold text-primary-foreground shadow-[0_10px_30px_rgba(168,85,247,0.35)] transition hover:scale-[1.02]"
           >
-            Save changes
+            {t("common.saveChanges")}
           </button>
         </div>
       </div>

@@ -13,6 +13,7 @@ import { ResumePreview } from "@/components/resume/ResumePreview";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell, Card, Progress } from "@/components/launchly/AppShell";
 import { useAuth } from "@/context/AuthContext";
+import { useI18n } from "@/i18n/I18nContext";
 import {
   Eye,
   AlertTriangle,
@@ -36,6 +37,7 @@ export const Route = createFileRoute("/recruiter-view")({
 function RecruiterView() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { language, t } = useI18n();
 
 
   const {
@@ -72,26 +74,26 @@ function RecruiterView() {
       useState(0);
 
   const scanSteps = [
-    "Scanning headline clarity...",
-    "Checking recruiter first impression...",
-    "Detecting measurable impact...",
-    "Mapping attention hotspots...",
-    "Evaluating technical proof...",
-    "Ranking strongest evidence...",
+    t("recruiterView.scanningHeadlineClarity"),
+    t("recruiterView.checkingRecruiterFirstImpression"),
+    t("recruiterView.detectingMeasurableImpact"),
+    t("recruiterView.mappingAttentionHotspots"),
+    t("recruiterView.evaluatingTechnicalProof"),
+    t("recruiterView.rankingStrongestEvidence"),
   ];
 
   const liveReasoning = [
-    "Recruiters usually scan the headline first.",
-    "Metrics and outcomes increase trust quickly.",
-    "Project evidence is more valuable than generic claims.",
-    "Weak visual hierarchy can hide strong experience.",
+    t("recruiterView.reasoningHeadlineFirst"),
+    t("recruiterView.reasoningMetricsTrust"),
+    t("recruiterView.reasoningProjectEvidence"),
+    t("recruiterView.reasoningVisualHierarchy"),
   ];
 
   const fallbackGazePoints = [
-      { x: 23, y: 13, label: "Headline", second: 0.5, section: "headline" },
-      { x: 63, y: 25, label: "Skills", second: 2, section: "skills" },
-      { x: 38, y: 42, label: "Experience", second: 4, section: "experience" },
-      { x: 71, y: 58, label: "Projects", second: 6, section: "projects" },
+      { x: 23, y: 13, label: t("recruiterView.headline"), second: 0.5, section: "headline" },
+      { x: 63, y: 25, label: t("resume.skills"), second: 2, section: "skills" },
+      { x: 38, y: 42, label: t("resume.experience"), second: 4, section: "experience" },
+      { x: 71, y: 58, label: t("resume.projects"), second: 6, section: "projects" },
   ];
 
   const scanPath =
@@ -121,10 +123,10 @@ function RecruiterView() {
       analysis?.drop_off_points || [];
 
   const detectedKeywords = [
-    "Metrics",
-    "Impact",
-    "Projects",
-    "Experience",
+    t("recruiterView.metrics"),
+    t("recruiterView.impact"),
+    t("resume.projects"),
+    t("resume.experience"),
   ];
 
   const {
@@ -231,7 +233,7 @@ ${(p.bullets || []).join(" ")}
           await analyze({
             resume_id: selectedResumeId || resume.id,
 
-            language: "english",
+            language,
 
             resume_content:
               buildResumeContext(),
@@ -326,7 +328,7 @@ ${(p.bullets || []).join(" ")}
     return (
       <div className="flex min-h-screen items-center justify-center bg-[oklch(0.145_0.02_270)] text-white">
         <div className="text-sm text-white/60">
-          Loading recruiter view...
+          {t("recruiterView.loading")}
         </div>
       </div>
     );
@@ -337,8 +339,8 @@ ${(p.bullets || []).join(" ")}
   }
   return (
     <AppShell
-      title="Recruiter View"
-      subtitle="A 7-second simulated recruiter scan of your profile — with the receipts."
+      title={t("recruiterView.title")}
+      subtitle={t("recruiterView.subtitle")}
       action={
         <div className="relative z-50 flex items-center pointer-events-auto">
           <button
@@ -362,10 +364,10 @@ ${(p.bullets || []).join(" ")}
             )}
 
             {isAnalyzing
-              ? "Analyzing..."
+              ? t("recruiterView.analyzing")
               : analysis
-                ? "Re-run scan"
-                : "Start scan"}
+                ? t("recruiterView.rerunScan")
+                : t("recruiterView.startScan")}
           </button>
         </div>
       }
@@ -386,11 +388,11 @@ ${(p.bullets || []).join(" ")}
               <div>
                 <div className="flex items-center gap-2 text-sm font-semibold text-white">
                   <Radar className="size-4 text-cyan-300" />
-                  Attention heatmap
+                  {t("recruiterView.attentionHeatmap")}
                 </div>
 
                 <div className="mt-1 text-xs text-muted-foreground">
-                  First 8 seconds · simulated recruiter scan of your selected resume
+                  {t("recruiterView.attentionHeatmapDescription")}
                 </div>
               </div>
 
@@ -422,7 +424,7 @@ ${(p.bullets || []).join(" ")}
                         value={item.id}
                         className="bg-[#0b0f1a] text-white"
                       >
-                        {item.title || "Untitled Resume"}
+                        {item.title || t("recruiterView.untitledResume")}
                       </option>
                     ))}
                   </select>
@@ -449,8 +451,8 @@ ${(p.bullets || []).join(" ")}
                 <div className="flex items-center gap-2 rounded-2xl border border-cyan-400/10 bg-cyan-400/[0.05] px-4 py-2 text-xs text-cyan-100 shadow-[0_0_30px_rgba(34,211,238,0.08)]">
                   <Activity className="size-10" />
                   {isAnalyzing
-                    ? "Scanning recruiter attention"
-                    : "Recruiter simulation ready"}
+                    ? t("recruiterView.scanningRecruiterAttention")
+                    : t("recruiterView.simulationReady")}
                 </div>
               </div>
             </div>
@@ -488,7 +490,7 @@ ${(p.bullets || []).join(" ")}
                     <ResumePreview resume={resume} />
                   ) : (
                     <div className="flex h-[1123px] items-center justify-center bg-white text-sm text-black/50">
-                      Select a resume to preview the recruiter scan.
+                      {t("recruiterView.selectResumePreview")}
                     </div>
                   )}
 
@@ -543,7 +545,7 @@ ${(p.bullets || []).join(" ")}
                 </div>
 
                 <div className={`pointer-events-none absolute right-6 top-6 rounded-2xl bg-[oklch(0.72_0.20_295_/_0.08)] px-4 py-2 text-xs font-medium text-[oklch(0.55_0.18_200)] backdrop-blur-xl ${isAnalyzing ? "animate-pulse" : ""}`}>
-                  Attention score: {animatedScore}/100
+                  {t("recruiterView.attentionScore", { score: animatedScore })}
                 </div>
 
                 <div className="pointer-events-none absolute inset-x-4 bottom-4 flex flex-nowrap items-center justify-center gap-2">
@@ -560,7 +562,7 @@ ${(p.bullets || []).join(" ")}
                       </div>
 
                       <span className="whitespace-nowrap leading-none">
-                        Detected {keyword}
+                        {t("recruiterView.detectedKeyword", { keyword })}
                       </span>
                     </div>
                   ))}
@@ -572,25 +574,22 @@ ${(p.bullets || []).join(" ")}
             <div className="mt-4 flex flex-wrap items-center justify-center gap-3 rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3">
               <div className="flex items-center gap-2">
                 <div className="size-3 rounded-full bg-[oklch(0.7_0.22_25)] shadow-[0_0_18px_rgba(255,80,80,0.6)]" />
-
                 <span className="text-xs text-white/70">
-                  High recruiter attention
+                  {t("recruiterView.highRecruiterAttention")}
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
                 <div className="size-3 rounded-full bg-[oklch(0.78_0.16_65)] shadow-[0_0_18px_rgba(255,180,80,0.5)]" />
-
                 <span className="text-xs text-white/70">
-                  Medium attention
+                  {t("recruiterView.mediumAttention")}
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
                 <div className="size-3 rounded-full bg-[oklch(0.78_0.17_155)] shadow-[0_0_18px_rgba(120,255,180,0.45)]" />
-
                 <span className="text-xs text-white/70">
-                  Lower attention
+                  {t("recruiterView.lowerAttention")}
                 </span>
               </div>
             </div>
@@ -598,17 +597,17 @@ ${(p.bullets || []).join(" ")}
             <div className="mt-5 grid gap-3 xl:grid-cols-3">
               {[
                 {
-                  t: "Strengths",
+                  t: t("recruiterView.strengths"),
                   c: "green",
                   items: analysis?.strengths || [],
                 },
                 {
-                  t: "Weak spots",
+                  t: t("recruiterView.weakSpots"),
                   c: "warning",
                   items: analysis?.weak_spots || [],
                 },
                 {
-                  t: "Missing impact",
+                  t: t("recruiterView.missingImpact"),
                   c: "pink",
                   items: analysis?.missing_impact || [],
                 },
@@ -624,7 +623,7 @@ ${(p.bullets || []).join(" ")}
                   <ul className="space-y-2 text-sm">
                     {b.items.length === 0 && (
                       <li className="text-sm text-white/45">
-                        Run a recruiter scan to generate insights.
+                        {t("recruiterView.runScanGenerateInsights")}
                       </li>
                     )}
 
@@ -656,7 +655,7 @@ ${(p.bullets || []).join(" ")}
 
 
           <Card>
-            <div className="text-xs text-muted-foreground">Recruiter Score</div>
+            <div className="text-xs text-muted-foreground">{t("recruiterView.recruiterScore")}</div>
             <div className="mt-1 flex items-baseline gap-2">
               <div className={`text-4xl font-semibold tracking-tight text-gradient ${isAnalyzing ? "animate-pulse" : ""}`}>
                 {animatedScore}
@@ -669,12 +668,12 @@ ${(p.bullets || []).join(" ")}
           <Card>
             <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
               <ScanSearch className="size-4 text-cyan-300" />
-              Live AI reasoning
+              {t("recruiterView.liveAiReasoning")}
             </div>
 
             <div className="rounded-2xl border border-cyan-400/10 bg-cyan-400/[0.04] p-4">
               <div className="mb-2 text-[11px] uppercase tracking-[0.22em] text-cyan-200/70">
-                {isAnalyzing ? "Scanning now" : "Latest scan logic"}
+                {isAnalyzing ? t("recruiterView.scanningNow") : t("recruiterView.latestScanLogic")}
               </div>
 
               <div className="min-h-[44px] text-sm leading-relaxed text-white/80">
@@ -707,7 +706,7 @@ ${(p.bullets || []).join(" ")}
           <Card>
               <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
                 <Activity className="size-4 text-cyan-300" />
-                8-second recruiter timeline
+                {t("recruiterView.timelineTitle")}
               </div>
 
               <div className="space-y-3">
@@ -716,8 +715,8 @@ ${(p.bullets || []).join(" ")}
                   : [
                       {
                         second: 0,
-                        title: "Initial scan",
-                        description: "Run a recruiter scan to simulate the first impression.",
+                        title: t("recruiterView.initialScan"),
+                        description: t("recruiterView.initialScanDescription"),
                         sentiment: "neutral",
                       },
                     ]
@@ -744,12 +743,12 @@ ${(p.bullets || []).join(" ")}
           <Card>
             <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
               <Target className="size-4 text-cyan-300" />
-              Signals
+              {t("recruiterView.signals")}
             </div>
             <div className="space-y-3">
 
               <Progress
-                label="Readability"
+                label={t("resume.readability")}
                 value={
                   analysis?.signals
                     ?.readability || 0
@@ -758,7 +757,7 @@ ${(p.bullets || []).join(" ")}
               />
 
               <Progress
-                label="Impact density"
+                label={t("recruiterView.impactDensity")}
                 value={
                   analysis?.signals
                     ?.impact_density || 0
@@ -766,7 +765,7 @@ ${(p.bullets || []).join(" ")}
               />
 
               <Progress
-                label="Technical depth"
+                label={t("recruiterView.technicalDepth")}
                 value={
                   analysis?.signals
                     ?.technical_depth || 0
@@ -774,7 +773,7 @@ ${(p.bullets || []).join(" ")}
               />
 
               <Progress
-                label="Visual hierarchy"
+                label={t("recruiterView.visualHierarchy")}
                 value={
                   analysis?.signals
                     ?.visual_hierarchy || 0
@@ -787,13 +786,13 @@ ${(p.bullets || []).join(" ")}
           <Card>
               <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
                 <AlertTriangle className="size-4 text-orange-300" />
-                Attention drop-off
+                {t("recruiterView.attentionDropOff")}
               </div>
 
               <div className="space-y-3">
                 {dropOffPoints.length === 0 ? (
                   <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-xs text-white/60">
-                    No major attention drop-off detected yet.
+                    {t("recruiterView.noAttentionDropOff")}
                   </div>
                 ) : (
                   dropOffPoints.map((point, index) => (
@@ -819,12 +818,12 @@ ${(p.bullets || []).join(" ")}
       <Card className="mt-4">
           <div className="mb-4 flex items-center gap-2 text-sm font-semibold">
             <Sparkles className="size-4 text-[oklch(0.85_0.14_250)]" />
-            Recruiter recommendations
+            {t("recruiterView.recommendations")}
           </div>
 
           {!analysis && (
             <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-xs text-white/60">
-              Run a recruiter scan to receive AI feedback.
+              {t("recruiterView.runScanReceiveFeedback")}
             </div>
           )}
 

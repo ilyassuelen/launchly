@@ -8,6 +8,8 @@ import {
   Card,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import type {
   DashboardApplicationItem,
 } from "@/features/dashboard/types/dashboard";
@@ -38,9 +40,13 @@ function getStatusColor(status?: string | null) {
   return "bg-white/[0.04] text-white/70 border-white/10";
 }
 
-function formatDate(value?: string | null) {
+function formatDate(
+  value: string | null | undefined,
+  language: "english" | "german",
+  t: (key: string) => string,
+) {
   if (!value) {
-    return "Unknown";
+    return t("dashboard.unknown");
   }
 
   const date = new Date(value);
@@ -49,15 +55,20 @@ function formatDate(value?: string | null) {
     return value;
   }
 
-  return new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-  }).format(date);
+  return new Intl.DateTimeFormat(
+    language === "german" ? "de" : "en",
+    {
+      month: "short",
+      day: "numeric",
+    },
+  ).format(date);
 }
 
 export function ApplicationMomentum({
   applications,
 }: ApplicationMomentumProps) {
+  const { language, t } = useI18n();
+
   const activeApplications =
     applications.filter(
       (application) =>
@@ -74,23 +85,25 @@ export function ApplicationMomentum({
         <div>
           <div className="flex items-center gap-2 text-sm font-semibold">
             <Briefcase className="size-4 text-cyan-300" />
-            Application momentum
+            {t("dashboard.applicationMomentumTitle")}
           </div>
 
           <div className="mt-1 text-xs text-muted-foreground">
-            Your latest application pipeline activity.
+            {t("dashboard.applicationMomentumDescription")}
           </div>
         </div>
 
         <div className="rounded-full border border-cyan-300/10 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100">
-          {activeApplications} active
+          {t("dashboard.active", {
+            count: activeApplications,
+          })}
         </div>
       </div>
 
       <div className="relative mt-5 space-y-3">
         {applications.length === 0 && (
           <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-5 text-sm text-white/50">
-            No applications tracked yet. Start applying to build momentum.
+            {t("dashboard.applicationsEmpty")}
           </div>
         )}
 
@@ -113,19 +126,24 @@ export function ApplicationMomentum({
               <div
                 className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${getStatusColor(application.status)}`}
               >
-                {application.status || "Unknown"}
+                {application.status ||
+                  t("dashboard.unknown")}
               </div>
             </div>
 
             <div className="mt-4 flex items-center justify-between text-xs">
               <div className="inline-flex items-center gap-1 text-muted-foreground">
                 <Clock3 className="size-3.5" />
-                {formatDate(application.date_label)}
+                {formatDate(
+                  application.date_label,
+                  language,
+                  t,
+                )}
               </div>
 
               <div className="inline-flex items-center gap-1 text-cyan-200">
                 <Target className="size-3.5" />
-                Pipeline signal
+                {t("dashboard.pipelineSignal")}
               </div>
             </div>
           </div>

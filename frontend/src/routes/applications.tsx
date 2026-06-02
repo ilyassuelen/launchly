@@ -16,6 +16,8 @@ import {
 
 import { useAuth } from "@/context/AuthContext";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import {
   Bell,
   Briefcase,
@@ -64,40 +66,40 @@ export const Route = createFileRoute("/applications")({
 });
 
 const columns: Array<{
-  title: string;
+  titleKey: string;
   status: ApplicationStatus;
   icon: typeof Send;
-  helper: string;
+  helperKey: string;
 }> = [
   {
-    title: "Applied",
+    titleKey: "applications.applied",
     status: "applied",
     icon: Send,
-    helper: "Recently sent applications",
+    helperKey: "applications.appliedHelper",
   },
   {
-    title: "Phone screen",
+    titleKey: "applications.phoneScreen",
     status: "phone_screen",
     icon: Clock,
-    helper: "First recruiter or team calls",
+    helperKey: "applications.phoneScreenHelper",
   },
   {
-    title: "Onsite",
+    titleKey: "applications.onsite",
     status: "onsite",
     icon: Briefcase,
-    helper: "Technical interviews or final rounds",
+    helperKey: "applications.onsiteHelper",
   },
   {
-    title: "Offer",
+    titleKey: "applications.offer",
     status: "offer",
     icon: CheckCircle2,
-    helper: "Offers and decisions",
+    helperKey: "applications.offerHelper",
   },
   {
-    title: "Rejected",
+    titleKey: "applications.rejected",
     status: "rejected",
     icon: XCircle,
-    helper: "Closed opportunities",
+    helperKey: "applications.rejectedHelper",
   },
 ];
 
@@ -129,7 +131,10 @@ function getTodayDateString() {
   return new Date().toISOString().slice(0, 10);
 }
 
-function getFollowUpState(application: ApplicationItem) {
+function getFollowUpState(
+  application: ApplicationItem,
+  t: (key: string) => string,
+) {
   if (application.status !== "applied") return null;
 
   const baseDate = application.follow_up_date || application.applied_date;
@@ -149,8 +154,8 @@ function getFollowUpState(application: ApplicationItem) {
     (dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
   );
 
-  if (diff < 0) return { label: "Follow-up overdue", tone: "overdue" as const };
-  if (diff <= 1) return { label: "Follow-up due soon", tone: "soon" as const };
+  if (diff < 0) return { label: t("applications.followUpOverdue"), tone: "overdue" as const };
+  if (diff <= 1) return { label: t("applications.followUpDueSoon"), tone: "soon" as const };
 
   return null;
 }
@@ -177,9 +182,13 @@ function getStatusDate(
   return application.applied_date;
 }
 
-function formatDate(value?: string | null) {
+function formatDate(
+  value: string | null | undefined,
+  language: "english" | "german",
+  t: (key: string) => string,
+) {
   if (!value) {
-    return "No date set";
+    return t("applications.noDateSet");
   }
 
   const date = new Date(value);
@@ -188,11 +197,14 @@ function formatDate(value?: string | null) {
     return value;
   }
 
-  return new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date);
+  return new Intl.DateTimeFormat(
+    language === "german" ? "de" : "en",
+    {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    },
+  ).format(date);
 }
 
 function getSortableDateValue(value?: string | null) {
@@ -249,43 +261,51 @@ function sortApplicationsForStatus(
   });
 }
 
-function getEmptyColumnMessage(status: ApplicationStatus) {
+function getEmptyColumnMessage(
+  status: ApplicationStatus,
+  t: (key: string) => string,
+) {
   if (status === "phone_screen") {
     return {
-      title: "No interviews yet.",
-      description: "Responses will appear here once your pipeline warms up.",
+      title: t("applications.noInterviewsYet"),
+      description: t("applications.noInterviewsDescription"),
     };
   }
 
   if (status === "onsite") {
     return {
-      title: "No onsite rounds yet.",
-      description: "Strong matches will move here as conversations progress.",
+      title: t("applications.noOnsiteRoundsYet"),
+      description: t("applications.noOnsiteDescription"),
     };
   }
 
   if (status === "offer") {
     return {
-      title: "No offers yet.",
-      description: "Your pipeline is still building momentum.",
+      title: t("applications.noOffersYet"),
+      description: t("applications.noOffersDescription"),
     };
   }
 
   if (status === "rejected") {
     return {
-      title: "No rejections yet.",
-      description: "Closed applications will appear here when needed.",
+      title: t("applications.noRejectionsYet"),
+      description: t("applications.noRejectionsDescription"),
     };
   }
 
   return {
-    title: "No applications yet.",
-    description: "Add your first application to start tracking your search.",
+    title: t("applications.noApplicationsYet"),
+    description: t("applications.noApplicationsDescription"),
   };
 }
 
-function getStatusLabel(status: ApplicationStatus) {
-  return columns.find((column) => column.status === status)?.title || status;
+function getStatusLabel(
+  status: ApplicationStatus,
+  t: (key: string) => string,
+) {
+  const column = columns.find((item) => item.status === status);
+
+  return column ? t(column.titleKey) : status;
 }
 
 function getPipelineProgress(status: ApplicationStatus) {
@@ -331,6 +351,7 @@ function buildStatusUpdatePayload(
 function Applications() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { language, t } = useI18n();
 
   const {
     applications,
@@ -400,9 +421,9 @@ function Applications() {
 
   const focusApplications = useMemo(() => {
     return applications
-      .filter((application) => getFollowUpState(application))
+      .filter((application) => getFollowUpState(application, t))
       .slice(0, 3);
-  }, [applications]);
+  }, [applications, t]);
 
   const recentApplications = useMemo(() => {
     return [...applications]
@@ -507,7 +528,7 @@ function Applications() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[oklch(0.145_0.02_270)] text-white">
         <div className="text-sm text-white/60">
-          Loading applications...
+          {t("applications.loading")}
         </div>
       </div>
     );
@@ -519,15 +540,15 @@ function Applications() {
 
   return (
     <AppShell
-      title="Applications"
-      subtitle="Track every application, stage, response and follow-up in one calm pipeline."
+      title={t("applications.title")}
+      subtitle={t("applications.subtitle")}
       action={
         <button
           onClick={handleOpenCreateModal}
           className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-sm font-semibold text-primary-foreground glow transition hover:scale-[1.02]"
         >
           <Plus className="size-4" />
-          Add application
+          {t("applications.addApplication")}
         </button>
       }
     >
@@ -540,63 +561,63 @@ function Applications() {
             <div className="min-w-0">
               <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/10 bg-cyan-400/[0.06] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-100/70">
                 <KanbanSquare className="size-3.5 text-cyan-300" />
-                Application Pipeline
+                {t("applications.applicationPipeline")}
               </div>
 
               <h1 className="mt-5 max-w-4xl text-3xl font-semibold tracking-tight text-white lg:text-4xl">
-                Manage every application from first send to final decision.
+                {t("applications.heroTitle")}
               </h1>
 
               <p className="mt-4 max-w-3xl text-sm leading-7 text-white/58 lg:text-[15px]">
-                Keep your job search organized with a focused board for applications, recruiter responses, interviews, offers and follow-ups.
+                {t("applications.heroDescription")}
               </p>
 
               <div className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 <div className="rounded-2xl border border-white/7 bg-black/20 px-4 py-3">
                   <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/35">
-                    Active
+                    {t("applications.active")}
                   </div>
                   <div className="mt-1 text-2xl font-semibold text-white">
                     {applicationStats.active}
                   </div>
                   <div className="mt-1 text-xs text-emerald-100/55">
-                    {totalApplications} total
+                    {t("applications.totalCount", { count: totalApplications })}
                   </div>
                 </div>
 
                 <div className="rounded-2xl border border-cyan-300/10 bg-cyan-400/[0.045] px-4 py-3">
                   <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-100/45">
-                    Interviews
+                    {t("applications.interviews")}
                   </div>
                   <div className="mt-1 text-2xl font-semibold text-cyan-50">
                     {interviewCount}
                   </div>
                   <div className="mt-1 text-xs text-cyan-100/50">
-                    phone + onsite
+                    {t("applications.phonePlusOnsite")}
                   </div>
                 </div>
 
                 <div className="rounded-2xl border border-emerald-300/10 bg-emerald-400/[0.045] px-4 py-3">
                   <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-100/45">
-                    Offers
+                    {t("applications.offers")}
                   </div>
                   <div className="mt-1 text-2xl font-semibold text-emerald-50">
                     {applicationStats.offers}
                   </div>
                   <div className="mt-1 text-xs text-emerald-100/50">
-                    keep going
+                    {t("applications.keepGoing")}
                   </div>
                 </div>
 
                 <div className="rounded-2xl border border-orange-300/10 bg-orange-400/[0.045] px-4 py-3">
                   <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-orange-100/45">
-                    Follow-ups
+                    {t("applications.followUps")}
                   </div>
                   <div className="mt-1 text-2xl font-semibold text-orange-50">
                     {applicationStats.follow_ups_due}
                   </div>
                   <div className="mt-1 text-xs text-orange-100/50">
-                    need attention
+                    {t("applications.needAttention")}
                   </div>
                 </div>
               </div>
@@ -620,15 +641,15 @@ function Applications() {
               <div>
                 <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/10 bg-cyan-400/[0.06] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-100/70">
                   <KanbanSquare className="size-3.5 text-cyan-300" />
-                  Pipeline Board
+                  {t("applications.pipelineBoard")}
                 </div>
 
                 <h2 className="mt-4 text-2xl font-semibold tracking-tight text-white lg:text-3xl">
-                  Move opportunities through your hiring pipeline
+                  {t("applications.boardTitle")}
                 </h2>
 
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-white/52">
-                  Drag cards between stages on desktop. On smaller screens, use the status menu inside each card.
+                  {t("applications.boardDescription")}
                 </p>
               </div>
 
@@ -639,8 +660,12 @@ function Applications() {
                   className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-medium text-white/70 transition hover:bg-white/[0.08]"
                 >
                   {showRejected
-                    ? `Hide rejected (${groupedApplications.rejected.length})`
-                    : `Show rejected (${groupedApplications.rejected.length})`}
+                    ? t("applications.hideRejected", {
+                        count: groupedApplications.rejected.length,
+                      })
+                    : t("applications.showRejected", {
+                        count: groupedApplications.rejected.length,
+                      })}
                 </button>
 
                 <button
@@ -648,7 +673,7 @@ function Applications() {
                   className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-violet-500 via-fuchsia-500 to-cyan-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-950/30 transition hover:scale-[1.01]"
                 >
                   <Plus className="size-4" />
-                  Add application
+                  {t("applications.addApplication")}
                 </button>
               </div>
             </div>
@@ -656,7 +681,7 @@ function Applications() {
             {isLoadingApplications ? (
               <div className="flex min-h-[260px] items-center gap-3 rounded-[2rem] border border-white/7 bg-black/20 p-6 text-sm text-white/60">
                 <Loader2 className="size-4 animate-spin text-cyan-300" />
-                Loading your application board...
+                {t("applications.loadingBoard")}
               </div>
             ) : (
               <div
@@ -688,14 +713,14 @@ function Applications() {
                     >
                       <div className="mb-4 flex items-start justify-between gap-3">
                         <div>
-                          <div className="flex items-center gap-2 text-base font-semibold text-white">
-                            <Icon className="size-4 text-cyan-300" />
-                            {column.title}
-                          </div>
+                        <div className="flex items-center gap-2 text-base font-semibold text-white">
+                          <Icon className="size-4 text-cyan-300" />
+                          {t(column.titleKey)}
+                        </div>
 
-                          <div className="mt-1 text-xs leading-5 text-white/45">
-                            {column.helper}
-                          </div>
+                        <div className="mt-1 text-xs leading-5 text-white/45">
+                          {t(column.helperKey)}
+                        </div>
                         </div>
 
                         <span className="rounded-full bg-white/5 px-2.5 py-1 text-xs text-white/45">
@@ -707,11 +732,11 @@ function Applications() {
                         {items.length === 0 ? (
                           <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.025] p-4 text-xs leading-6 text-white/40">
                             <div className="font-semibold text-white/60">
-                              {getEmptyColumnMessage(column.status).title}
+                              {getEmptyColumnMessage(column.status, t).title}
                             </div>
 
                             <div className="mt-1">
-                              {getEmptyColumnMessage(column.status).description}
+                              {getEmptyColumnMessage(column.status, t).description}
                             </div>
                           </div>
                         ) : (
@@ -730,6 +755,8 @@ function Applications() {
                               onMove={(status) =>
                                 handleMoveApplication(application, status)
                               }
+                              language={language}
+                              t={t}
                             />
                           ))
                         )}
@@ -751,15 +778,15 @@ function Applications() {
                 <div>
                   <div className="flex items-center gap-2 text-sm font-semibold text-white">
                     <Bell className="size-4 text-orange-300" />
-                    Follow-up center
+                    {t("applications.followUpCenter")}
                   </div>
                   <div className="mt-1 text-xs leading-5 text-white/45">
-                    Applications that need your attention.
+                    {t("applications.followUpCenterDescription")}
                   </div>
                 </div>
 
                 <div className="rounded-full border border-orange-300/10 bg-orange-400/[0.08] px-2.5 py-1 text-[11px] text-orange-100/75">
-                  {applicationStats.follow_ups_due} due
+                  {t("applications.dueCount", { count: applicationStats.follow_ups_due })}
                 </div>
               </div>
 
@@ -779,13 +806,13 @@ function Applications() {
                         {application.job_title}
                       </div>
                       <div className="mt-2 inline-flex rounded-full border border-orange-300/15 bg-orange-400/[0.08] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-orange-100/75">
-                        {getFollowUpState(application)?.label}
+                        {getFollowUpState(application, t)?.label}
                       </div>
                     </button>
                   ))
                 ) : (
                   <div className="rounded-2xl border border-white/7 bg-black/20 p-4 text-sm leading-6 text-white/45 md:col-span-3">
-                    No urgent follow-ups right now. Keep your pipeline moving.
+                    {t("applications.noUrgentFollowUps")}
                   </div>
                 )}
               </div>
@@ -798,7 +825,7 @@ function Applications() {
             <div className="relative">
               <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-white">
                 <Sparkles className="size-4 text-cyan-300" />
-                Recent pipeline activity
+                {t("applications.recentPipelineActivity")}
               </div>
 
               <div className="grid gap-3 md:grid-cols-2">
@@ -819,19 +846,19 @@ function Applications() {
                         </div>
 
                         <div className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${statusChipClassNames[application.status]}`}>
-                          {getStatusLabel(application.status)}
+                          {getStatusLabel(application.status, t)}
                         </div>
                       </div>
 
                       <div className="mt-3 flex items-center gap-1.5 text-[11px] text-white/42">
                         <CalendarDays className="size-3.5" />
-                        {formatDate(getStatusDate(application))}
+                        {formatDate(getStatusDate(application), language, t)}
                       </div>
                     </div>
                   ))
                 ) : (
                   <div className="rounded-2xl border border-white/7 bg-black/20 p-4 text-sm text-white/45 md:col-span-2">
-                    Recent application activity will appear here.
+                    {t("applications.recentActivityEmpty")}
                   </div>
                 )}
               </div>
@@ -875,6 +902,8 @@ type ApplicationBoardCardProps = {
   onEdit: () => void;
   onDelete: () => void;
   onMove: (status: ApplicationStatus) => void;
+  language: "english" | "german";
+  t: (key: string, params?: Record<string, string | number>) => string;
 };
 
 function ApplicationBoardCard({
@@ -884,8 +913,10 @@ function ApplicationBoardCard({
   onEdit,
   onDelete,
   onMove,
+  language,
+  t,
 }: ApplicationBoardCardProps) {
-  const followUpState = getFollowUpState(application);
+  const followUpState = getFollowUpState(application, t);
 
   return (
     <div
@@ -930,7 +961,7 @@ function ApplicationBoardCard({
 
       <div className="mt-3 flex items-center gap-1.5 text-[11px] text-white/42">
         <CalendarDays className="size-3.5" />
-        {formatDate(getStatusDate(application))}
+        {formatDate(getStatusDate(application), language, t)}
       </div>
 
       <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
@@ -951,7 +982,9 @@ function ApplicationBoardCard({
               key={column.status}
               value={column.status}
             >
-              Move to {column.title}
+              {t("applications.moveToStatus", {
+                status: t(column.titleKey),
+              })}
             </option>
           ))}
         </select>

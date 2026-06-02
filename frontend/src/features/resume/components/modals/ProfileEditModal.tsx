@@ -8,6 +8,7 @@ import { ResumeEditModal } from "@/features/resume/components/ui/ResumeEditModal
 import { ResumeInput } from "@/features/resume/components/ui/ResumeInput";
 import { ResumeFieldGroup } from "@/features/resume/components/ui/ResumeFieldGroup";
 import { ResumeActionButton } from "@/features/resume/components/ui/ResumeActionButton";
+import { useI18n } from "@/i18n/I18nContext";
 
 type ProfileItem = {
   id: string | number;
@@ -54,6 +55,7 @@ export function ProfileEditModal({
   onSave,
   onChange,
 }: ProfileEditModalProps) {
+  const { t } = useI18n();
   if (!profile) {
     return null;
   }
@@ -65,8 +67,8 @@ export function ProfileEditModal({
   return (
     <ResumeEditModal
       open={open}
-      title="Edit Profile"
-      subtitle="Manage social profiles and public links."
+      title={t("resume.editProfile")}
+      subtitle={t("resume.profileModalSubtitle")}
       onClose={onClose}
       footer={
         <div className="flex items-center justify-end gap-3">
@@ -74,7 +76,7 @@ export function ProfileEditModal({
             variant="ghost"
             onClick={onClose}
           >
-            Cancel
+            {t("common.cancel")}
           </ResumeActionButton>
 
           <ResumeActionButton
@@ -82,14 +84,14 @@ export function ProfileEditModal({
             variant="primary"
             onClick={onSave}
           >
-            Save Changes
+            {t("common.saveChanges")}
           </ResumeActionButton>
         </div>
       }
     >
       <div className="space-y-6">
 
-        <ResumeFieldGroup label="Platform">
+        <ResumeFieldGroup label={t("resume.platform")}>
           <ResumeInput
             value={profile.platform}
             onChange={(e) =>
@@ -98,11 +100,11 @@ export function ProfileEditModal({
                 e.target.value,
               )
             }
-            placeholder="e.g. LinkedIn"
+            placeholder={t("resume.platformPlaceholder")}
           />
         </ResumeFieldGroup>
 
-        <ResumeFieldGroup label="Profile URL">
+        <ResumeFieldGroup label={t("resume.profileUrl")}>
           <ResumeInput
             value={profile.url}
             onChange={(e) =>
@@ -115,7 +117,7 @@ export function ProfileEditModal({
           />
         </ResumeFieldGroup>
 
-        <ResumeFieldGroup label="Display Label">
+        <ResumeFieldGroup label={t("resume.displayLabel")}>
           <ResumeInput
             value={profile.label}
             onChange={(e) =>
@@ -124,7 +126,7 @@ export function ProfileEditModal({
                 e.target.value,
               )
             }
-            placeholder="e.g. GitHub"
+            placeholder={t("resume.displayLabelPlaceholder")}
           />
         </ResumeFieldGroup>
 

@@ -1,4 +1,5 @@
 import { Sparkles } from "lucide-react";
+import { useI18n } from "@/i18n/I18nContext";
 
 interface Props {
   summary: string;
@@ -12,11 +13,12 @@ export function SummaryEditor({
   summary,
   updateSummary,
 }: Props) {
+  const { t } = useI18n();
   return (
     <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-4">
       <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
         <Sparkles className="size-3.5" />
-        Summary
+        {t("resume.summary")}
       </div>
 
       <textarea

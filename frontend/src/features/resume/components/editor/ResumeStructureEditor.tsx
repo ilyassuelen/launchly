@@ -17,6 +17,7 @@ import {
 } from "@dnd-kit/sortable";
 
 import { CSS } from "@dnd-kit/utilities";
+import { useI18n } from "@/i18n/I18nContext";
 
 type SidebarSectionId = string;
 type MainSectionId = string;
@@ -74,6 +75,8 @@ type SortableSectionItemProps = {
   onToggle: () => void;
 
   children?: React.ReactNode;
+
+  dragLabel: string;
 };
 
 function SortableSectionItem({
@@ -83,6 +86,7 @@ function SortableSectionItem({
   isActive,
   onToggle,
   children,
+  dragLabel,
 }: SortableSectionItemProps) {
   const {
     attributes,
@@ -134,7 +138,7 @@ function SortableSectionItem({
         </span>
 
         <span className="text-[10px] text-muted-foreground">
-          drag
+          {dragLabel}
         </span>
       </button>
 
@@ -158,6 +162,8 @@ export function ResumeStructureEditor({
   renderSidebarSectionContent,
   renderMainSectionContent,
 }: ResumeStructureEditorProps) {
+  const { t } = useI18n();
+
   const sidebarSectionOrder =
     resume.sidebarSectionOrder || [];
 
@@ -251,7 +257,7 @@ export function ResumeStructureEditor({
   return (
     <div>
       <div className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-        Resume structure
+        {t("resume.resumeStructure")}
       </div>
 
       <ul className="space-y-2">
@@ -259,7 +265,7 @@ export function ResumeStructureEditor({
         {/* SIDEBAR */}
 
         <div className="mb-2 rounded-2xl border border-cyan-400/10 bg-cyan-400/[0.04] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-300">
-          Sidebar sections
+          {t("resume.sidebarSections")}
         </div>
 
         <DndContext
@@ -282,6 +288,7 @@ export function ResumeStructureEditor({
                   name={section.name}
                   icon={section.icon}
                   isActive={isActive}
+                  dragLabel={t("resume.drag")}
                   onToggle={() =>
                     setActiveSection(
                       activeSection ===
@@ -303,7 +310,7 @@ export function ResumeStructureEditor({
         {/* MAIN */}
 
         <div className="mb-2 mt-4 rounded-2xl border border-violet-400/10 bg-violet-500/[0.05] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-violet-200">
-          Main content PDF sections
+          {t("resume.mainContentPdfSections")}
         </div>
 
         <DndContext
@@ -326,6 +333,7 @@ export function ResumeStructureEditor({
                   name={section.name}
                   icon={section.icon}
                   isActive={isActive}
+                  dragLabel={t("resume.drag")}
                   onToggle={() =>
                     setActiveSection(
                       activeSection ===

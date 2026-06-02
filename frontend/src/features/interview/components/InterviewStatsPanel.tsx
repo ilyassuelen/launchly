@@ -9,6 +9,8 @@ import {
   Progress,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import type {
   InterviewStatsResponse,
 } from "@/features/interview/types/interview";
@@ -28,6 +30,8 @@ function clampScore(value?: number | null) {
 export function InterviewStatsPanel({
   stats,
 }: InterviewStatsPanelProps) {
+  const { t } = useI18n();
+
   const averageScore = clampScore(stats?.average_score);
   const bestScore = clampScore(stats?.best_score);
   const totalSessions = stats?.total_sessions || 0;
@@ -40,11 +44,11 @@ export function InterviewStatsPanel({
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm font-semibold">
             <BarChart3 className="size-4 text-cyan-300" />
-            Interview stats
+            {t("interview.interviewStats")}
           </div>
 
           <div className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-white/55">
-            {totalSessions} sessions
+            {t("interview.sessionsCount", { count: totalSessions })}
           </div>
         </div>
 
@@ -52,7 +56,7 @@ export function InterviewStatsPanel({
           <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Zap className="size-3.5 text-cyan-300" />
-              Average
+              {t("interview.average")}
             </div>
 
             <div className="mt-3 text-3xl font-semibold tracking-tight text-white">
@@ -60,14 +64,14 @@ export function InterviewStatsPanel({
             </div>
 
             <div className="mt-1 text-xs text-muted-foreground">
-              overall score
+              {t("interview.overallScore")}
             </div>
           </div>
 
           <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Trophy className="size-3.5 text-violet-300" />
-              Best
+              {t("interview.best")}
             </div>
 
             <div className="mt-3 text-3xl font-semibold tracking-tight text-white">
@@ -75,7 +79,7 @@ export function InterviewStatsPanel({
             </div>
 
             <div className="mt-1 text-xs text-muted-foreground">
-              highest score
+              {t("interview.highestScore")}
             </div>
           </div>
         </div>
@@ -83,7 +87,7 @@ export function InterviewStatsPanel({
         <div className="mt-5 space-y-3">
           {(stats?.by_difficulty || []).length === 0 && (
             <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-sm text-white/50">
-              Complete your first interview to unlock score statistics.
+              {t("interview.completeFirstInterviewForStats")}
             </div>
           )}
 
@@ -98,12 +102,15 @@ export function InterviewStatsPanel({
                 </span>
 
                 <span className="text-muted-foreground">
-                  {bucket.sessions} sessions · best {clampScore(bucket.best_score)}
+                  {t("interview.sessionsBestScore", {
+                    count: bucket.sessions,
+                    score: clampScore(bucket.best_score),
+                  })}
                 </span>
               </div>
 
               <Progress
-                label="Average score"
+                label={t("interview.averageScore")}
                 value={clampScore(bucket.average_score)}
                 color={
                   clampScore(bucket.average_score) >= 75

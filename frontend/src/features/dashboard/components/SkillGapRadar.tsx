@@ -7,6 +7,8 @@ import {
   Card,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import type {
   DashboardMissingSkill,
 } from "@/features/dashboard/types/dashboard";
@@ -30,6 +32,7 @@ function getPriorityClass(priority?: string) {
 export function SkillGapRadar({
   skills,
 }: SkillGapRadarProps) {
+  const { t } = useI18n();
   const highPriorityCount =
     skills.filter((skill) => skill.priority === "high").length;
 
@@ -41,23 +44,25 @@ export function SkillGapRadar({
         <div>
           <div className="flex items-center gap-2 text-sm font-semibold">
             <Radar className="size-4 text-violet-300" />
-            Skill gap radar
+            {t("dashboard.skillGapRadarTitle")}
           </div>
 
           <div className="mt-1 text-xs text-muted-foreground">
-            Skills and proof points your profile should strengthen next.
+            {t("dashboard.skillGapRadarDescription")}
           </div>
         </div>
 
         <div className="rounded-full border border-violet-300/10 bg-violet-400/10 px-3 py-1 text-xs font-semibold text-violet-100">
-          {highPriorityCount} urgent
+          {t("dashboard.urgent", {
+            count: highPriorityCount,
+          })}
         </div>
       </div>
 
       <div className="relative mt-5 flex flex-wrap gap-2">
         {skills.length === 0 && (
           <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-5 text-sm text-white/50">
-            No skill gaps detected yet. Run an AI review to generate targeted skill recommendations.
+            {t("dashboard.skillGapRadarEmpty")}
           </div>
         )}
 
@@ -75,13 +80,15 @@ export function SkillGapRadar({
       {skills.length > 0 && (
         <div className="relative mt-5 rounded-2xl border border-white/5 bg-black/10 p-4">
           <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
-            Suggested learning
+            {t("dashboard.suggestedLearning")}
           </div>
 
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             {skills.slice(0, 3).map((skill) => (
               <li key={`learn-${skill.skill}`}>
-                • Improve {skill.skill}
+                • {t("dashboard.improveSkill", {
+                  skill: skill.skill,
+                })}
               </li>
             ))}
           </ul>

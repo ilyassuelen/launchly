@@ -9,6 +9,8 @@ import { ResumeInput } from "@/features/resume/components/ui/ResumeInput";
 import { ResumeTextarea } from "@/features/resume/components/ui/ResumeTextarea";
 import { ResumeActionButton } from "@/features/resume/components/ui/ResumeActionButton";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 type ExperienceEditModalProps = {
   open: boolean;
 
@@ -89,13 +91,14 @@ export function ExperienceEditModal({
 
   onSave,
 }: ExperienceEditModalProps) {
+  const { t } = useI18n();
   return (
     <ResumeEditModal
       open={open}
       title={
-        role || "Edit Experience"
+        role || t("resume.editExperience")
       }
-      subtitle="Manage company details, dates and impact bullets."
+      subtitle={t("resume.experienceModalSubtitle")}
       onClose={onClose}
       footer={
         <div className="flex items-center justify-end gap-3">
@@ -103,7 +106,7 @@ export function ExperienceEditModal({
             variant="ghost"
             onClick={onClose}
           >
-            Cancel
+            {t("common.cancel")}
           </ResumeActionButton>
 
           <ResumeActionButton
@@ -111,14 +114,14 @@ export function ExperienceEditModal({
             variant="primary"
             onClick={onSave}
           >
-            Save Changes
+            {t("common.saveChanges")}
           </ResumeActionButton>
         </div>
       }
     >
       <div className="space-y-6">
 
-        <ResumeFieldGroup label="Company">
+        <ResumeFieldGroup label={t("resume.company")}>
           <ResumeInput
             value={company}
             onChange={(e) =>
@@ -126,11 +129,11 @@ export function ExperienceEditModal({
                 e.target.value,
               )
             }
-            placeholder="e.g. OpenAI"
+            placeholder={t("resume.companyPlaceholder")}
           />
         </ResumeFieldGroup>
 
-        <ResumeFieldGroup label="Role">
+        <ResumeFieldGroup label={t("resume.role")}>
           <ResumeInput
             value={role}
             onChange={(e) =>
@@ -138,13 +141,13 @@ export function ExperienceEditModal({
                 e.target.value,
               )
             }
-            placeholder="e.g. AI Engineer"
+            placeholder={t("resume.rolePlaceholder")}
           />
         </ResumeFieldGroup>
 
         <div className="grid gap-4 md:grid-cols-2">
 
-          <ResumeFieldGroup label="Start Date">
+          <ResumeFieldGroup label={t("resume.startDate")}>
             <ResumeInput
               value={startDate || ""}
               onChange={(e) =>
@@ -152,11 +155,11 @@ export function ExperienceEditModal({
                   e.target.value,
                 )
               }
-              placeholder="e.g. Jan 2025"
+              placeholder={t("resume.experienceStartDatePlaceholder")}
             />
           </ResumeFieldGroup>
 
-          <ResumeFieldGroup label="End Date">
+          <ResumeFieldGroup label={t("resume.endDate")}>
             <ResumeInput
               value={endDate || ""}
               onChange={(e) =>
@@ -164,13 +167,13 @@ export function ExperienceEditModal({
                   e.target.value,
                 )
               }
-              placeholder="e.g. Present"
+              placeholder={t("resume.endDatePlaceholder")}
             />
           </ResumeFieldGroup>
         </div>
 
         {onChangeSummary && (
-          <ResumeFieldGroup label="Summary">
+          <ResumeFieldGroup label={t("resume.summary")}>
             <ResumeTextarea
               value={summary || ""}
               onChange={(e) =>
@@ -179,7 +182,7 @@ export function ExperienceEditModal({
                 )
               }
               rows={5}
-              placeholder="Write a short summary about your responsibilities and impact"
+              placeholder={t("resume.experienceSummaryPlaceholder")}
             />
           </ResumeFieldGroup>
         )}
@@ -187,7 +190,7 @@ export function ExperienceEditModal({
         <div className="space-y-5">
           <div className="flex items-center justify-between">
             <div className="text-sm font-semibold text-white">
-              Impact Bullets
+              {t("resume.impactBullets")}
             </div>
 
             <ResumeActionButton
@@ -195,7 +198,7 @@ export function ExperienceEditModal({
               variant="primary"
               onClick={onAddBullet}
             >
-              Add Bullet
+              {t("resume.addBullet")}
             </ResumeActionButton>
           </div>
 
@@ -204,9 +207,9 @@ export function ExperienceEditModal({
               (bullet, index) => (
                 <ResumeFieldGroup
                   key={index}
-                  label={`Bullet ${
-                    index + 1
-                  }`}
+                  label={t("resume.bulletNumber", {
+                    count: index + 1,
+                  })}
                 >
                   <ResumeTextarea
                     value={bullet}
@@ -217,7 +220,7 @@ export function ExperienceEditModal({
                       )
                     }
                     rows={4}
-                    placeholder="Describe measurable impact, ownership or technical achievements"
+                    placeholder={t("resume.bulletPlaceholder")}
                   />
                 </ResumeFieldGroup>
               ),

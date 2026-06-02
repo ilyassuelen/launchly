@@ -17,6 +17,8 @@ import {
   Card,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import { useCoverLetter } from "@/features/cover-letter/hooks/useCoverLetter";
 import { CoverLetterRenderer } from "@/components/cover-letter/CoverLetterRenderer";
 
@@ -90,6 +92,7 @@ export const Route =
   });
 
 function CoverLetterBuilder() {
+  const { language, t } = useI18n();
   const { coverLetterId } =
     useParams({
       from:
@@ -221,7 +224,7 @@ const textareaClassName =
     return (
       <div className="flex min-h-screen items-center justify-center bg-[oklch(0.145_0.02_270)] text-white">
         <div className="text-sm text-white/60">
-          Loading cover letter...
+          {t("coverLetter.loadingCoverLetter")}
         </div>
       </div>
     );
@@ -306,7 +309,7 @@ const textareaClassName =
 
           const response =
             await generateAICoverLetter({
-              language: "english",
+              language,
 
               tone:
                 coverLetter.tone,
@@ -374,7 +377,7 @@ const textareaClassName =
               tone:
                 coverLetter.tone,
 
-              language: "english",
+              language,
 
               job_posting:
                 coverLetter.jobPosting,
@@ -405,8 +408,8 @@ const textareaClassName =
   return (
     <AppShell
       defaultSidebarCollapsed
-      title="Cover Letter Builder"
-      subtitle="Tailored, recruiter-focused — generated from any job posting in seconds."
+      title={t("coverLetter.builderTitle")}
+      subtitle={t("coverLetter.builderSubtitle")}
     >
       <div className="grid gap-4 lg:grid-cols-12">
 
@@ -416,11 +419,11 @@ const textareaClassName =
           <div className="flex items-center justify-between border-b border-white/5 pb-4">
             <div>
               <div className="text-sm font-semibold">
-                Cover letter editor
+                {t("coverLetter.coverLetterEditor")}
               </div>
 
               <div className="mt-1 text-xs text-muted-foreground">
-                Personalize your letter and recruiter details
+                {t("coverLetter.coverLetterEditorDescription")}
               </div>
             </div>
           </div>
@@ -429,7 +432,7 @@ const textareaClassName =
 
             <div>
               <div className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-white/45">
-                Personal Information
+                {t("coverLetter.personalInformation")}
               </div>
 
               <div className="space-y-3">
@@ -529,7 +532,7 @@ const textareaClassName =
 
                             <div>
                               <div className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-white/45">
-                                Company Information
+                                {t("coverLetter.companyInformation")}
                               </div>
 
                               <div className="space-y-3">
@@ -614,7 +617,7 @@ const textareaClassName =
 
             <div>
               <div className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-white/45">
-                Letter Content
+                {t("coverLetter.letterContent")}
               </div>
 
               <div className="space-y-3">
@@ -690,7 +693,7 @@ const textareaClassName =
 
             <div>
               <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Tone
+                {t("coverLetter.tone")}
               </div>
 
               <div className="grid grid-cols-3 gap-2">
@@ -722,7 +725,7 @@ const textareaClassName =
 
             <div>
               <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Resume
+                {t("resume.resume")}
               </div>
 
               <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.045] shadow-[0_12px_40px_rgba(0,0,0,0.18)] backdrop-blur-xl transition hover:border-cyan-300/25 hover:bg-white/[0.07]">
@@ -853,7 +856,7 @@ ${
       value=""
       className="bg-[#0b0f1a] text-white"
     >
-      Select a resume
+      {t("coverLetter.selectResume")}
     </option>
 
     {resumes.map((resume) => (
@@ -889,7 +892,7 @@ ${
 
             <div>
               <div className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-white/45">
-                Job Posting
+                {t("coverLetter.jobPosting")}
               </div>
 
               <textarea
@@ -932,12 +935,12 @@ ${
               {isGenerating ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  Generating...
+                  {t("coverLetter.generating")}
                 </>
               ) : (
                 <>
                   <WandSparkles className="size-4" />
-                  Generate with AI
+                  {t("coverLetter.generateWithAI")}
                 </>
               )}
             </button>
@@ -962,11 +965,11 @@ ${
               <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                   <div className="text-sm font-semibold text-white">
-                    Live letter preview
+                    {t("coverLetter.liveLetterPreview")}
                   </div>
 
                   <div className="mt-1 text-xs text-muted-foreground">
-                    Real-time recruiter-ready formatting with document-style preview.
+                    {t("coverLetter.liveLetterPreviewDescription")}
                   </div>
                 </div>
 

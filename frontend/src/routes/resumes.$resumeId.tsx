@@ -26,6 +26,8 @@ import {
   AppShell,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import { templates } from "@/features/resume/constants/templates";
 import { FONT_OPTIONS } from "@/features/resume/constants/typography";
 
@@ -95,6 +97,7 @@ export const Route = createFileRoute("/resumes/$resumeId")({
 });
 
 function ResumeBuilder() {
+  const { language, t } = useI18n();
   const { resumeId } = useParams({
       from: "/resumes/$resumeId",
   });
@@ -481,7 +484,7 @@ const selectedProfile =
   if (isLoading || !resume) {
     return (
       <div className="p-10 text-white">
-        Loading resume...
+        {t("resume.loadingResume")}
       </div>
     );
   }
@@ -661,7 +664,7 @@ ${(p.bullets || []).join(" ")}
           await analyzeResume({
             resume_id: resume.id,
 
-            language: "english",
+            language,
 
             tone:
               "professional",
@@ -769,13 +772,13 @@ ${(p.bullets || []).join(" ")}
         ...(prev.experience || []),
         {
           id: crypto.randomUUID(),
-          company: "New Company",
-          role: "New Role",
+          company: t("resume.newCompany"),
+          role: t("resume.newRole"),
           startDate: "",
           endDate: "",
           location: "",
           bullets: [
-            "Describe your impact",
+            t("resume.describeYourImpact"),
           ],
         },
       ],
@@ -802,13 +805,13 @@ ${(p.bullets || []).join(" ")}
         ...(prev.projects || []),
         {
           id: crypto.randomUUID(),
-          title: "New Project",
+          title: t("resume.newProject"),
           stack:
             "React · TypeScript",
           description:
-            "Project description",
+            t("resume.projectDescription"),
           bullets: [
-            "Describe what you built",
+            t("resume.describeWhatYouBuilt"),
           ],
           technologies: [],
         },
@@ -835,8 +838,8 @@ ${(p.bullets || []).join(" ")}
         ...(prev.education || []),
         {
           id: crypto.randomUUID(),
-          school: "New School",
-          degree: "New Degree",
+          school: t("resume.newSchool"),
+          degree: t("resume.newDegree"),
           startDate: "",
           endDate: "",
           description: [],
@@ -956,8 +959,8 @@ ${(p.bullets || []).join(" ")}
         ...(prev.languages || []),
         {
           id: crypto.randomUUID(),
-          name: "New Language",
-          level: "Beginner",
+          name: t("resume.newLanguage"),
+          level: t("resume.beginner"),
         },
       ],
     }));
@@ -1001,7 +1004,7 @@ ${(p.bullets || []).join(" ")}
           ...prev,
           {
               id: crypto.randomUUID(),
-              name: "New Soft Skill",
+              name: t("resume.newSoftSkill"),
           },
       ]);
   };
@@ -1032,9 +1035,8 @@ ${(p.bullets || []).join(" ")}
         ...(prev.skills || []),
         {
           id: crypto.randomUUID(),
-          category:
-            "New Skill Group",
-          skills: ["New Skill"],
+          category: t("resume.newSkillGroup"),
+          skills: [t("resume.newSkill")],
         },
       ],
     }));
@@ -1456,8 +1458,8 @@ ${(p.bullets || []).join(" ")}
   return (
     <AppShell
       defaultSidebarCollapsed
-      title="Resume Builder"
-      subtitle="Live AI feedback, ATS optimization and recruiter-grade formatting."
+      title={t("resume.title")}
+      subtitle={t("resume.builderSubtitle")}
     >
       <div className="grid gap-4 lg:grid-cols-12">
 

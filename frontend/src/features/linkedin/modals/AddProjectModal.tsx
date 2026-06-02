@@ -2,6 +2,7 @@ import {
   FolderKanban,
   X,
 } from "lucide-react";
+import { useI18n } from "@/i18n/I18nContext";
 
 export type LinkedInProjectDraft = {
   id: string;
@@ -31,6 +32,8 @@ export function AddProjectModal({
   removeProjectSkill,
   saveProjectEditor,
 }: AddProjectModalProps) {
+  const { t } = useI18n();
+
   if (!editingProject) {
     return null;
   }
@@ -42,11 +45,11 @@ export function AddProjectModal({
           <div className="flex items-start justify-between gap-6">
             <div>
               <div className="text-2xl font-bold text-white">
-                Edit LinkedIn project
+                {t("linkedin.editLinkedInProject")}
               </div>
 
               <div className="mt-2 text-sm leading-7 text-white/50">
-                Add project evidence recruiters can understand quickly.
+                {t("linkedin.editLinkedInProjectDescription")}
               </div>
             </div>
 
@@ -63,7 +66,7 @@ export function AddProjectModal({
         <div className="space-y-7 px-8 py-7">
           <div>
             <div className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-white/60">
-              Project name
+              {t("linkedin.projectName")}
             </div>
 
             <input
@@ -74,14 +77,14 @@ export function AddProjectModal({
                   title: event.target.value,
                 })
               }
-              placeholder="Enter the project name"
+              placeholder={t("linkedin.projectNamePlaceholder")}
               className="w-full rounded-2xl border border-white/10 bg-black/30 px-5 py-3.5 text-base text-white outline-none transition focus:border-violet-400/40"
             />
           </div>
 
           <div>
             <div className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-white/60">
-              Project description
+              {t("linkedin.projectDescription")}
             </div>
 
             <textarea
@@ -93,14 +96,14 @@ export function AddProjectModal({
                 })
               }
               rows={5}
-              placeholder="Describe what the project does, what you built and why it matters."
+              placeholder={t("linkedin.projectDescriptionPlaceholder")}
               className="w-full resize-none rounded-2xl border border-white/10 bg-black/30 px-5 py-3.5 text-sm leading-7 text-white outline-none transition focus:border-violet-400/40"
             />
           </div>
 
           <div>
             <div className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-white/60">
-              Skills
+              {t("resume.skills")}
             </div>
 
             <input
@@ -114,12 +117,12 @@ export function AddProjectModal({
                   addProjectSkill();
                 }
               }}
-              placeholder="Type a skill and press Enter"
+              placeholder={t("linkedin.skillInputPlaceholder")}
               className="w-full rounded-2xl border border-white/10 bg-black/30 px-5 py-3.5 text-sm text-white outline-none transition focus:border-violet-400/40"
             />
 
             <div className="mt-3 text-sm text-white/40">
-              Add technologies, tools, methods or domain skills individually.
+              {t("linkedin.projectSkillsHelperText")}
             </div>
 
             <div className="mt-5 flex flex-wrap gap-3">
@@ -149,7 +152,7 @@ export function AddProjectModal({
             onClick={() => setEditingProject(null)}
             className="rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-3 text-sm text-white/70 transition hover:bg-white/[0.06]"
           >
-            Cancel
+            {t("common.cancel")}
           </button>
 
           <button
@@ -158,7 +161,7 @@ export function AddProjectModal({
             className="inline-flex items-center gap-2 rounded-2xl bg-gradient-brand px-7 py-3 text-sm font-semibold text-primary-foreground shadow-[0_10px_30px_rgba(168,85,247,0.35)] transition hover:scale-[1.02]"
           >
             <FolderKanban className="size-4" />
-            Save project
+            {t("linkedin.saveProject")}
           </button>
         </div>
       </div>

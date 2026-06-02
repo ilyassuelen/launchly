@@ -18,6 +18,7 @@ import {
 } from "react";
 
 import { useAuth } from "@/context/AuthContext";
+import { useI18n } from "@/i18n/I18nContext";
 
 import logo from "../../static/logo.png";
 
@@ -38,6 +39,7 @@ function RegisterPage() {
     loading: authLoading,
     refreshUser,
   } = useAuth();
+  const { t } = useI18n();
 
   const [firstName, setFirstName] =
     useState("");
@@ -95,7 +97,7 @@ function RegisterPage() {
       setError(
         err?.response?.data?.detail ||
           err?.message ||
-          "Registration failed. Please try again.",
+          t("auth.register") + " failed.",
       );
     } finally {
       setLoading(false);
@@ -134,7 +136,7 @@ function RegisterPage() {
               to="/login"
               className="text-sm text-white/60 transition hover:text-white"
             >
-              Already have an account?
+              {t("auth.alreadyHaveAccount")}
             </Link>
           </div>
         </header>
@@ -147,19 +149,15 @@ function RegisterPage() {
               <div className="relative">
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs text-white/50">
                   <Sparkles className="size-3.5 text-cyan-300" />
-                  Start your career growth
-                  journey
+                  {t("auth.registerSubtitle")}
                 </div>
 
                 <h1 className="mt-5 text-3xl font-semibold tracking-tight">
-                  Create your account
+                  {t("auth.registerTitle")}
                 </h1>
 
                 <p className="mt-3 text-sm leading-6 text-white/55">
-                  Build stronger resumes,
-                  optimize your positioning
-                  and improve your chances of
-                  landing interviews.
+                  {t("auth.registerSubtitle")}
                 </p>
 
                 <form
@@ -169,7 +167,7 @@ function RegisterPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="mb-2 block text-sm text-white/60">
-                        First name
+                        {t("auth.firstName")}
                       </label>
 
                       <input
@@ -188,7 +186,7 @@ function RegisterPage() {
 
                     <div>
                       <label className="mb-2 block text-sm text-white/60">
-                        Last name
+                        {t("auth.lastName")}
                       </label>
 
                       <input
@@ -208,7 +206,7 @@ function RegisterPage() {
 
                   <div>
                     <label className="mb-2 block text-sm text-white/60">
-                      Username
+                      {t("auth.username")}
                     </label>
 
                     <input
@@ -227,7 +225,7 @@ function RegisterPage() {
 
                   <div>
                     <label className="mb-2 block text-sm text-white/60">
-                      Email
+                      {t("auth.email")}
                     </label>
 
                     <input
@@ -246,7 +244,7 @@ function RegisterPage() {
 
                   <div>
                     <label className="mb-2 block text-sm text-white/60">
-                      Password
+                      {t("auth.password")}
                     </label>
 
                     <div className="relative">
@@ -264,7 +262,7 @@ function RegisterPage() {
                             e.target.value,
                           )
                         }
-                        placeholder="Create a password"
+                        placeholder={t("auth.createPassword")}
                         className="h-12 w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 pr-12 text-sm text-white outline-none transition focus:border-violet-400/40 focus:bg-white/[0.05]"
                       />
 
@@ -300,11 +298,11 @@ function RegisterPage() {
                     {loading ? (
                       <>
                         <Loader2 className="size-4 animate-spin" />
-                        Creating account...
+                        {t("auth.creatingAccount")}
                       </>
                     ) : (
                       <>
-                        Create account
+                        {t("auth.createAccount")}
                         <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
                       </>
                     )}
@@ -312,12 +310,12 @@ function RegisterPage() {
                 </form>
 
                 <div className="mt-6 text-center text-sm text-white/45">
-                  Already have an account?{" "}
+                  {t("auth.alreadyHaveAccount")} {" "}
                   <Link
                     to="/login"
                     className="font-medium text-cyan-300 transition hover:text-cyan-200"
                   >
-                    Sign in
+                    {t("auth.signIn")}
                   </Link>
                 </div>
               </div>

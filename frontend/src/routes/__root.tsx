@@ -10,6 +10,7 @@ import {
 
 import appCss from "../styles.css?url";
 import { AuthProvider } from "@/context/AuthContext";
+import { I18nProvider } from "@/i18n/I18nContext";
 
 function NotFoundComponent() {
   return (
@@ -89,7 +90,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Outlet />
+        <I18nProvider>
+          <Outlet />
+        </I18nProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

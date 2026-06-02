@@ -11,6 +11,8 @@ import {
 
 import { templates } from "@/features/resume/constants/templates";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import { FONT_OPTIONS } from "@/features/resume/constants/typography";
 
 type Props = {
@@ -30,6 +32,7 @@ export function ResumeRightPanel({
   typography,
   updateTypography,
 }: Props) {
+  const { t } = useI18n();
   const atsScore =
     analysis?.ats_score?.score || 0;
 
@@ -41,7 +44,7 @@ export function ResumeRightPanel({
       <Card>
         <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
           <Target className="size-4 text-cyan-300" />
-          ATS Score
+          {t("resume.atsScore")}
         </div>
 
         <div className="flex items-end gap-2">
@@ -69,27 +72,27 @@ export function ResumeRightPanel({
           <div className="mt-4 space-y-2">
 
             <div className="flex justify-between text-xs text-white/70">
-              <span>Completeness</span>
+              <span>{t("resume.completeness")}</span>
               <span>{atsBreakdown.completeness}/20</span>
             </div>
 
             <div className="flex justify-between text-xs text-white/70">
-              <span>Keyword Relevance</span>
+              <span>{t("resume.keywordRelevance")}</span>
               <span>{atsBreakdown.keyword_relevance}/25</span>
             </div>
 
             <div className="flex justify-between text-xs text-white/70">
-              <span>Experience Quality</span>
+              <span>{t("resume.experienceQuality")}</span>
               <span>{atsBreakdown.experience_quality}/25</span>
             </div>
 
             <div className="flex justify-between text-xs text-white/70">
-              <span>Formatting</span>
+              <span>{t("resume.formatting")}</span>
               <span>{atsBreakdown.formatting}/15</span>
             </div>
 
             <div className="flex justify-between text-xs text-white/70">
-              <span>Readability</span>
+              <span>{t("resume.readability")}</span>
               <span>{atsBreakdown.readability}/15</span>
             </div>
 
@@ -100,7 +103,7 @@ export function ResumeRightPanel({
       <Card>
         <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
           <LayoutTemplate className="size-4 text-violet-300" />
-          Templates
+          {t("resume.templates")}
         </div>
 
         <div className="grid grid-cols-2 gap-3">
@@ -136,14 +139,14 @@ export function ResumeRightPanel({
       <Card>
         <div className="mb-4 flex items-center gap-2 text-sm font-semibold">
           <Sparkles className="size-4 text-violet-300" />
-          Typography
+          {t("resume.typography")}
         </div>
 
         <div className="space-y-5">
 
           <div>
             <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-white/45">
-              Font Family
+              {t("resume.fontFamily")}
             </div>
 
             <div className="grid grid-cols-1 gap-2">
@@ -170,7 +173,7 @@ export function ResumeRightPanel({
                   </div>
 
                   <div className="mt-1 text-xs text-white/50">
-                    The quick brown fox jumps over the lazy dog
+                    {t("resume.fontPreviewSentence")}
                   </div>
                 </button>
               ))}
@@ -180,7 +183,7 @@ export function ResumeRightPanel({
           <div>
             <div className="mb-2 flex items-center justify-between">
               <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/45">
-                Font Size
+                {t("resume.fontSize")}
               </div>
 
               <div className="text-xs text-white/60">
@@ -208,7 +211,7 @@ export function ResumeRightPanel({
           <div>
             <div className="mb-2 flex items-center justify-between">
               <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/45">
-                Line Height
+                {t("resume.lineHeight")}
               </div>
 
               <div className="text-xs text-white/60">

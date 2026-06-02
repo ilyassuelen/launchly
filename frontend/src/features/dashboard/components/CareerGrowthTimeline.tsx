@@ -16,6 +16,8 @@ import {
   Card,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import type {
   CareerGrowthPoint,
 } from "@/features/dashboard/types/dashboard";
@@ -35,6 +37,7 @@ function clampScore(value?: number | null) {
 export function CareerGrowthTimeline({
   growth,
 }: CareerGrowthTimelineProps) {
+  const { t } = useI18n();
   const chartData =
     growth.length > 0
       ? growth.map((item) => ({
@@ -42,13 +45,13 @@ export function CareerGrowthTimeline({
           v: clampScore(item.v),
         }))
       : [
-          { d: "Mon", v: 0 },
-          { d: "Tue", v: 0 },
-          { d: "Wed", v: 0 },
-          { d: "Thu", v: 0 },
-          { d: "Fri", v: 0 },
-          { d: "Sat", v: 0 },
-          { d: "Sun", v: 0 },
+          { d: t("dashboard.dayMon"), v: 0 },
+          { d: t("dashboard.dayTue"), v: 0 },
+          { d: t("dashboard.dayWed"), v: 0 },
+          { d: t("dashboard.dayThu"), v: 0 },
+          { d: t("dashboard.dayFri"), v: 0 },
+          { d: t("dashboard.daySat"), v: 0 },
+          { d: t("dashboard.daySun"), v: 0 },
         ];
 
   const firstValue = chartData[0]?.v || 0;
@@ -65,11 +68,11 @@ export function CareerGrowthTimeline({
         <div>
           <div className="flex items-center gap-2 text-sm font-semibold">
             <TrendingUp className="size-4 text-violet-300" />
-            Career growth timeline
+            {t("dashboard.careerGrowthTimelineTitle")}
           </div>
 
           <div className="mt-1 text-xs text-muted-foreground">
-            Last 7 saved dashboard reviews · all signals combined
+            {t("dashboard.careerGrowthTimelineDescription")}
           </div>
         </div>
 

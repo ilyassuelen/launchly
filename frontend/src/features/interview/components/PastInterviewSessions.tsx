@@ -10,6 +10,8 @@ import {
   Card,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import type {
   InterviewSession,
   InterviewStatsResponse,
@@ -24,9 +26,13 @@ type PastInterviewSessionsProps = {
   onReset?: () => Promise<unknown>;
 };
 
-function formatDate(value?: string | null) {
+function formatDate(
+  value: string | null | undefined,
+  language: "english" | "german",
+  t: (key: string) => string,
+) {
   if (!value) {
-    return "Unknown";
+    return t("interview.unknown");
   }
 
   const date = new Date(value);
@@ -35,10 +41,13 @@ function formatDate(value?: string | null) {
     return value;
   }
 
-  return new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-  }).format(date);
+  return new Intl.DateTimeFormat(
+    language === "german" ? "de" : "en",
+    {
+      month: "short",
+      day: "numeric",
+    },
+  ).format(date);
 }
 
 function getStatusClass(status?: string | null) {
@@ -72,9 +81,11 @@ export function PastInterviewSessions({
   onDeleteSession,
   onReset,
 }: PastInterviewSessionsProps) {
+  const { language, t } = useI18n();
+
   const handleReset = async () => {
     const confirmed = window.confirm(
-      "Are you sure you want to reset your entire interview history? This action cannot be undone.",
+      t("interview.resetHistoryConfirm"),
     );
 
     if (!confirmed) {
@@ -97,13 +108,13 @@ export function PastInterviewSessions({
           <div className="min-w-0">
             <div className="flex items-center gap-2 text-sm font-semibold text-white">
               <History className="size-4 shrink-0 text-violet-300" />
-              <span>Past sessions</span>
+              <span>{t("interview.pastSessions")}</span>
             </div>
           </div>
 
           <div className="flex shrink-0 items-center gap-2">
             <div className="rounded-full border border-white/10 bg-white/[0.04] px-1 py-1.5 text-[11px] font-medium text-white/55">
-              Last 30
+              {t("interview.last30")}
             </div>
 
             {sessions.length > 0 && (
@@ -113,7 +124,7 @@ export function PastInterviewSessions({
                 className="inline-flex items-center gap-1.5 rounded-full border border-red-400/15 bg-red-400/[0.07] px-3 py-1.5 text-[11px] font-medium text-red-100 transition hover:border-red-300/25 hover:bg-red-400/[0.13]"
               >
                 <RotateCcw className="size-3.5" />
-                Reset
+                {t("interview.reset")}
               </button>
             )}
           </div>
@@ -122,7 +133,7 @@ export function PastInterviewSessions({
         <div className="space-y-3">
           {sessions.length === 0 && (
             <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-sm leading-6 text-white/50">
-              No interview sessions yet. Start your first mock interview to build your score history.
+              {t("interview.noInterviewSessions")}
             </div>
           )}
 
@@ -162,7 +173,11 @@ export function PastInterviewSessions({
                 <div className="mt-4 flex items-center justify-between text-xs">
                   <div className="inline-flex items-center gap-1 text-muted-foreground">
                     <Clock3 className="size-3.5" />
-                    {formatDate(session.created_at)}
+                    {formatDate(
+                      session.created_at,
+                      language,
+                      t,
+                    )}
                   </div>
 
                   {score !== null ? (
@@ -172,7 +187,7 @@ export function PastInterviewSessions({
                     </div>
                   ) : (
                     <div className="rounded-full bg-white/[0.04] px-2.5 py-1 text-white/45">
-                      No score yet
+                      {t("interview.noScoreYet")}
                     </div>
                   )}
                 </div>
@@ -183,14 +198,14 @@ export function PastInterviewSessions({
                       onClick={() => onSelectSession?.(session.id)}
                       className="inline-flex items-center justify-center rounded-xl border border-violet-300/20 bg-violet-400/15 px-3 py-2 text-xs font-semibold text-violet-100 shadow-[0_14px_40px_rgba(139,92,246,0.22)] transition hover:bg-violet-400/25"
                     >
-                      View results
+                      {t("interview.viewResults")}
                     </button>
 
                     <button
                       type="button"
                       onClick={async () => {
                         const confirmed = window.confirm(
-                          "Are you sure you want to delete this interview session?",
+                          t("interview.deleteSessionConfirm"),
                         );
 
                         if (!confirmed) {
@@ -206,7 +221,7 @@ export function PastInterviewSessions({
                       className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-red-400/20 bg-red-400/15 px-3 py-2 text-xs font-semibold text-red-100 shadow-[0_14px_40px_rgba(248,113,113,0.16)] transition hover:bg-red-400/25"
                     >
                       <Trash2 className="size-3.5" />
-                      Delete
+                      {t("common.delete")}
                     </button>
                   </div>
                 </div>

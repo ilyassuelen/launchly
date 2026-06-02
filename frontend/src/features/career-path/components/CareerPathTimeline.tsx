@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import { Card } from "@/components/launchly/AppShell";
+import { useI18n } from "@/i18n/I18nContext";
 
 import type { CareerPathMilestone } from "../types/careerPath";
 
@@ -32,8 +33,30 @@ function getPriorityClassName(priority?: string) {
   return "border-white/10 bg-white/[0.04] text-white/55";
 }
 
+function getPriorityLabel(
+  priority: string | undefined,
+  t: (key: string) => string,
+) {
+  const normalized = priority?.toLowerCase();
+
+  if (normalized === "high") {
+    return t("careerPath.priorityHigh");
+  }
+
+  if (normalized === "medium") {
+    return t("careerPath.priorityMedium");
+  }
+
+  if (normalized === "low") {
+    return t("careerPath.priorityLow");
+  }
+
+  return priority || t("careerPath.notSpecified");
+}
+
 export function CareerPathTimeline({ roadmap }: CareerPathTimelineProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const { t } = useI18n();
 
   const activeMilestone = roadmap[activeIndex] ?? roadmap[0] ?? null;
 
@@ -54,15 +77,15 @@ export function CareerPathTimeline({ roadmap }: CareerPathTimelineProps) {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/10 bg-cyan-300/[0.06] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-100/70">
               <Route className="size-3.5 text-cyan-300" />
-              Career roadmap
+              {t("careerPath.careerRoadmap")}
             </div>
 
             <h2 className="mt-4 text-2xl font-semibold tracking-tight text-white lg:text-3xl">
-              Your strategic path toward the target role
+              {t("careerPath.timelineTitle")}
             </h2>
 
             <p className="mt-3 max-w-3xl text-sm leading-7 text-white/55">
-              A cleaner journey view: follow the roadmap step by step, then open each milestone for the concrete tasks.
+              {t("careerPath.timelineDescription")}
             </p>
           </div>
 
@@ -71,7 +94,7 @@ export function CareerPathTimeline({ roadmap }: CareerPathTimelineProps) {
 
         {roadmap.length === 0 ? (
           <div className="rounded-[2rem] border border-dashed border-white/10 bg-white/[0.03] p-8 text-sm text-white/50">
-            No roadmap milestones available yet.
+            {t("careerPath.noRoadmapMilestones")}
           </div>
         ) : (
           <div className="space-y-5">
@@ -82,16 +105,18 @@ export function CareerPathTimeline({ roadmap }: CareerPathTimelineProps) {
                 <div className="mb-5 flex items-center justify-between gap-4">
                   <div>
                     <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/35">
-                      Journey map
+                      {t("careerPath.journeyMap")}
                     </div>
 
                     <div className="mt-1 text-sm text-white/55">
-                      Click a step to inspect the milestone.
+                      {t("careerPath.journeyMapDescription")}
                     </div>
                   </div>
 
                   <div className="hidden rounded-full border border-cyan-300/10 bg-cyan-400/[0.07] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100/65 sm:block">
-                    Step {activeIndex + 1} active
+                    {t("careerPath.stepActive", {
+                      number: activeIndex + 1,
+                    })}
                   </div>
                 </div>
 
@@ -141,7 +166,9 @@ export function CareerPathTimeline({ roadmap }: CareerPathTimelineProps) {
                             </div>
 
                             <div className="mt-4 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/45">
-                              Step {index + 1}
+                              {t("careerPath.stepNumber", {
+                                number: index + 1,
+                              })}
                             </div>
 
                             <div className="mt-3 line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-5 text-white/85">
@@ -165,7 +192,7 @@ export function CareerPathTimeline({ roadmap }: CareerPathTimelineProps) {
                 <div className="rounded-[2rem] border border-white/7 bg-[linear-gradient(180deg,rgba(255,255,255,0.045),rgba(255,255,255,0.022))] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.20)]">
                   <div className="mb-4 flex flex-wrap items-center gap-2">
                     <div className="rounded-full border border-cyan-300/10 bg-cyan-300/[0.06] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100/75">
-                      Selected milestone
+                      {t("careerPath.selectedMilestone")}
                     </div>
 
                     <div className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/55">
@@ -173,7 +200,7 @@ export function CareerPathTimeline({ roadmap }: CareerPathTimelineProps) {
                     </div>
 
                     <div className={`rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${getPriorityClassName(activeMilestone.priority)}`}>
-                      {activeMilestone.priority}
+                      {getPriorityLabel(activeMilestone.priority, t)}
                     </div>
                   </div>
 
@@ -189,7 +216,7 @@ export function CareerPathTimeline({ roadmap }: CareerPathTimelineProps) {
                 <div className="rounded-[2rem] border border-white/7 bg-black/20 p-5">
                   <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-white">
                     <ArrowRight className="size-4 text-cyan-300" />
-                    Action checklist
+                    {t("careerPath.actionChecklist")}
                   </div>
 
                   {activeMilestone.tasks.length > 0 ? (
@@ -208,7 +235,7 @@ export function CareerPathTimeline({ roadmap }: CareerPathTimelineProps) {
                     </div>
                   ) : (
                     <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.03] p-4 text-sm text-white/45">
-                      No tasks listed for this milestone.
+                      {t("careerPath.noTasksForMilestone")}
                     </div>
                   )}
                 </div>

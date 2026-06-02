@@ -2,6 +2,8 @@ import {
   Clock3,
 } from "lucide-react";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 type Props = {
   coverLetter: any;
 };
@@ -9,6 +11,7 @@ type Props = {
 export function CoverLetterThumbnail({
   coverLetter,
 }: Props) {
+  const { t } = useI18n();
   return (
     <div className="group relative overflow-hidden rounded-[28px] border border-white/10 bg-[#0B1020] transition hover:border-violet-400/30 hover:bg-[#0D1326]">
       {/* background glow */}
@@ -22,14 +25,14 @@ export function CoverLetterThumbnail({
               <div className="text-sm font-semibold text-white">
                 {
                   coverLetter.recipient?.companyName ||
-                  "New Company"
+                  t("coverLetter.newCompany")
                 }
               </div>
 
               <div className="mt-1 text-xs text-white/50">
                 {
                   coverLetter.content?.subject ||
-                  "Cover Letter"
+                  t("coverLetter.coverLetter")
                 }
               </div>
             </div>
@@ -72,7 +75,7 @@ export function CoverLetterThumbnail({
           <div className="mt-5 flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs text-white/40">
               <Clock3 className="size-3" />
-              Updated recently
+              {t("coverLetter.updatedRecently")}
             </div>
           </div>
         </div>

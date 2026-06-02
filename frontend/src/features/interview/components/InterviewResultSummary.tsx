@@ -10,6 +10,8 @@ import {
   Progress,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import type {
   InterviewResult,
 } from "@/features/interview/types/interview";
@@ -26,13 +28,16 @@ function clampScore(value?: number | null) {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
-function getScoreLabel(score: number) {
-  if (score >= 85) return "Excellent";
-  if (score >= 75) return "Strong";
-  if (score >= 60) return "Promising";
-  if (score > 0) return "Needs practice";
+function getScoreLabel(
+  score: number,
+  t: (key: string) => string,
+) {
+  if (score >= 85) return t("interview.excellent");
+  if (score >= 75) return t("interview.strong");
+  if (score >= 60) return t("interview.promising");
+  if (score > 0) return t("interview.needsPractice");
 
-  return "Pending";
+  return t("interview.pending");
 }
 
 function getScoreTone(score: number) {
@@ -43,41 +48,51 @@ function getScoreTone(score: number) {
   return "text-red-200";
 }
 
-function getVerdictLabel(score: number) {
-  if (score >= 85) return "Excellent candidate";
-  if (score >= 75) return "Strong candidate";
-  if (score >= 60) return "Promising candidate";
-  if (score > 0) return "Needs more practice";
+function getVerdictLabel(
+  score: number,
+  t: (key: string) => string,
+) {
+  if (score >= 85) return t("interview.excellentCandidate");
+  if (score >= 75) return t("interview.strongCandidate");
+  if (score >= 60) return t("interview.promisingCandidate");
+  if (score > 0) return t("interview.needsMorePractice");
 
-  return "Awaiting result";
+  return t("interview.awaitingResult");
 }
 
 function getVerdictDescription(
   result: InterviewResult | null,
   score: number,
+  t: (key: string, params?: Record<string, string | number>) => string,
 ) {
   if (!result) {
-    return "Complete an interview to receive your AI verdict.";
+    return t("interview.completeInterviewForVerdict");
   }
 
+  const params = {
+    difficulty: result.difficulty,
+    role: result.role,
+  };
+
   if (score >= 85) {
-    return `You are showing a very strong signal for ${result.difficulty} ${result.role} interviews.`;
+    return t("interview.veryStrongSignal", params);
   }
 
   if (score >= 75) {
-    return `You are showing a strong signal for ${result.difficulty} ${result.role} interviews.`;
+    return t("interview.strongSignal", params);
   }
 
   if (score >= 60) {
-    return `You have a solid base for ${result.difficulty} ${result.role} interviews, with clear areas to sharpen.`;
+    return t("interview.solidBaseSignal", params);
   }
 
-  return `Your ${result.difficulty} ${result.role} interview readiness needs more structured practice.`;
+  return t("interview.needsStructuredPractice", params);
 }
 
 export function InterviewResultSummary({
   result,
 }: InterviewResultSummaryProps) {
+  const { t } = useI18n();
   const overallScore = clampScore(
     result?.overall_score,
   );
@@ -92,22 +107,22 @@ export function InterviewResultSummary({
           <div className="min-w-0">
             <div className="inline-flex items-center gap-2 rounded-full border border-violet-300/15 bg-violet-400/[0.08] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-violet-100/75">
               <Award className="size-3.5 text-violet-300" />
-              Interview score
+              {t("interview.interviewScore")}
             </div>
 
             <div className="mt-3 text-2xl font-semibold tracking-tight text-white">
-              {result ? "Your interview performance" : "Score dashboard"}
+              {result ? t("interview.yourInterviewPerformance") : t("interview.scoreDashboard")}
             </div>
 
             <div className="mt-1 max-w-2xl text-sm leading-6 text-white/55">
               {result
-                ? "A clear breakdown of your readiness, communication quality and answer structure."
-                : "Complete an interview to unlock your performance dashboard."}
+                ? t("interview.performanceBreakdownDescription")
+                : t("interview.unlockPerformanceDashboard")}
             </div>
           </div>
 
           <div className={`shrink-0 rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs font-semibold shadow-[0_12px_34px_rgba(0,0,0,0.22)] ${getScoreTone(overallScore)}`}>
-            {getScoreLabel(overallScore)}
+            {getScoreLabel(overallScore, t)}
           </div>
         </div>
 
@@ -129,18 +144,18 @@ export function InterviewResultSummary({
                   </div>
 
                   <div className="mt-1 text-[10px] uppercase tracking-[0.24em] text-violet-100/70">
-                    score
+                    {t("interview.score")}
                   </div>
                 </div>
               </div>
 
               <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-emerald-300/15 bg-emerald-400/[0.08] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-100">
                 <CheckCircle2 className="size-3.5 text-emerald-300" />
-                {getVerdictLabel(overallScore)}
+                {getVerdictLabel(overallScore, t)}
               </div>
 
               <div className="mt-5 max-w-[220px] text-sm leading-6 text-white/60">
-                {getVerdictDescription(result, overallScore)}
+                {getVerdictDescription(result, overallScore, t)}
               </div>
             </div>
           </div>
@@ -149,14 +164,14 @@ export function InterviewResultSummary({
             <div className="grid gap-3 md:grid-cols-2">
               <div className="rounded-2xl border border-white/7 bg-white/[0.035] p-4">
                 <Progress
-                  label="Confidence"
+                  label={t("interview.confidence")}
                   value={clampScore(result?.confidence_score)}
                 />
               </div>
 
               <div className="rounded-2xl border border-white/7 bg-white/[0.035] p-4">
                 <Progress
-                  label="Communication"
+                  label={t("interview.communication")}
                   value={clampScore(result?.communication_score)}
                   color={
                     clampScore(result?.communication_score) >= 75
@@ -168,7 +183,7 @@ export function InterviewResultSummary({
 
               <div className="rounded-2xl border border-white/7 bg-white/[0.035] p-4">
                 <Progress
-                  label="STAR structure"
+                  label={t("interview.starStructure")}
                   value={clampScore(result?.structure_score)}
                   color={
                     clampScore(result?.structure_score) < 65
@@ -180,7 +195,7 @@ export function InterviewResultSummary({
 
               <div className="rounded-2xl border border-white/7 bg-white/[0.035] p-4">
                 <Progress
-                  label="Specificity"
+                  label={t("interview.specificity")}
                   value={clampScore(result?.specificity_score)}
                 />
               </div>
@@ -188,7 +203,7 @@ export function InterviewResultSummary({
 
             {!result && (
               <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-sm leading-6 text-white/50">
-                Complete an interview to generate your score summary.
+                {t("interview.completeInterviewForScoreSummary")}
               </div>
             )}
 
@@ -196,13 +211,13 @@ export function InterviewResultSummary({
               <div className="rounded-[1.75rem] border border-white/7 bg-black/20 p-4">
                 <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-white">
                   <TrendingUp className="size-4 text-cyan-300" />
-                  Session summary
+                  {t("interview.sessionSummary")}
                 </div>
 
                 <div className="grid gap-3 text-xs md:grid-cols-3">
                   <div className="rounded-2xl border border-white/5 bg-white/[0.035] p-3">
                     <div className="text-muted-foreground">
-                      Mode
+                      {t("interview.mode")}
                     </div>
 
                     <div className="mt-1 font-semibold text-white/85">
@@ -212,7 +227,7 @@ export function InterviewResultSummary({
 
                   <div className="rounded-2xl border border-white/5 bg-white/[0.035] p-3">
                     <div className="text-muted-foreground">
-                      Level
+                      {t("interview.level")}
                     </div>
 
                     <div className="mt-1 font-semibold text-white/85">
@@ -222,7 +237,7 @@ export function InterviewResultSummary({
 
                   <div className="rounded-2xl border border-white/5 bg-white/[0.035] p-3">
                     <div className="text-muted-foreground">
-                      Role
+                      {t("interview.role")}
                     </div>
 
                     <div className="mt-1 truncate font-semibold text-white/85">
@@ -240,12 +255,12 @@ export function InterviewResultSummary({
             <div className="rounded-[1.75rem] border border-emerald-400/10 bg-emerald-400/[0.045] p-5">
               <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-white">
                 <CheckCircle2 className="size-4 text-emerald-300" />
-                Key strengths
+                {t("interview.keyStrengths")}
               </div>
 
               <ul className="space-y-2.5 text-xs leading-5 text-white/65">
                 {(result.strengths || []).length === 0 && (
-                  <li>No strengths detected yet.</li>
+                  <li>{t("interview.noStrengthsDetected")}</li>
                 )}
 
                 {(result.strengths || []).slice(0, 3).map((item, index) => (
@@ -260,12 +275,12 @@ export function InterviewResultSummary({
             <div className="rounded-[1.75rem] border border-cyan-400/10 bg-cyan-400/[0.045] p-5">
               <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-white">
                 <Target className="size-4 text-cyan-300" />
-                Highest leverage focus
+                {t("interview.highestLeverageFocus")}
               </div>
 
               <ul className="space-y-2.5 text-xs leading-5 text-white/65">
                 {(result.weaknesses || []).length === 0 && (
-                  <li>No focus areas detected yet.</li>
+                  <li>{t("interview.noFocusAreasDetected")}</li>
                 )}
 
                 {(result.weaknesses || []).slice(0, 3).map((item, index) => (

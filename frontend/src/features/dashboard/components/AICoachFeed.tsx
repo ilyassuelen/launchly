@@ -13,6 +13,8 @@ import {
   Card,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import type {
   DashboardInsight,
 } from "@/features/dashboard/types/dashboard";
@@ -35,21 +37,28 @@ function getIcon(type?: string) {
   return Brain;
 }
 
-function formatDate(value?: string | null) {
+function formatDate(
+  value: string | null | undefined,
+  language: "english" | "german",
+  t: (key: string) => string,
+) {
   if (!value) {
-    return "run review to generate";
+    return t("dashboard.generatedRunReview");
   }
 
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    return "latest review";
+    return t("dashboard.generatedLatestReview");
   }
 
-  return new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-  }).format(date);
+  return new Intl.DateTimeFormat(
+    language === "german" ? "de" : "en",
+    {
+      month: "short",
+      day: "numeric",
+    },
+  ).format(date);
 }
 
 export function AICoachFeed({
@@ -57,6 +66,7 @@ export function AICoachFeed({
   onNavigate,
   generatedAt,
 }: AICoachFeedProps) {
+  const { language, t } = useI18n();
   return (
     <Card className="group relative overflow-hidden lg:col-span-2">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.08),transparent_30%)] opacity-80" />
@@ -64,19 +74,25 @@ export function AICoachFeed({
       <div className="relative mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm font-semibold">
           <Sparkles className="size-4 text-cyan-300" />
-          AI coach feed
+          {t("dashboard.aiCoachFeedTitle")}
         </div>
 
         <span className="inline-flex items-center gap-1 rounded-full bg-white/5 px-2 py-0.5 text-xs text-muted-foreground">
           <Sparkles className="size-3" />
-          generated {formatDate(generatedAt)}
+          {t("dashboard.generated", {
+            date: formatDate(
+              generatedAt,
+              language,
+              t,
+            ),
+          })}
         </span>
       </div>
 
       <ul className="relative divide-y divide-white/5">
         {insights.length === 0 && (
           <li className="rounded-2xl px-2 py-5 text-sm text-white/50">
-            Run an AI review to generate personalized career insights.
+            {t("dashboard.aiCoachFeedEmpty")}
           </li>
         )}
 
@@ -113,7 +129,8 @@ export function AICoachFeed({
                 }
                 className="ml-4 inline-flex shrink-0 items-center gap-1 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs transition hover:border-white/20 hover:bg-white/[0.06]"
               >
-                {insight.action_label || "Open"}
+                {insight.action_label ||
+                  t("dashboard.open")}
                 <ArrowRight className="size-3" />
               </button>
             </li>

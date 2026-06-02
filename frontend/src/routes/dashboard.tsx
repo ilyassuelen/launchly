@@ -8,6 +8,7 @@ import {
   Card,
 } from "@/components/launchly/AppShell";
 import { useAuth } from "@/context/AuthContext";
+import { useI18n } from "@/i18n/I18nContext";
 import logo from "../../static/logo.png";
 import {
   AlertTriangle,
@@ -86,15 +87,15 @@ function getGeneratedAt(
 
 function buildFallbackInsights(
   profileStrength: Record<string, number>,
+  t: (key: string, params?: Record<string, string | number>) => string,
 ): DashboardInsight[] {
   const fallback: DashboardInsight[] = [];
 
   if (clampScore(profileStrength?.Resume) < 75) {
     fallback.push({
-      title: "Improve your resume score",
-      description:
-        "Run the Resume Builder analysis and strengthen weak resume sections before sending more applications.",
-      action_label: "Improve",
+      title: t("dashboard.improveResumeScore"),
+      description: t("dashboard.improveResumeScoreDescription"),
+      action_label: t("dashboard.improve"),
       target_path: "/resumes",
       type: "resume",
     });
@@ -102,10 +103,9 @@ function buildFallbackInsights(
 
   if (clampScore(profileStrength?.LinkedIn) < 75) {
     fallback.push({
-      title: "Optimize your LinkedIn profile",
-      description:
-        "Improve your headline, About section and searchable keywords to increase recruiter visibility.",
-      action_label: "Optimize",
+      title: t("dashboard.optimizeLinkedInProfile"),
+      description: t("dashboard.optimizeLinkedInProfileDescription"),
+      action_label: t("dashboard.optimize"),
       target_path: "/linkedin",
       type: "linkedin",
     });
@@ -113,10 +113,9 @@ function buildFallbackInsights(
 
   if (clampScore(profileStrength?.Portfolio) < 75) {
     fallback.push({
-      title: "Strengthen your portfolio proof",
-      description:
-        "Add clearer project outcomes, technical proof and README improvements to raise your portfolio signal.",
-      action_label: "Review",
+      title: t("dashboard.strengthenPortfolioProof"),
+      description: t("dashboard.strengthenPortfolioProofDescription"),
+      action_label: t("dashboard.review"),
       target_path: "/portfolio",
       type: "portfolio",
     });
@@ -124,10 +123,9 @@ function buildFallbackInsights(
 
   if (clampScore(profileStrength?.Applications) < 70) {
     fallback.push({
-      title: "Build application momentum",
-      description:
-        "Send a few focused applications this week to create a stronger pipeline.",
-      action_label: "Open Board",
+      title: t("dashboard.buildApplicationMomentum"),
+      description: t("dashboard.buildApplicationMomentumDescription"),
+      action_label: t("dashboard.openBoard"),
       target_path: "/applications",
       type: "applications",
     });
@@ -138,6 +136,7 @@ function buildFallbackInsights(
 
 function Dashboard() {
   const { user, loading } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
 
   const {
@@ -170,7 +169,7 @@ function Dashboard() {
       <div className="flex min-h-screen items-center justify-center bg-[oklch(0.145_0.02_270)] text-white">
         <div className="flex items-center gap-3 text-sm text-white/60">
           <Loader2 className="size-4 animate-spin text-cyan-300" />
-          Loading dashboard...
+          {t("dashboard.loading")}
         </div>
       </div>
     );
@@ -183,7 +182,7 @@ function Dashboard() {
   const firstName =
     user?.first_name ||
     user?.username ||
-    "User";
+    t("dashboard.userFallback");
 
   const profileStrength =
     summary?.profile_strength || {};
@@ -191,7 +190,7 @@ function Dashboard() {
   const insights =
     summary?.insights?.length
       ? summary.insights
-      : buildFallbackInsights(profileStrength);
+      : buildFallbackInsights(profileStrength, t);
 
   const nextBestActions =
     summary?.next_best_actions?.length
@@ -215,18 +214,18 @@ function Dashboard() {
       title={
         <div className="flex flex-col gap-2">
           <div className="inline-flex w-fit items-center gap-2 rounded-full border border-cyan-300/10 bg-cyan-300/[0.06] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-            Career intelligence dashboard
+            {t("dashboard.heroBadge")}
           </div>
 
           <div className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
-            Your career command center,
+            {t("dashboard.heroTitle")}
             <span className="ml-2 bg-gradient-to-r from-violet-200 via-sky-200 to-cyan-200 bg-clip-text text-transparent">
               {firstName}
             </span>
           </div>
         </div>
       }
-      subtitle="Track your readiness, market fit, skill gaps, and next best actions from one focused dashboard."
+      subtitle={t("dashboard.heroSubtitle")}
     >
       <div className="space-y-4">
         {error && (
@@ -300,18 +299,19 @@ function Dashboard() {
             <div className="absolute left-1/2 top-0 h-32 w-32 -translate-x-1/2 rounded-full bg-violet-500/10 blur-3xl" />
 
             <div className="relative mb-3 text-sm font-semibold">
-              Activity heatmap
+              {t("dashboard.activityHeatmap")}
             </div>
 
             <ActivityHeatmap
               cells={summary?.activity?.heatmap || []}
+              t={t}
             />
 
             <div className="relative mt-3 flex items-center justify-between text-xs text-muted-foreground">
               <span>
-                {summary?.activity?.streak_days || 0}-day streak
+                {t("dashboard.dayStreak", { count: summary?.activity?.streak_days || 0 })}
               </span>
-              <span>Last 13 weeks</span>
+              <span>{t("dashboard.last13Weeks")}</span>
             </div>
           </Card>
         </div>
@@ -322,8 +322,13 @@ function Dashboard() {
 
 function ActivityHeatmap({
   cells,
+  t,
 }: {
   cells: number[];
+  t: (
+    key: string,
+    params?: Record<string, string | number>,
+  ) => string;
 }) {
   const normalizedCells =
     cells.length > 0
@@ -349,7 +354,7 @@ function ActivityHeatmap({
         return (
           <div
             key={`activity-${index}`}
-            title={`Activity level ${value}`}
+            title={t("dashboard.activityLevel", { value })}
             className={`size-3 rounded-[4px] transition hover:scale-125 ${colors[value]}`}
           />
         );

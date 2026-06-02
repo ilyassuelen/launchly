@@ -16,6 +16,7 @@ import {
   Progress,
 } from "@/components/launchly/AppShell";
 import { useAuth } from "@/context/AuthContext";
+import { useI18n } from "@/i18n/I18nContext";
 
 import { useCareerPath } from "@/features/career-path/hooks/useCareerPath";
 
@@ -28,26 +29,29 @@ import { CareerPathApplicationStrategy } from "@/features/career-path/components
 
 import type { CareerPathGenerateRequest } from "@/features/career-path/types/careerPath";
 
-function getRoleFitLabel(roleFit?: string | null) {
+function getRoleFitLabel(
+  roleFit: string | null | undefined,
+  t: (key: string) => string,
+) {
   const normalized = roleFit?.toLowerCase();
 
   if (normalized === "very_low") {
-    return "Very Low";
+    return t("careerPath.roleFitVeryLow");
   }
 
   if (normalized === "low") {
-    return "Low";
+    return t("careerPath.roleFitLow");
   }
 
   if (normalized === "medium") {
-    return "Medium";
+    return t("careerPath.roleFitMedium");
   }
 
   if (normalized === "high") {
-    return "High";
+    return t("careerPath.roleFitHigh");
   }
 
-  return "Not assessed";
+  return t("careerPath.roleFitNotAssessed");
 }
 
 function getRoleFitClassName(roleFit?: string | null) {
@@ -73,24 +77,27 @@ function getRoleFitClassName(roleFit?: string | null) {
 }
 
 
-function getConfidenceLabel(confidence: number) {
+function getConfidenceLabel(
+  confidence: number,
+  t: (key: string) => string,
+) {
   if (confidence >= 85) {
-    return "Job-ready signal";
+    return t("careerPath.jobReadySignal");
   }
 
   if (confidence >= 70) {
-    return "Strong direction";
+    return t("careerPath.strongDirection");
   }
 
   if (confidence >= 45) {
-    return "Developing path";
+    return t("careerPath.developingPath");
   }
 
   if (confidence > 0) {
-    return "Needs foundation";
+    return t("careerPath.needsFoundation");
   }
 
-  return "Awaiting roadmap";
+  return t("careerPath.awaitingRoadmap");
 }
 
 type CareerFlowTone = "cyan" | "violet" | "emerald";
@@ -171,6 +178,7 @@ export const Route = createFileRoute("/career-path")({
 function CareerPath() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   const {
     selectedCareerPath,
@@ -207,7 +215,7 @@ function CareerPath() {
       <div className="flex min-h-screen items-center justify-center bg-[oklch(0.145_0.02_270)] text-white">
         <div className="flex items-center gap-2 text-sm text-white/60">
           <Loader2 className="h-4 w-4 animate-spin" />
-          Loading career path...
+          {t("careerPath.loading")}
         </div>
       </div>
     );
@@ -215,14 +223,14 @@ function CareerPath() {
 
   const careerPath = selectedCareerPath || latestCareerPath;
   const confidence = careerPath?.confidence_score ?? 0;
-  const roleFitLabel = getRoleFitLabel(careerPath?.role_fit);
+  const roleFitLabel = getRoleFitLabel(careerPath?.role_fit, t);
   const roleFitClassName = getRoleFitClassName(careerPath?.role_fit);
-  const confidenceLabel = getConfidenceLabel(confidence);
+  const confidenceLabel = getConfidenceLabel(confidence, t);
 
   return (
     <AppShell
-      title="Career Path"
-      subtitle="Build a role-specific roadmap from your saved Launchly signals."
+      title={t("careerPath.title")}
+      subtitle={t("careerPath.subtitle")}
     >
       <div className="space-y-6">
         <Card className="relative min-h-[450px] overflow-hidden border-cyan-300/10 bg-[linear-gradient(135deg,rgba(15,23,42,0.96),rgba(8,13,24,0.98)_55%,rgba(18,24,46,0.9))] p-0 shadow-[0_24px_80px_rgba(6,182,212,0.06)]">
@@ -293,28 +301,28 @@ function CareerPath() {
 
             <div className="absolute left-[7%] top-[325px] hidden md:block">
               <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-cyan-100/55">
-                Phase 01
+                {t("careerPath.phase01")}
               </div>
               <div className="mt-1 text-2xl font-semibold tracking-tight text-white/75">
-                Profile signal
+                {t("careerPath.profileSignal")}
               </div>
             </div>
 
             <div className="absolute left-[42%] top-[325px] hidden md:block">
               <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-violet-100/55">
-                Phase 02
+                {t("careerPath.phase02")}
               </div>
               <div className="mt-1 text-2xl font-semibold tracking-tight text-white/75">
-                Skill gaps
+                {t("careerPath.skillGaps")}
               </div>
             </div>
 
             <div className="absolute right-[7%] top-[325px] hidden lg:block text-right">
               <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-emerald-100/55">
-                Phase 03
+                {t("careerPath.phase03")}
               </div>
               <div className="mt-1 text-2xl font-semibold tracking-tight text-white/75">
-                Job-ready proof
+                {t("careerPath.jobReadyProof")}
               </div>
             </div>
           </div>
@@ -340,7 +348,7 @@ function CareerPath() {
 
             <div>
               <div className="text-sm font-semibold">
-                Failed to load career path
+                {t("careerPath.failedToLoad")}
               </div>
 
               <div className="mt-1 text-sm text-red-100/75">
@@ -354,14 +362,14 @@ function CareerPath() {
           <div className="flex min-h-[300px] items-center justify-center rounded-3xl border border-white/10 bg-black/20">
             <div className="flex items-center gap-2 text-sm text-white/60">
               <Loader2 className="h-4 w-4 animate-spin" />
-              Loading your latest roadmap...
+              {t("careerPath.loadingLatestRoadmap")}
             </div>
           </div>
         ) : careerPath ? (
           <>
             <CareerFlowSection
-              stage="Stage 01"
-              title="Career Readiness"
+              stage={t("careerPath.stage01")}
+              title={t("careerPath.careerReadiness")}
               tone="cyan"
             >
             <Card className="relative overflow-hidden border-cyan-300/10 bg-[linear-gradient(135deg,rgba(15,23,42,0.96),rgba(8,13,24,0.98)_50%,rgba(20,18,48,0.82))] p-0 shadow-[0_28px_90px_rgba(6,182,212,0.08)]">
@@ -373,11 +381,11 @@ function CareerPath() {
                   <div className="min-w-0">
                     <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/10 bg-cyan-400/[0.06] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-100/70">
                       <TrendingUp className="size-3.5 text-cyan-300" />
-                      Career Readiness Journey
+                      {t("careerPath.careerReadinessJourney")}
                     </div>
 
                     <h2 className="mt-4 max-w-4xl text-3xl font-semibold tracking-tight text-white lg:text-4xl">
-                      Your path toward{" "}
+                      {t("careerPath.yourPathToward")}{" "}
                       <span className="bg-gradient-to-r from-violet-200 via-cyan-100 to-emerald-200 bg-clip-text text-transparent">
                         {careerPath.target_role}
                       </span>
@@ -385,20 +393,24 @@ function CareerPath() {
 
                     <p className="mt-4 max-w-4xl text-sm leading-7 text-white/58 lg:text-[15px]">
                       {careerPath.summary ||
-                        "Your profile-based roadmap is ready."}
+                        t("careerPath.profileRoadmapReady")}
                     </p>
 
                     <div className="mt-5 flex flex-wrap gap-2">
                       <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-white/70">
-                        {careerPath.timeframe_months ?? 6} months
+                        {t("careerPath.monthsCount", {
+                          count: careerPath.timeframe_months ?? 6,
+                        })}
                       </div>
 
                       <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-white/70">
-                        {careerPath.current_level || "Not specified"}
+                        {careerPath.current_level || t("careerPath.notSpecified")}
                       </div>
 
                       <div className={`rounded-full border px-3 py-1.5 text-xs font-medium ${roleFitClassName}`}>
-                        {roleFitLabel} fit
+                        {t("careerPath.roleFitLabel", {
+                          roleFit: roleFitLabel,
+                        })}
                       </div>
                     </div>
                   </div>
@@ -408,7 +420,7 @@ function CareerPath() {
 
                     <div className="relative">
                       <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/15 bg-cyan-300/[0.08] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-100/75">
-                        Estimated Role Readiness
+                        {t("careerPath.estimatedRoleReadiness")}
                       </div>
 
                       <div className="relative isolate mx-auto mt-5 grid size-32 place-items-center overflow-hidden rounded-full border border-cyan-300/20 bg-white/[0.045] shadow-[0_28px_85px_rgba(34,211,238,0.16)]">
@@ -448,15 +460,17 @@ function CareerPath() {
                       <div className="mb-8 flex items-center justify-between gap-4">
                         <div>
                           <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/35">
-                            Progression path
+                            {t("careerPath.progressionPath")}
                           </div>
                           <div className="mt-1 text-sm text-white/55">
-                            From profile signals to job-ready proof
+                            {t("careerPath.progressionPathDescription")}
                           </div>
                         </div>
 
                         <div className="rounded-full border border-cyan-300/10 bg-cyan-400/[0.06] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100/65">
-                          {confidence}% complete
+                          {t("careerPath.completePercent", {
+                            percent: confidence,
+                          })}
                         </div>
                       </div>
 
@@ -469,10 +483,10 @@ function CareerPath() {
 
                         <div className="relative grid grid-cols-4 gap-4">
                           {[
-                            ["Current", "Saved profile signals", 0, "cyan"],
-                            ["Developing", "Skill gaps in focus", 35, "violet"],
-                            ["Intermediate", "Portfolio proof growing", 70, "violet"],
-                            ["Job Ready", "Recruiter-ready evidence", 100, "emerald"],
+                            [t("careerPath.current"), t("careerPath.savedProfileSignals"), 0, "cyan"],
+                            [t("careerPath.developing"), t("careerPath.skillGapsInFocus"), 35, "violet"],
+                            [t("careerPath.intermediate"), t("careerPath.portfolioProofGrowing"), 70, "violet"],
+                            [t("careerPath.jobReady"), t("careerPath.recruiterReadyEvidence"), 100, "emerald"],
                           ].map(([label, description, threshold, tone], index) => {
                             const active = confidence >= Number(threshold);
                             const toneClass =
@@ -509,7 +523,9 @@ function CareerPath() {
                                   }`}
                                 >
                                   <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/35">
-                                    Stage {index + 1}
+                                    {t("careerPath.stageNumber", {
+                                      number: index + 1,
+                                    })}
                                   </div>
 
                                   <div className="mt-1 text-sm font-semibold text-white/85">
@@ -530,7 +546,7 @@ function CareerPath() {
                         <div className="mt-7 rounded-[1.5rem] border border-white/7 bg-black/25 p-5">
                           <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-white/35">
                             <Target className="size-3.5 text-violet-300" />
-                            Fit analysis
+                            {t("careerPath.fitAnalysis")}
                           </div>
 
                           <p className="text-sm leading-7 text-white/55">
@@ -546,24 +562,24 @@ function CareerPath() {
             </CareerFlowSection>
 
             <CareerFlowSection
-              stage="Stage 02"
-              title="Strategic Roadmap"
+              stage={t("careerPath.stage02")}
+              title={t("careerPath.strategicRoadmap")}
               tone="violet"
             >
               <CareerPathTimeline roadmap={careerPath.roadmap} />
             </CareerFlowSection>
 
             <CareerFlowSection
-              stage="Stage 03"
-              title="Skill Gaps"
+              stage={t("careerPath.stage03")}
+              title={t("careerPath.skillGaps")}
               tone="cyan"
             >
               <CareerPathSkillGaps skillGaps={careerPath.skill_gaps} />
             </CareerFlowSection>
 
             <CareerFlowSection
-              stage="Stage 04"
-              title="Learning Track"
+              stage={t("careerPath.stage04")}
+              title={t("careerPath.learningTrack")}
               tone="violet"
             >
               <CareerPathLearningPlan
@@ -572,16 +588,16 @@ function CareerPath() {
             </CareerFlowSection>
 
             <CareerFlowSection
-              stage="Stage 05"
-              title="Portfolio Proof"
+              stage={t("careerPath.stage05")}
+              title={t("careerPath.portfolioProof")}
               tone="emerald"
             >
               <CareerPathProjects projectPlan={careerPath.project_plan} />
             </CareerFlowSection>
 
             <CareerFlowSection
-              stage="Stage 06"
-              title="Application Launch"
+              stage={t("careerPath.stage06")}
+              title={t("careerPath.applicationLaunch")}
               tone="violet"
             >
               <CareerPathApplicationStrategy
@@ -596,13 +612,11 @@ function CareerPath() {
             </div>
 
             <h2 className="mt-5 text-xl font-semibold text-white">
-              No profile-based roadmap yet
+              {t("careerPath.noRoadmapYet")}
             </h2>
 
             <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-white/55">
-              Generate your first roadmap from your saved Launchly profile.
-              Launchly will use your resume, applications, interview results,
-              LinkedIn analysis, portfolio insights and dashboard signals.
+              {t("careerPath.noRoadmapDescription")}
             </p>
           </div>
         )}

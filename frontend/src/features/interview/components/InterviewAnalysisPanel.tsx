@@ -10,6 +10,8 @@ import {
   Card,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import type {
   InterviewResult,
 } from "@/features/interview/types/interview";
@@ -52,6 +54,8 @@ export function InterviewAnalysisPanel({
   result,
   isActive = false,
 }: InterviewAnalysisPanelProps) {
+  const { t } = useI18n();
+
   return (
     <Card className="relative overflow-hidden border-white/8 bg-white/[0.025] shadow-[0_18px_60px_rgba(0,0,0,0.18)]">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(139,92,246,0.08),transparent_38%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.06),transparent_35%)]" />
@@ -61,24 +65,24 @@ export function InterviewAnalysisPanel({
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/60">
               <Activity className="size-3.5 text-cyan-300" />
-              Analysis
+              {t("interview.analysis")}
             </div>
 
             <div className="mt-3 text-lg font-semibold text-white">
-              AI feedback overview
+              {t("interview.aiFeedbackOverview")}
             </div>
 
             <div className="mt-1 max-w-xl text-sm leading-6 text-white/50">
               {result
-                ? "Recruiter-style interpretation, coaching priorities and session signals generated from your answers."
+                ? t("interview.feedbackOverviewReady")
                 : isActive
-                  ? "Your feedback overview will appear automatically after the final answer."
-                  : "Start and complete an interview to unlock your feedback overview."}
+                  ? t("interview.feedbackOverviewAfterFinalAnswer")
+                  : t("interview.feedbackOverviewLocked")}
             </div>
           </div>
 
           <div className="shrink-0 rounded-full border border-white/10 bg-white/[0.035] px-3 py-1.5 text-xs font-medium text-white/45">
-            {result ? "Generated" : "Pending"}
+            {result ? t("interview.generated") : t("interview.pending")}
           </div>
         </div>
 
@@ -88,17 +92,19 @@ export function InterviewAnalysisPanel({
               <div>
                 <div className="flex items-center gap-2 text-sm font-semibold text-white">
                   <Sparkles className="size-4 text-violet-300" />
-                  Recruiter perspective
+                  {t("interview.recruiterPerspective")}
                 </div>
 
                 <div className="mt-1 text-xs leading-5 text-white/45">
-                  What a recruiter would likely notice first.
+                  {t("interview.recruiterPerspectiveDescription")}
                 </div>
               </div>
 
               {result && (
                 <div className="rounded-full bg-white/[0.04] px-2.5 py-1 text-[10px] text-white/45">
-                  {result.recruiter_insights?.length || 0} signals
+                  {t("interview.signalsCount", {
+                    count: result.recruiter_insights?.length || 0,
+                  })}
                 </div>
               )}
             </div>
@@ -106,7 +112,7 @@ export function InterviewAnalysisPanel({
             <div className="divide-y divide-white/[0.06]">
               {!result && (
                 <div className="rounded-2xl border border-white/5 bg-white/[0.025] p-4 text-sm leading-6 text-white/50">
-                  Recruiter-style insights will be generated after the interview.
+                  {t("interview.recruiterInsightsEmpty")}
                 </div>
               )}
 
@@ -139,7 +145,7 @@ export function InterviewAnalysisPanel({
                       <div
                         className={`shrink-0 rounded-full px-2 py-1 text-[10px] capitalize ${styles.badge}`}
                       >
-                        {insight.impact || "medium"}
+                        {insight.impact || t("interview.medium")}
                       </div>
                     </div>
                   </div>
@@ -150,22 +156,22 @@ export function InterviewAnalysisPanel({
             <div className="mt-5 rounded-2xl border border-white/[0.06] bg-white/[0.025] p-4">
               <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
                 <TrendingUp className="size-3.5 text-cyan-300" />
-                Session signals
+                {t("interview.sessionSignals")}
               </div>
 
               <div className="grid gap-3 text-xs sm:grid-cols-3">
                 {[
                   [
-                    "Engagement",
-                    result?.recruiter_engagement || "Pending",
+                    t("interview.engagement"),
+                    result?.recruiter_engagement || t("interview.pending"),
                   ],
                   [
-                    "Filler words",
-                    result?.filler_words || "Unknown",
+                    t("interview.fillerWords"),
+                    result?.filler_words || t("interview.unknown"),
                   ],
                   [
-                    "Confidence",
-                    result?.estimated_confidence || "Pending",
+                    t("interview.confidence"),
+                    result?.estimated_confidence || t("interview.pending"),
                   ],
                 ].map(([label, value]) => (
                   <div
@@ -189,18 +195,18 @@ export function InterviewAnalysisPanel({
             <div className="mb-5">
               <div className="flex items-center gap-2 text-sm font-semibold text-white">
                 <TrendingUp className="size-4 text-cyan-300" />
-                Growth opportunities
+                {t("interview.growthOpportunities")}
               </div>
 
               <div className="mt-1 text-xs leading-5 text-white/45">
-                The highest-leverage next steps to improve your interview performance.
+                {t("interview.growthOpportunitiesDescription")}
               </div>
             </div>
 
             <ul className="space-y-4 text-sm text-white/65">
               {!result && (
                 <li className="rounded-2xl border border-white/5 bg-white/[0.025] p-4 text-white/50">
-                  Coaching tips will be generated from your answers.
+                  {t("interview.coachingTipsEmpty")}
                 </li>
               )}
 

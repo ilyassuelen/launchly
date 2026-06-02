@@ -15,6 +15,7 @@ import {
 } from "react";
 
 import { useAuth } from "@/context/AuthContext";
+import { useI18n } from "@/i18n/I18nContext";
 
 import logo from "../../static/logo.png";
 import { login } from "@/services/auth";
@@ -31,6 +32,7 @@ function LoginPage() {
     loading: authLoading,
     refreshUser,
   } = useAuth();
+  const { t } = useI18n();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -67,7 +69,7 @@ function LoginPage() {
       setError(
         err?.response?.data?.detail ||
           err?.message ||
-          "Login failed. Please check your credentials.",
+          t("auth.login") + " failed.",
       );
     } finally {
       setLoading(false);
@@ -106,7 +108,7 @@ function LoginPage() {
               to="/register"
               className="text-sm text-white/60 transition hover:text-white"
             >
-              Create account
+              {t("auth.createAccount")}
             </Link>
           </div>
         </header>
@@ -118,17 +120,15 @@ function LoginPage() {
 
               <div className="relative">
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs text-white/50">
-                  Welcome back
+                  {t("auth.loginTitle")}
                 </div>
 
                 <h1 className="mt-6 text-4xl font-semibold tracking-tight">
-                  Sign in to Launchly
+                  {t("auth.login") + " to Launchly"}
                 </h1>
 
                 <p className="mt-3 text-sm leading-7 text-white/55">
-                  Continue improving your
-                  resume, portfolio and
-                  interview readiness.
+                  {t("auth.loginSubtitle")}
                 </p>
 
                 <form
@@ -137,7 +137,7 @@ function LoginPage() {
                 >
                   <div>
                     <label className="mb-2 block text-sm text-white/60">
-                      Username
+                      {t("auth.email")}
                     </label>
 
                     <input
@@ -149,14 +149,14 @@ function LoginPage() {
                           e.target.value,
                         )
                       }
-                      placeholder="Enter your username"
+                      placeholder={t("auth.email")}
                       className="h-14 w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 text-sm text-white outline-none transition focus:border-violet-400/40 focus:bg-white/[0.05]"
                     />
                   </div>
 
                   <div>
                     <label className="mb-2 block text-sm text-white/60">
-                      Password
+                      {t("auth.password")}
                     </label>
 
                     <div className="relative">
@@ -173,7 +173,7 @@ function LoginPage() {
                             e.target.value,
                           )
                         }
-                        placeholder="Enter your password"
+                        placeholder={t("auth.password")}
                         className="h-14 w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 pr-12 text-sm text-white outline-none transition focus:border-violet-400/40 focus:bg-white/[0.05]"
                       />
 
@@ -209,11 +209,11 @@ function LoginPage() {
                     {loading ? (
                       <>
                         <Loader2 className="size-4 animate-spin" />
-                        Signing in...
+                        {t("auth.loggingIn")}
                       </>
                     ) : (
                       <>
-                        Sign in
+                        {t("auth.signIn")}
                         <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
                       </>
                     )}
@@ -221,12 +221,12 @@ function LoginPage() {
                 </form>
 
                 <div className="mt-8 text-center text-sm text-white/45">
-                  Don’t have an account?{" "}
+                  {t("auth.noAccount")} {" "}
                   <Link
                     to="/register"
                     className="font-medium text-cyan-300 transition hover:text-cyan-200"
                   >
-                    Create one
+                    {t("auth.createAccount")}
                   </Link>
                 </div>
               </div>

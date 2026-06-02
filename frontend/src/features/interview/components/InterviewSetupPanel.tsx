@@ -10,6 +10,8 @@ import {
   Card,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import type {
   InterviewDifficulty,
   InterviewMode,
@@ -31,26 +33,26 @@ type InterviewSetupPanelProps = {
 
 const modes: {
   value: InterviewMode;
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
   icon: React.ComponentType<{ className?: string }>;
 }[] = [
   {
     value: "behavioral",
-    label: "Behavioral / HR",
-    description: "Motivation, teamwork, conflict, ownership",
+    labelKey: "interview.modeBehavioral",
+    descriptionKey: "interview.modeBehavioralDescription",
     icon: MessageSquare,
   },
   {
     value: "technical",
-    label: "Technical",
-    description: "Skills, projects, architecture, debugging",
+    labelKey: "interview.modeTechnical",
+    descriptionKey: "interview.modeTechnicalDescription",
     icon: Code2,
   },
   {
     value: "system-design",
-    label: "System Design",
-    description: "Design thinking, tradeoffs, scalability",
+    labelKey: "interview.modeSystemDesign",
+    descriptionKey: "interview.modeSystemDesignDescription",
     icon: Sparkles,
   },
 ];
@@ -74,6 +76,8 @@ export function InterviewSetupPanel({
   onMaxQuestionsChange,
   onStart,
 }: InterviewSetupPanelProps) {
+  const { t } = useI18n();
+
   const canStart =
     role.trim().length >= 2 &&
     !isStarting &&
@@ -93,12 +97,12 @@ export function InterviewSetupPanel({
                 </div>
 
                 <div className="text-base font-semibold text-white">
-                  Interview Setup
+                  {t("interview.interviewSetup")}
                 </div>
               </div>
 
               <div className="mt-2 text-xs text-muted-foreground">
-                Configure your AI mock interview session.
+                {t("interview.interviewSetupDescription")}
               </div>
             </div>
 
@@ -108,7 +112,7 @@ export function InterviewSetupPanel({
 
         <div>
           <div className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Interview mode
+            {t("interview.interviewMode")}
           </div>
 
           <div className="space-y-2">
@@ -134,11 +138,11 @@ export function InterviewSetupPanel({
 
                   <div className="min-w-0">
                     <div className="font-medium">
-                      {item.label}
+                      {t(item.labelKey)}
                     </div>
 
                     <div className="mt-0.5 text-xs leading-5 text-muted-foreground">
-                      {item.description}
+                      {t(item.descriptionKey)}
                     </div>
                   </div>
                 </button>
@@ -150,19 +154,19 @@ export function InterviewSetupPanel({
         <div className="mt-6 rounded-2xl border border-white/5 bg-white/[0.03] p-4">
           <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             <Briefcase className="size-3.5" />
-            Target role
+            {t("interview.targetRole")}
           </div>
 
           <input
             value={role}
             disabled={disabled || isStarting}
             onChange={(event) => onRoleChange(event.target.value)}
-            placeholder="e.g. AI Engineer, Frontend Developer..."
+            placeholder={t("interview.targetRolePlaceholder")}
             className="mt-2 w-full rounded-xl border border-white/10 bg-black/20 px-3 py-3 text-sm text-white/80 outline-none placeholder:text-white/35 transition focus:border-cyan-300/30 focus:bg-black/30 disabled:cursor-not-allowed disabled:opacity-60"
           />
 
           <div className="mt-5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Difficulty
+            {t("interview.difficulty")}
           </div>
 
           <div className="mt-2 flex gap-2">
@@ -188,7 +192,7 @@ export function InterviewSetupPanel({
           </div>
 
           <div className="mt-5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Questions
+            {t("interview.questions")}
           </div>
 
           <div className="mt-2 flex gap-2">
@@ -217,16 +221,16 @@ export function InterviewSetupPanel({
         <div className="mt-6 rounded-2xl border border-white/5 bg-gradient-to-br from-cyan-400/[0.08] to-violet-500/[0.08] p-4">
           <div className="flex items-center gap-2 text-sm font-semibold">
             <Sparkles className="size-4 text-cyan-300" />
-            How it works
+            {t("interview.howItWorks")}
           </div>
 
           <div className="mt-4 space-y-3 text-xs leading-5 text-white/65">
             <div className="rounded-xl bg-black/20 p-3">
-              Questions are adapted to your selected role, level and saved resume context.
+              {t("interview.howItWorksAdaptiveQuestions")}
             </div>
 
             <div className="rounded-xl bg-black/20 p-3">
-              After the final question, Launchly automatically scores your interview.
+              {t("interview.howItWorksAutoScore")}
             </div>
           </div>
         </div>
@@ -238,7 +242,7 @@ export function InterviewSetupPanel({
           className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-brand px-5 py-3 text-sm font-semibold text-primary-foreground glow transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Play className="size-4" />
-          {isStarting ? "Starting interview..." : "Start interview"}
+          {isStarting ? t("interview.startingInterview") : t("interview.startInterview")}
         </button>
       </div>
     </Card>

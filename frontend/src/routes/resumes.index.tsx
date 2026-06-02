@@ -20,6 +20,8 @@ import {
   Card,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import { ResumeThumbnail } from "@/features/resume/components/ResumeThumbnail";
 
 import {
@@ -38,6 +40,7 @@ export const Route =
 
 function ResumesPage() {
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   const [resumes, setResumes] =
     useState<any[]>([]);
@@ -84,7 +87,7 @@ function ResumesPage() {
       try {
         const response =
           await createResume({
-            title: "New Resume",
+            title: t("resume.newResume"),
             template: "aurora",
             data: mockResume,
           });
@@ -135,15 +138,15 @@ function ResumesPage() {
   if (loading) {
     return (
       <div className="p-10 text-white">
-        Loading resumes...
+        {t("resume.loadingResumes")}
       </div>
     );
   }
 
   return (
     <AppShell
-      title="Resumes"
-      subtitle="Manage your resume variants."
+      title={t("resume.resumes")}
+      subtitle={t("resume.manageVariants")}
     >
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
 
@@ -158,11 +161,11 @@ function ResumesPage() {
           </div>
 
           <div className="mt-5 text-lg font-semibold">
-            Create Resume
+            {t("resume.createResume")}
           </div>
 
           <div className="mt-1 text-sm text-muted-foreground">
-            Create a new variant
+            {t("resume.createNewVariant")}
           </div>
         </button>
 

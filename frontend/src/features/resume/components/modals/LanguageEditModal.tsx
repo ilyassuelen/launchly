@@ -4,6 +4,7 @@ import { ResumeEditModal } from "@/features/resume/components/ui/ResumeEditModal
 import { ResumeInput } from "@/features/resume/components/ui/ResumeInput";
 import { ResumeFieldGroup } from "@/features/resume/components/ui/ResumeFieldGroup";
 import { ResumeActionButton } from "@/features/resume/components/ui/ResumeActionButton";
+import { useI18n } from "@/i18n/I18nContext";
 
 type LanguageItem = {
   id: string | number;
@@ -29,6 +30,7 @@ export function LanguageEditModal({
   onSave,
   onChange,
 }: LanguageEditModalProps) {
+  const { t } = useI18n();
   if (!language) {
     return null;
   }
@@ -36,8 +38,8 @@ export function LanguageEditModal({
   return (
     <ResumeEditModal
       open={open}
-      title="Edit Language"
-      subtitle="Manage language information and proficiency level."
+      title={t("resume.editLanguage")}
+      subtitle={t("resume.languageModalSubtitle")}
       onClose={onClose}
       footer={
         <div className="flex items-center justify-end gap-3">
@@ -45,7 +47,7 @@ export function LanguageEditModal({
             variant="ghost"
             onClick={onClose}
           >
-            Cancel
+            {t("common.cancel")}
           </ResumeActionButton>
 
           <ResumeActionButton
@@ -53,14 +55,14 @@ export function LanguageEditModal({
             variant="primary"
             onClick={onSave}
           >
-            Save Changes
+            {t("common.saveChanges")}
           </ResumeActionButton>
         </div>
       }
     >
       <div className="space-y-6">
 
-        <ResumeFieldGroup label="Language">
+        <ResumeFieldGroup label={t("resume.language")}>
           <ResumeInput
             value={language.name}
             onChange={(e) =>
@@ -69,11 +71,11 @@ export function LanguageEditModal({
                 e.target.value,
               )
             }
-            placeholder="e.g. English"
+            placeholder={t("resume.languagePlaceholder")}
           />
         </ResumeFieldGroup>
 
-        <ResumeFieldGroup label="Proficiency Level">
+        <ResumeFieldGroup label={t("resume.proficiencyLevel")}>
           <ResumeInput
             value={language.level}
             onChange={(e) =>
@@ -82,7 +84,7 @@ export function LanguageEditModal({
                 e.target.value,
               )
             }
-            placeholder="e.g. Fluent"
+            placeholder={t("resume.proficiencyLevelPlaceholder")}
           />
         </ResumeFieldGroup>
 

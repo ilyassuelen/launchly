@@ -6,6 +6,8 @@ import {
   Card,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import type { CoverLetter } from "@/features/cover-letter/types/coverLetter";
 
 import { FONT_OPTIONS } from "@/features/resume/constants/typography";
@@ -59,6 +61,7 @@ export function CoverLetterRightPanel({
   typography,
   updateTypography,
 }: Props) {
+  const { t } = useI18n();
   return (
     <div className="space-y-4 lg:col-span-2">
 
@@ -69,7 +72,7 @@ export function CoverLetterRightPanel({
 
           <LayoutTemplate className="size-4 text-violet-300" />
 
-          Templates
+          {t("resume.templates")}
 
         </div>
 
@@ -117,7 +120,7 @@ export function CoverLetterRightPanel({
 
           <LayoutTemplate className="size-4 text-violet-300" />
 
-          Typography
+          {t("resume.typography")}
 
         </div>
 
@@ -127,7 +130,7 @@ export function CoverLetterRightPanel({
           <div>
 
             <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-white/45">
-              Font Family
+              {t("resume.fontFamily")}
             </div>
 
             <div className="grid grid-cols-1 gap-2">
@@ -155,7 +158,7 @@ export function CoverLetterRightPanel({
                   </div>
 
                   <div className="mt-1 text-xs text-white/50">
-                    The quick brown fox jumps over the lazy dog
+                    {t("resume.fontPreviewSentence")}
                   </div>
 
                 </button>
@@ -171,7 +174,7 @@ export function CoverLetterRightPanel({
             <div className="mb-2 flex items-center justify-between">
 
               <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/45">
-                Font Size
+                {t("resume.fontSize")}
               </div>
 
               <div className="text-xs text-white/60">
@@ -204,7 +207,7 @@ export function CoverLetterRightPanel({
             <div className="mb-2 flex items-center justify-between">
 
               <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/45">
-                Line Height
+                {t("resume.lineHeight")}
               </div>
 
               <div className="text-xs text-white/60">

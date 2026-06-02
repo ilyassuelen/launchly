@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 import { Card } from "@/components/launchly/AppShell";
+import { useI18n } from "@/i18n/I18nContext";
 
 import type {
   CoverLetterAnalysis,
@@ -29,6 +30,8 @@ export function CoverLetterInsightsPanel({
   onAnalyze,
   canAnalyze,
 }: Props) {
+  const { t } = useI18n();
+
   const smartSuggestions =
     analysis?.smart_suggestions || [];
 
@@ -52,11 +55,11 @@ export function CoverLetterInsightsPanel({
               <div>
 
                 <div className="text-sm font-semibold">
-                  Smart suggestions
+                  {t("coverLetter.smartSuggestions")}
                 </div>
 
                 <div className="mt-1 text-xs text-muted-foreground">
-                  AI-powered recommendations to improve recruiter response
+                  {t("coverLetter.smartSuggestionsDescription")}
                 </div>
 
               </div>
@@ -91,15 +94,15 @@ export function CoverLetterInsightsPanel({
               {isAnalyzing ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  Analyzing...
+                  {t("coverLetter.analyzing")}
                 </>
               ) : (
                 <>
                   <Brain className="size-4" />
 
                   {analysis
-                      ? "Re-Analyze"
-                      : "Analyze Cover Letter"}
+                      ? t("coverLetter.reAnalyze")
+                      : t("coverLetter.analyzeCoverLetter")}
                 </>
               )}
             </button>
@@ -110,7 +113,7 @@ export function CoverLetterInsightsPanel({
 
             {isAnalyzing ? (
               <div className="col-span-full rounded-3xl border border-white/5 bg-white/[0.03] p-6 text-sm text-white/60">
-                Generating AI analysis...
+                {t("coverLetter.generatingAiAnalysis")}
               </div>
             ) : smartSuggestions.length > 0 ? (
               smartSuggestions.map((suggestion, index) => {
@@ -156,7 +159,9 @@ export function CoverLetterInsightsPanel({
                     <div
                       className={`mb-4 inline-flex rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${priorityClasses}`}
                     >
-                      {suggestion.priority || "low"} impact
+                      {t("coverLetter.priorityImpact", {
+                        priority: suggestion.priority || t("coverLetter.low"),
+                      })}
                     </div>
                     <div className="flex items-center gap-4">
 
@@ -179,7 +184,7 @@ export function CoverLetterInsightsPanel({
               })
             ) : (
               <div className="col-span-full rounded-3xl border border-white/5 bg-white/[0.03] p-6 text-sm text-white/60">
-                Generate a cover letter to receive AI-powered recruiter analysis.
+                {t("coverLetter.generateCoverLetterForAnalysis")}
               </div>
             )}
 
@@ -201,11 +206,11 @@ export function CoverLetterInsightsPanel({
               <div>
 
                 <div className="text-sm font-semibold">
-                  Recruiter analysis
+                  {t("coverLetter.recruiterAnalysis")}
                 </div>
 
                 <div className="mt-1 text-xs text-muted-foreground">
-                  Simulated recruiter review
+                  {t("coverLetter.simulatedRecruiterReview")}
                 </div>
 
               </div>
@@ -216,14 +221,14 @@ export function CoverLetterInsightsPanel({
 
               {isAnalyzing ? (
                 <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-sm text-white/60">
-                  Analyzing recruiter impression...
+                  {t("coverLetter.analyzingRecruiterImpression")}
                 </div>
               ) : recruiterAnalysis ? (
                 <>
                   <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4">
 
                     <div className="text-xs uppercase tracking-[0.18em] text-cyan-300">
-                      Strongest Area
+                      {t("coverLetter.strongestArea")}
                     </div>
 
                     <div className="mt-2 text-sm text-white/80">
@@ -235,7 +240,7 @@ export function CoverLetterInsightsPanel({
                   <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4">
 
                     <div className="text-xs uppercase tracking-[0.18em] text-orange-300">
-                      Improvement Opportunity
+                      {t("coverLetter.improvementOpportunity")}
                     </div>
 
                     <div className="mt-2 text-sm text-white/80">
@@ -247,7 +252,7 @@ export function CoverLetterInsightsPanel({
                   <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4">
 
                     <div className="text-xs uppercase tracking-[0.18em] text-emerald-300">
-                      Recruiter Impression
+                      {t("coverLetter.recruiterImpression")}
                     </div>
 
                     <div className="mt-2 text-sm text-white/80">
@@ -258,7 +263,7 @@ export function CoverLetterInsightsPanel({
                 </>
               ) : (
                 <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-sm text-white/60">
-                  No recruiter analysis available yet.
+                  {t("coverLetter.noRecruiterAnalysis")}
                 </div>
               )}
 

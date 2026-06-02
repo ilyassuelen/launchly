@@ -1,4 +1,5 @@
 import { Card } from "@/components/launchly/AppShell";
+import { useI18n } from "@/i18n/I18nContext";
 
 import { PersonalInfoEditor } from "@/features/resume/components/editor/PersonalInfoEditor";
 import { SummaryEditor } from "@/features/resume/components/editor/SummaryEditor";
@@ -71,6 +72,7 @@ export function ResumeLeftPanel({
   renderSidebarSectionContent,
   renderMainSectionContent,
 }: Props) {
+  const { t } = useI18n();
   return (
     <Card className="overflow-hidden lg:col-span-3">
 
@@ -78,11 +80,11 @@ export function ResumeLeftPanel({
 
         <div>
           <div className="text-sm font-semibold">
-            Resume editor
+            {t("resume.resumeEditor")}
           </div>
 
           <div className="mt-1 text-xs text-muted-foreground">
-            Drag, edit and optimize sections
+            {t("resume.resumeEditorDescription")}
           </div>
         </div>
 

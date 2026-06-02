@@ -12,31 +12,36 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-const scanSteps = [
-  {
-    label: "Scanning repositories...",
-    icon: Github,
-  },
-  {
-    label: "Reading README files...",
-    icon: FileText,
-  },
-  {
-    label: "Evaluating recruiter signal...",
-    icon: Radar,
-  },
-  {
-    label: "Analyzing architecture depth...",
-    icon: SearchCode,
-  },
-  {
-    label: "Building portfolio review...",
-    icon: ShieldCheck,
-  },
-];
+import { useI18n } from "@/i18n/I18nContext";
+
 
 export function PortfolioScanLoader() {
   const [activeStep, setActiveStep] = useState(0);
+
+  const { t } = useI18n();
+
+  const scanSteps = [
+    {
+      label: t("portfolio.scanRepositories"),
+      icon: Github,
+    },
+    {
+      label: t("portfolio.readingReadmes"),
+      icon: FileText,
+    },
+    {
+      label: t("portfolio.evaluatingRecruiterSignal"),
+      icon: Radar,
+    },
+    {
+      label: t("portfolio.analyzingArchitectureDepth"),
+      icon: SearchCode,
+    },
+    {
+      label: t("portfolio.buildingPortfolioReview"),
+      icon: ShieldCheck,
+    },
+  ];
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -62,7 +67,7 @@ export function PortfolioScanLoader() {
         <div>
           <div className="flex items-center gap-2 text-sm font-semibold text-white">
             <Loader2 className="size-4 animate-spin text-cyan-300" />
-            Portfolio scan running
+            {t("portfolio.portfolioScanRunning")}
           </div>
 
           <div className="mt-1 text-sm text-white/55">

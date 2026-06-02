@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 
 import { Card } from "@/components/launchly/AppShell";
+import { useI18n } from "@/i18n/I18nContext";
 
 import { ResumePreview } from "@/components/resume/ResumePreview";
 
@@ -42,6 +43,7 @@ export function ResumePreviewPanel({
   printRef,
   previewContentRef,
 }: Props) {
+  const { t } = useI18n();
   return (
     <Card className="relative flex h-[calc(100vh-120px)] min-h-[900px] flex-col overflow-hidden p-0 lg:col-span-7">
 
@@ -51,11 +53,11 @@ export function ResumePreviewPanel({
 
         <div>
           <div className="text-sm font-semibold">
-            Live document preview
+            {t("resume.liveDocumentPreview")}
           </div>
 
           <div className="mt-1 text-xs text-muted-foreground">
-            Real-time recruiter-ready formatting
+            {t("resume.recruiterReadyFormatting")}
           </div>
         </div>
 
@@ -94,10 +96,10 @@ export function ResumePreviewPanel({
               <Wand2 className="size-4" />
 
               {saveStatus === "saving"
-                ? "Saving..."
+                ? t("common.saving")
                 : saveStatus === "saved"
-                  ? "Saved"
-                  : "Save"}
+                  ? t("resume.saved")
+                  : t("common.save")}
             </button>
 
             <button
@@ -105,7 +107,7 @@ export function ResumePreviewPanel({
               className="inline-flex items-center gap-2 rounded-xl bg-gradient-brand px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[0_10px_30px_rgba(168,85,247,0.35)] transition hover:scale-[1.02]"
             >
               <Download className="size-4" />
-              Export
+              {t("resume.export")}
             </button>
 
           </div>
@@ -132,7 +134,7 @@ export function ResumePreviewPanel({
                 }}
               >
                 <div className="absolute -top-3 right-4 rounded-full border border-red-400/30 bg-red-500/15 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-red-200 backdrop-blur-xl">
-                  Content exceeds A4 page
+                  {t("resume.contentExceedsA4")}
                 </div>
               </div>
             )}

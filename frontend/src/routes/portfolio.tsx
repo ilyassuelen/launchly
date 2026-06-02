@@ -16,6 +16,7 @@ import {
 } from "@/components/launchly/AppShell";
 
 import { useAuth } from "@/context/AuthContext";
+import { useI18n } from "@/i18n/I18nContext";
 
 import {
   Github,
@@ -87,10 +88,13 @@ function getProgressColor(score: number) {
   return undefined;
 }
 
-function getAttentionMeta(level?: string) {
+function getAttentionMeta(
+  level: string | undefined,
+  t: (key: string) => string,
+) {
   if (level === "high") {
     return {
-      label: "High recruiter interest",
+      label: t("portfolio.highRecruiterInterest"),
       icon: Flame,
       className: "border-orange-400/15 bg-orange-400/10 text-orange-200",
     };
@@ -98,14 +102,14 @@ function getAttentionMeta(level?: string) {
 
   if (level === "medium") {
     return {
-      label: "Medium attention",
+      label: t("portfolio.mediumAttention"),
       icon: Eye,
       className: "border-cyan-400/15 bg-cyan-400/10 text-cyan-200",
     };
   }
 
   return {
-    label: "Low signal",
+    label: t("portfolio.lowSignal"),
     icon: AlertTriangle,
     className: "border-white/10 bg-white/[0.04] text-white/55",
   };
@@ -114,6 +118,7 @@ function getAttentionMeta(level?: string) {
 function Portfolio() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   const {
     analysis,
@@ -172,7 +177,7 @@ function Portfolio() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[oklch(0.145_0.02_270)] text-white">
         <div className="text-sm text-white/60">
-          Loading portfolio analyzer...
+          {t("portfolio.loading")}
         </div>
       </div>
     );
@@ -188,8 +193,8 @@ function Portfolio() {
 
   return (
     <AppShell
-      title="Portfolio Analyzer"
-      subtitle="Transform your GitHub into a portfolio recruiters actually notice."
+      title={t("portfolio.title")}
+      subtitle={t("portfolio.subtitle")}
     >
       <div className="space-y-4">
         <Card className="relative overflow-hidden border-cyan-300/15 bg-[linear-gradient(135deg,rgba(15,23,42,0.98),rgba(8,13,24,0.98)_48%,rgba(18,32,58,0.88))] shadow-[0_28px_90px_rgba(6,182,212,0.10),0_0_0_1px_rgba(255,255,255,0.03)]">
@@ -203,7 +208,7 @@ function Portfolio() {
               <div className="relative">
                 <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/15 bg-cyan-300/[0.08] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-100/75">
                   <Github className="size-3.5 text-cyan-300" />
-                  Portfolio quality
+                  {t("portfolio.portfolioQuality")}
                 </div>
 
                 <div className="relative isolate mx-auto mt-6 grid size-40 place-items-center overflow-hidden rounded-full border border-cyan-300/20 bg-white/[0.045] shadow-[0_28px_85px_rgba(34,211,238,0.16)]">
@@ -228,41 +233,43 @@ function Portfolio() {
                 <div className="mt-5 inline-flex items-center justify-center gap-2 rounded-full border border-emerald-300/15 bg-emerald-400/[0.08] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-100">
                   <Check className="size-3.5 text-emerald-300" />
                   {portfolioScore >= 80
-                    ? "Recruiter signal"
+                    ? t("portfolio.recruiterSignal")
                     : portfolioScore >= 65
-                      ? "Solid foundation"
+                      ? t("linkedin.strongFoundation")
                       : portfolioScore > 0
-                        ? "Needs polish"
-                        : "Awaiting scan"}
+                        ? t("linkedin.needsPolish")
+                        : t("portfolio.awaitingScan")}
                 </div>
 
                 <div className="mt-4 text-xs leading-5 text-white/55">
                   {analysis
-                    ? `Based on ${repos.length} public repositories.`
+                    ? t("portfolio.basedOnRepositories", {
+                        count: repos.length,
+                      })
                     : isLoadingProfile
-                      ? "Loading your saved portfolio analysis..."
-                      : "Run a GitHub scan to calculate portfolio quality."}
+                      ? t("portfolio.loadingSavedAnalysis")
+                      : t("portfolio.runScanCalculateQuality")}
                 </div>
               </div>
             </div>
 
             <div className="min-w-0">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/55">
-                GitHub readiness
+                {t("portfolio.githubReadiness")}
               </div>
 
               <div className="mt-4 text-3xl font-semibold tracking-tight text-white">
-                Turn your GitHub into a recruiter-ready portfolio.
+                {t("portfolio.heroTitle")}
               </div>
 
               <div className="mt-2 max-w-2xl text-sm leading-6 text-white/55">
-                Launchly reviews public repositories, README quality, architecture depth and project maturity through a senior-engineer lens.
+                {t("portfolio.heroDescription")}
               </div>
 
               <div className="mt-6 grid gap-3 md:grid-cols-2">
                 <div className="rounded-2xl border border-white/7 bg-white/[0.035] p-4">
                   <Progress
-                    label="Technical depth"
+                    label={t("recruiterView.technicalDepth")}
                     value={signals?.technical_depth || 0}
                     color={getProgressColor(signals?.technical_depth || 0)}
                   />
@@ -270,7 +277,7 @@ function Portfolio() {
 
                 <div className="rounded-2xl border border-white/7 bg-white/[0.035] p-4">
                   <Progress
-                    label="Architecture"
+                    label={t("portfolio.architecture")}
                     value={signals?.architecture || 0}
                     color={getProgressColor(signals?.architecture || 0)}
                   />
@@ -278,7 +285,7 @@ function Portfolio() {
 
                 <div className="rounded-2xl border border-white/7 bg-white/[0.035] p-4">
                   <Progress
-                    label="README quality"
+                    label={t("portfolio.readmeQuality")}
                     value={signals?.readme_quality || 0}
                     color={getProgressColor(signals?.readme_quality || 0)}
                   />
@@ -286,7 +293,7 @@ function Portfolio() {
 
                 <div className="rounded-2xl border border-white/7 bg-white/[0.035] p-4">
                   <Progress
-                    label="Business impact"
+                    label={t("portfolio.businessImpact")}
                     value={signals?.business_impact || 0}
                     color={getProgressColor(signals?.business_impact || 0)}
                   />
@@ -297,11 +304,11 @@ function Portfolio() {
             <div className="rounded-[2rem] border border-white/7 bg-black/20 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
               <div className="flex items-center gap-2 text-sm font-semibold text-white">
                 <Search className="size-4 text-violet-300" />
-                Scan GitHub profile
+                {t("portfolio.scanGithubProfile")}
               </div>
 
               <div className="mt-1 text-xs leading-5 text-white/45">
-                Enter a public GitHub username to scan repos, READMEs and profile metadata.
+                {t("portfolio.scanGithubDescription")}
               </div>
 
               <div className="mt-5 space-y-3">
@@ -319,7 +326,7 @@ function Portfolio() {
                         handleAnalyzePortfolio();
                       }
                     }}
-                    placeholder="GitHub username, e.g. suelen-ilyas"
+                    placeholder={t("portfolio.githubUsernamePlaceholder")}
                     className="w-full rounded-2xl border border-white/10 bg-black/25 py-3 pl-11 pr-4 text-sm text-white/80 outline-none transition placeholder:text-white/30 focus:border-cyan-300/30"
                   />
                 </div>
@@ -337,10 +344,10 @@ function Portfolio() {
                   )}
 
                   {isAnalyzing
-                    ? "Scanning GitHub..."
+                    ? t("portfolio.scanningGithub")
                     : analysis
-                      ? "Re-scan GitHub"
-                      : "Scan GitHub"}
+                      ? t("portfolio.rescanGithub")
+                      : t("portfolio.scanGithub")}
                 </button>
 
                 {error && (
@@ -353,7 +360,7 @@ function Portfolio() {
               {analysis?.github_profile && (
                 <div className="mt-5 rounded-[1.75rem] border border-cyan-300/10 bg-white/[0.035] p-4">
                   <div className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-cyan-100/60">
-                    Connected profile
+                    {t("portfolio.connectedProfile")}
                   </div>
 
                   <div className="flex items-center gap-3">
@@ -389,7 +396,7 @@ function Portfolio() {
                   <div className="mt-4 grid grid-cols-2 gap-2">
                     <div className="rounded-2xl border border-white/5 bg-black/20 px-3 py-2.5">
                       <div className="text-[10px] uppercase tracking-[0.14em] text-white/35">
-                        Followers
+                        {t("portfolio.followers")}
                       </div>
 
                       <div className="mt-1 text-lg font-semibold text-white">
@@ -399,7 +406,7 @@ function Portfolio() {
 
                     <div className="rounded-2xl border border-white/5 bg-black/20 px-3 py-2.5">
                       <div className="text-[10px] uppercase tracking-[0.14em] text-white/35">
-                        Following
+                        {t("portfolio.following")}
                       </div>
 
                       <div className="mt-1 text-lg font-semibold text-white">
@@ -427,25 +434,27 @@ function Portfolio() {
             <div className="relative">
               <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-4">
                 <div>
-                  <div className="flex items-center gap-2 text-sm font-semibold">
-                    <Code2 className="size-4 text-cyan-300" />
-                    Repository reviews
-                  </div>
+                    <div className="flex items-center gap-2 text-sm font-semibold">
+                      <Code2 className="size-4 text-cyan-300" />
+                      {t("portfolio.repositoryReviews")}
+                    </div>
 
-                  <div className="mt-1 text-xs text-muted-foreground">
-                    Public repos sorted by GitHub recency and reviewed for recruiter signal.
-                  </div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      {t("portfolio.repositoryReviewsDescription")}
+                    </div>
                 </div>
 
                 <div className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[11px] text-white/50">
-                  {repos.length} repos
+                  {t("portfolio.reposCount", {
+                    count: repos.length,
+                  })}
                 </div>
               </div>
 
               <div className="space-y-3">
                 {repos.length === 0 ? (
                   <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-5 text-sm text-white/45">
-                    Enter your GitHub username and start a scan to list your public repositories.
+                    {t("portfolio.enterGithubUsernameEmpty")}
                   </div>
                 ) : (
                   repos.map((repo) => (
@@ -463,7 +472,7 @@ function Portfolio() {
                           </div>
 
                           <div className="mt-1 text-sm text-muted-foreground">
-                            {repo.description || "No repository description provided."}
+                            {repo.description || t("portfolio.noRepositoryDescription")}
                           </div>
 
                           <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
@@ -490,7 +499,7 @@ function Portfolio() {
                               rel="noreferrer"
                               className="inline-flex items-center gap-1 text-cyan-200/80 transition hover:text-cyan-100"
                             >
-                              View repo
+                              {t("portfolio.viewRepo")}
                               <ExternalLink className="size-3.5" />
                             </a>
                           </div>
@@ -499,7 +508,7 @@ function Portfolio() {
                         <div className="w-full rounded-2xl border border-white/7 bg-black/20 p-4 md:w-72">
                           <div className="mb-3 flex items-center justify-between gap-3">
                             <div className="text-xs font-semibold uppercase tracking-[0.16em] text-white/45">
-                              Repo score
+                              {t("portfolio.repoScore")}
                             </div>
 
                             <div className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${getTagClassName(repo.tag)}`}>
@@ -520,12 +529,12 @@ function Portfolio() {
 
                             <div className="text-right text-xs text-white/45">
                               {repo.score >= 80
-                                ? "Strong signal"
+                                ? t("portfolio.strongSignal")
                                 : repo.score >= 65
-                                  ? "Solid project"
+                                  ? t("portfolio.solidProject")
                                   : repo.score >= 50
-                                    ? "Needs polish"
-                                    : "Low signal"}
+                                    ? t("linkedin.needsPolish")
+                                    : t("portfolio.lowSignal")}
                             </div>
                           </div>
 
@@ -540,13 +549,13 @@ function Portfolio() {
 
                       <div className="mt-4 rounded-2xl border border-white/5 bg-black/20 p-4">
                         <div className="text-sm leading-7 text-white/70">
-                          {repo.summary || "No summary returned for this repository."}
+                          {repo.summary || t("portfolio.noRepositorySummary")}
                         </div>
 
                         <div className="mt-4 grid gap-4 md:grid-cols-3">
                           <div>
                             <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-emerald-200/80">
-                              Strengths
+                              {t("recruiterView.strengths")}
                             </div>
 
                             <ul className="space-y-1.5 text-xs text-white/55">
@@ -561,14 +570,14 @@ function Portfolio() {
                                   </li>
                                 ))
                               ) : (
-                                <li>No strengths listed.</li>
+                                <li>{t("portfolio.noStrengthsListed")}</li>
                               )}
                             </ul>
                           </div>
 
                           <div>
                             <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-orange-200/80">
-                              Risks
+                              {t("portfolio.risks")}
                             </div>
 
                             <ul className="space-y-1.5 text-xs text-white/55">
@@ -583,14 +592,14 @@ function Portfolio() {
                                   </li>
                                 ))
                               ) : (
-                                <li>No major risks listed.</li>
+                                <li>{t("portfolio.noMajorRisksListed")}</li>
                               )}
                             </ul>
                           </div>
 
                           <div>
                             <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-cyan-200/80">
-                              Improvements
+                              {t("portfolio.improvements")}
                             </div>
 
                             <ul className="space-y-1.5 text-xs text-white/55">
@@ -605,7 +614,7 @@ function Portfolio() {
                                   </li>
                                 ))
                               ) : (
-                                <li>No improvements listed.</li>
+                                <li>{t("portfolio.noImprovementsListed")}</li>
                               )}
                             </ul>
                           </div>
@@ -625,7 +634,7 @@ function Portfolio() {
               <div className="relative">
                 <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-white">
                   <Sparkles className="size-4 text-[oklch(0.85_0.14_250)]" />
-                  Top wins
+                  {t("portfolio.topWins")}
                 </div>
 
                 <ul className="space-y-3 text-sm">
@@ -641,7 +650,7 @@ function Portfolio() {
                     ))
                   ) : (
                     <li className="text-sm text-white/45">
-                      Strongest portfolio signals will appear here after the scan.
+                      {t("portfolio.topWinsEmpty")}
                     </li>
                   )}
                 </ul>
@@ -653,13 +662,16 @@ function Portfolio() {
               <div className="relative">
                 <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
                   <Flame className="size-4 text-orange-300" />
-                  Recruiter attention heatmap
+                  {t("portfolio.recruiterAttentionHeatmap")}
                 </div>
 
                 <div className="space-y-2">
                   {repos.length ? (
                     repos.map((repo) => {
-                      const meta = getAttentionMeta(repo.recruiter_attention);
+                      const meta = getAttentionMeta(
+                        repo.recruiter_attention,
+                        t,
+                      );
                       const Icon = meta.icon;
 
                       return (
@@ -674,7 +686,7 @@ function Portfolio() {
                               </div>
 
                               <div className="mt-1 text-xs leading-5 text-white/45">
-                                {repo.attention_reason || "Recruiter attention estimated from repo quality."}
+                                {repo.attention_reason || t("portfolio.attentionEstimated")}
                               </div>
                             </div>
 
@@ -688,7 +700,7 @@ function Portfolio() {
                     })
                   ) : (
                     <div className="text-sm text-white/45">
-                      Recruiter attention levels will appear after the scan.
+                      {t("portfolio.attentionLevelsEmpty")}
                     </div>
                   )}
                 </div>
@@ -700,7 +712,7 @@ function Portfolio() {
               <div className="relative">
                 <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
                   <AlertTriangle className="size-4 text-orange-300" />
-                  Red flags
+                  {t("portfolio.redFlags")}
                 </div>
 
                 <div className="space-y-2 text-sm text-white/65">
@@ -716,7 +728,7 @@ function Portfolio() {
                     ))
                   ) : (
                     <div className="text-white/45">
-                      Risks and weak portfolio signals will appear here after the scan.
+                      {t("portfolio.redFlagsEmpty")}
                     </div>
                   )}
                 </div>
@@ -729,12 +741,12 @@ function Portfolio() {
               <div className="relative">
                 <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
                   <Sparkles className="size-4 text-violet-300" />
-                  Recruiter conclusion
+                  {t("linkedin.recruiterConclusion")}
                 </div>
 
                 <div className="text-sm leading-7 text-white/70">
                   {analysis?.ai_conclusion ||
-                    "Run a scan to receive a concise senior-engineer portfolio conclusion."}
+                    t("portfolio.conclusionEmpty")}
                 </div>
               </div>
             </Card>

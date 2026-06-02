@@ -9,6 +9,8 @@ import {
   Card,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import type {
   DashboardSummaryResponse,
 } from "@/features/dashboard/types/dashboard";
@@ -27,12 +29,15 @@ function clampScore(value?: number | null) {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
-function getReadinessLabel(score: number) {
-  if (score >= 85) return "Career-ready";
-  if (score >= 75) return "Strong momentum";
-  if (score >= 60) return "Building profile";
-  if (score > 0) return "Needs focus";
-  return "Start your review";
+function getReadinessLabel(
+  score: number,
+  t: (key: string) => string,
+) {
+  if (score >= 85) return t("dashboard.careerReady");
+  if (score >= 75) return t("dashboard.strongMomentum");
+  if (score >= 60) return t("dashboard.buildingProfile");
+  if (score > 0) return t("dashboard.needsFocus");
+  return t("dashboard.startReview");
 }
 
 function getScoreAccent(score: number) {
@@ -72,17 +77,19 @@ export function CareerReadinessHero({
   isReviewing,
   onRunReview,
 }: CareerReadinessHeroProps) {
+  const { t } = useI18n();
+
   const careerScore = clampScore(
     summary?.career_score?.value,
   );
 
   const label =
     summary?.career_score?.label ||
-    getReadinessLabel(careerScore);
+    getReadinessLabel(careerScore, t);
 
   const delta =
     summary?.career_score?.delta ||
-    "Run an AI review to refresh your career signal.";
+    t("dashboard.runReviewRefresh");
 
   const accent = getScoreAccent(careerScore);
   const progressWidth = `${careerScore}%`;
@@ -99,11 +106,11 @@ export function CareerReadinessHero({
         <div className="max-w-2xl">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-400/20 bg-violet-400/10 px-3 py-1 text-xs font-semibold text-violet-100">
             <Sparkles className="size-3.5" />
-            Career command center
+            {t("dashboard.careerCommandCenter")}
           </div>
 
           <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
-            Your career readiness is{" "}
+            {t("dashboard.careerReadinessIs")} {" "}
             <span className="text-gradient">
               {careerScore}/100
             </span>
@@ -148,8 +155,8 @@ export function CareerReadinessHero({
               )}
 
               {isReviewing
-                ? "Reviewing profile..."
-                : "Run AI review"}
+                ? t("dashboard.reviewingProfile")
+                : t("dashboard.runAiReview")}
             </button>
 
             <div className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white/70">
@@ -197,7 +204,7 @@ export function CareerReadinessHero({
               </div>
 
               <div className={`mt-2 text-xs uppercase tracking-[0.25em] ${accent.text}`}>
-                readiness
+                {t("dashboard.readinessLower")}
               </div>
             </div>
           </div>

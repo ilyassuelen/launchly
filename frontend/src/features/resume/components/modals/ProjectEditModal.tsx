@@ -9,6 +9,7 @@ import { ResumeFieldGroup } from "@/features/resume/components/ui/ResumeFieldGro
 import { ResumeInput } from "@/features/resume/components/ui/ResumeInput";
 import { ResumeTextarea } from "@/features/resume/components/ui/ResumeTextarea";
 import { ResumeActionButton } from "@/features/resume/components/ui/ResumeActionButton";
+import { useI18n } from "@/i18n/I18nContext";
 
 type ProjectEditModalProps = {
   open: boolean;
@@ -75,13 +76,14 @@ export function ProjectEditModal({
 
   onSave,
 }: ProjectEditModalProps) {
+  const { t } = useI18n();
   return (
     <ResumeEditModal
       open={open}
       title={
-        title || "Edit Project"
+        title || t("resume.editProject")
       }
-      subtitle="Manage project details, tech stack, achievements and links."
+      subtitle={t("resume.projectModalSubtitle")}
       onClose={onClose}
       footer={
         <div className="flex items-center justify-end gap-3">
@@ -89,7 +91,7 @@ export function ProjectEditModal({
             variant="ghost"
             onClick={onClose}
           >
-            Cancel
+            {t("common.cancel")}
           </ResumeActionButton>
 
           <ResumeActionButton
@@ -97,14 +99,14 @@ export function ProjectEditModal({
             variant="primary"
             onClick={onSave}
           >
-            Save Changes
+            {t("common.saveChanges")}
           </ResumeActionButton>
         </div>
       }
     >
       <div className="space-y-6">
 
-        <ResumeFieldGroup label="Project Title">
+        <ResumeFieldGroup label={t("resume.projectTitle")}>
           <ResumeInput
             value={title}
             onChange={(e) =>
@@ -112,11 +114,11 @@ export function ProjectEditModal({
                 e.target.value,
               )
             }
-            placeholder="e.g. InsightAI"
+            placeholder={t("resume.projectTitlePlaceholder")}
           />
         </ResumeFieldGroup>
 
-        <ResumeFieldGroup label="Tech Stack">
+        <ResumeFieldGroup label={t("resume.techStack")}>
           <ResumeInput
             value={stack}
             onChange={(e) =>
@@ -124,14 +126,14 @@ export function ProjectEditModal({
                 e.target.value,
               )
             }
-            placeholder="React · TypeScript · FastAPI"
+            placeholder={t("resume.techStackPlaceholder")}
           />
         </ResumeFieldGroup>
 
         <div className="space-y-5">
           <div className="flex items-center justify-between">
             <div className="text-sm font-semibold text-white">
-              Project Bullets
+              {t("resume.projectBullets")}
             </div>
 
             <ResumeActionButton
@@ -139,7 +141,7 @@ export function ProjectEditModal({
               variant="primary"
               onClick={onAddBullet}
             >
-              Add Bullet
+              {t("resume.addBullet")}
             </ResumeActionButton>
           </div>
 
@@ -148,9 +150,9 @@ export function ProjectEditModal({
               (bullet, index) => (
                 <ResumeFieldGroup
                   key={index}
-                  label={`Bullet ${
-                    index + 1
-                  }`}
+                  label={t("resume.bulletNumber", {
+                    count: index + 1,
+                  })}
                 >
                   <ResumeTextarea
                     value={bullet}
@@ -161,7 +163,7 @@ export function ProjectEditModal({
                       )
                     }
                     rows={4}
-                    placeholder="Describe features, architecture or measurable impact"
+                    placeholder={t("resume.projectBulletPlaceholder")}
                   />
                 </ResumeFieldGroup>
               ),
@@ -173,7 +175,7 @@ export function ProjectEditModal({
           <div className="space-y-5">
             <div className="flex items-center justify-between">
               <div className="text-sm font-semibold text-white">
-                Project Links
+                {t("resume.projectLinks")}
               </div>
 
               {onAddLink && (
@@ -182,7 +184,7 @@ export function ProjectEditModal({
                   variant="primary"
                   onClick={onAddLink}
                 >
-                  Add Link
+                  {t("resume.addLink")}
                 </ResumeActionButton>
               )}
             </div>
@@ -191,9 +193,9 @@ export function ProjectEditModal({
               {links.map((link, index) => (
                 <ResumeFieldGroup
                   key={index}
-                  label={`Link ${
-                    index + 1
-                  }`}
+                  label={t("resume.linkNumber", {
+                    count: index + 1,
+                  })}
                 >
                   <ResumeInput
                     value={link}
@@ -203,7 +205,7 @@ export function ProjectEditModal({
                         e.target.value,
                       )
                     }
-                    placeholder="https://github.com/..."
+                    placeholder={t("resume.projectLinkPlaceholder")}
                   />
                 </ResumeFieldGroup>
               ))}

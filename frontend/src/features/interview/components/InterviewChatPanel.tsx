@@ -17,6 +17,8 @@ import {
   Card,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import type {
   InterviewMessage,
   InterviewResult,
@@ -37,26 +39,31 @@ type InterviewChatPanelProps = {
 function getSessionStatusLabel(
   session: InterviewSession | null,
   result: InterviewResult | null,
+  t: (key: string) => string,
 ) {
   if (!session) {
-    return "Ready";
+    return t("interview.ready");
   }
 
   if (result || session.status === "completed") {
-    return "Completed";
+    return t("interview.completed");
   }
 
-  return "Running";
+  return t("interview.running");
 }
 
 function getProgressText(
   session: InterviewSession | null,
+  t: (key: string, params?: Record<string, string | number>) => string,
 ) {
   if (!session) {
-    return "Start a session to begin";
+    return t("interview.startSessionToBegin");
   }
 
-  return `Question ${session.current_question_index}/${session.max_questions}`;
+  return t("interview.questionProgress", {
+    current: session.current_question_index,
+    total: session.max_questions,
+  });
 }
 
 export function InterviewChatPanel({
@@ -69,6 +76,8 @@ export function InterviewChatPanel({
   onAnswerChange,
   onSubmitAnswer,
 }: InterviewChatPanelProps) {
+  const { t } = useI18n();
+
   const sessionCompleted =
     Boolean(result) ||
     session?.status === "completed";
@@ -99,7 +108,7 @@ export function InterviewChatPanel({
         <div className="mb-5 flex items-center justify-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/15 bg-cyan-300/[0.06] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-cyan-100/70 shadow-[0_14px_45px_rgba(34,211,238,0.10)]">
             <Bot className="size-4 text-cyan-300" />
-            AI Interview Console
+            {t("interview.aiInterviewConsole")}
           </div>
         </div>
 
@@ -137,12 +146,12 @@ export function InterviewChatPanel({
                         : "animate-pulse bg-emerald-300 shadow-[0_0_16px_rgba(110,231,183,0.75)]"
                   }`}
                 />
-                {getSessionStatusLabel(session, result)}
+                {getSessionStatusLabel(session, result, t)}
               </div>
             </div>
 
             <div className="relative mb-4 flex items-center justify-between gap-3 rounded-2xl border border-cyan-300/10 bg-white/[0.045] px-4 py-3 text-xs text-white/65 shadow-[0_12px_36px_rgba(0,0,0,0.18)]">
-              <span className="font-medium text-white/75">{getProgressText(session)}</span>
+              <span className="font-medium text-white/75">{getProgressText(session, t)}</span>
 
               {session && (
                 <span className="rounded-full bg-white/[0.05] px-2.5 py-1 text-white/55">
@@ -160,12 +169,11 @@ export function InterviewChatPanel({
                   </div>
 
                   <div className="mt-5 text-xl font-semibold text-white">
-                    Ready for your mock interview?
+                    {t("interview.readyForMockInterview")}
                   </div>
 
                   <div className="mt-2 text-sm leading-6 text-muted-foreground">
-                    Choose your mode, role and difficulty on the left.
-                    Then start the interview to receive resume-aware questions.
+                    {t("interview.mockInterviewIntro")}
                   </div>
                 </div>
               </div>
@@ -175,7 +183,7 @@ export function InterviewChatPanel({
               <div className="flex min-h-[360px] items-center justify-center">
                 <div className="flex items-center gap-3 text-sm text-cyan-100">
                   <Loader2 className="size-4 animate-spin" />
-                  Preparing your interview...
+                  {t("interview.preparingInterview")}
                 </div>
               </div>
             )}
@@ -223,7 +231,7 @@ export function InterviewChatPanel({
 
                 <div className="inline-flex items-center gap-2 rounded-[1.6rem] rounded-tl-sm border border-white/5 bg-white/[0.04] p-5 text-sm text-white/65">
                   <Loader2 className="size-4 animate-spin text-cyan-300" />
-                  Thinking...
+                  {t("interview.thinking")}
                 </div>
               </div>
             )}
@@ -238,11 +246,11 @@ export function InterviewChatPanel({
 
                   <div>
                     <div className="text-sm font-semibold text-white">
-                      Interview completed
+                      {t("interview.interviewCompleted")}
                     </div>
 
                     <div className="mt-1 text-xs leading-5 text-white/60">
-                      Your answers have been evaluated. Review your score, recruiter insights and coaching tips on the right.
+                      {t("interview.interviewCompletedDescription")}
                     </div>
                   </div>
                 </div>
@@ -278,10 +286,10 @@ export function InterviewChatPanel({
                 className="h-12 max-h-32 min-h-12 flex-1 resize-none bg-transparent px-2 py-3 text-sm leading-6 text-white/80 outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
                 placeholder={
                   sessionCompleted
-                    ? "Interview completed"
+                    ? t("interview.interviewCompleted")
                     : session
-                      ? "Type your answer..."
-                      : "Start an interview first..."
+                      ? t("interview.typeYourAnswer")
+                      : t("interview.startInterviewFirst")
                 }
               />
 

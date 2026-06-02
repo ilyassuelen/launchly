@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import { Card } from "@/components/launchly/AppShell";
+import { useI18n } from "@/i18n/I18nContext";
 import { useNavigate } from "@tanstack/react-router";
 
 import type { CareerPathApplicationStrategyItem } from "../types/careerPath";
@@ -53,6 +54,7 @@ export function CareerPathApplicationStrategy({
   applicationStrategy,
 }: CareerPathApplicationStrategyProps) {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const primaryMove = applicationStrategy[0];
   const totalActions = applicationStrategy.reduce(
     (count, item) => count + item.action_items.length,
@@ -73,22 +75,22 @@ export function CareerPathApplicationStrategy({
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/10 bg-cyan-400/[0.06] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-100/70">
               <Send className="size-3.5 text-cyan-300" />
-              Application Command Center
+              {t("careerPath.applicationCommandCenter")}
             </div>
 
             <h2 className="mt-4 text-2xl font-semibold tracking-tight text-white lg:text-3xl">
-              Convert your roadmap into focused outreach
+              {t("careerPath.applicationStrategyTitle")}
             </h2>
 
             <p className="mt-3 max-w-3xl text-sm leading-7 text-white/55">
-              Turn your strongest proof into a practical application flow: choose better targets, sharpen your message and apply with evidence.
+              {t("careerPath.applicationStrategyDescription")}
             </p>
           </div>
 
           <div className="grid gap-2 sm:grid-cols-2 lg:min-w-[460px]">
             <div className="rounded-2xl border border-white/7 bg-black/20 px-4 py-3">
               <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/35">
-                Moves
+                {t("careerPath.moves")}
               </div>
 
               <div className="mt-1 text-xl font-semibold text-white">
@@ -98,7 +100,7 @@ export function CareerPathApplicationStrategy({
 
             <div className="rounded-2xl border border-cyan-300/10 bg-cyan-400/[0.045] px-4 py-3">
               <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-100/55">
-                Actions
+                {t("careerPath.actions")}
               </div>
 
               <div className="mt-1 text-xl font-semibold text-cyan-100">
@@ -112,7 +114,7 @@ export function CareerPathApplicationStrategy({
 
         {applicationStrategy.length === 0 ? (
           <div className="rounded-[2rem] border border-dashed border-white/10 bg-white/[0.03] p-8 text-sm text-white/50">
-            No application strategy available yet.
+            {t("careerPath.noApplicationStrategy")}
           </div>
         ) : (
           <div className="grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]">
@@ -123,16 +125,16 @@ export function CareerPathApplicationStrategy({
                 <div className="mb-5 flex items-center justify-between gap-3 border-b border-white/5 pb-4">
                   <div>
                     <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/35">
-                      Launch flow
+                      {t("careerPath.launchFlow")}
                     </div>
 
                     <div className="mt-1 text-sm text-white/55">
-                      From target selection to recruiter-ready applications
+                      {t("careerPath.launchFlowDescription")}
                     </div>
                   </div>
 
                   <div className="rounded-full border border-cyan-300/10 bg-cyan-400/[0.06] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100/65">
-                    Evidence-first
+                    {t("careerPath.evidenceFirst")}
                   </div>
                 </div>
 
@@ -156,11 +158,13 @@ export function CareerPathApplicationStrategy({
                           <div className="min-w-0 flex-1">
                             <div className="mb-2 flex flex-wrap items-center gap-2">
                               <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/45">
-                                Move {String(index + 1).padStart(2, "0")}
+                                {t("careerPath.moveNumber", {
+                                  number: String(index + 1).padStart(2, "0"),
+                                })}
                               </span>
 
                               <span className={`rounded-full border ${accent.border} ${accent.bg} px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${accent.text}`}>
-                                Recruiter-facing
+                                {t("careerPath.recruiterFacing")}
                               </span>
                             </div>
 
@@ -174,7 +178,9 @@ export function CareerPathApplicationStrategy({
                           </div>
 
                           <div className="rounded-2xl border border-white/5 bg-black/20 px-3 py-2 text-xs text-white/45 md:w-32 md:text-right">
-                            {strategy.action_items.length} actions
+                            {t("careerPath.actionsCount", {
+                              count: strategy.action_items.length,
+                            })}
                           </div>
                         </div>
 
@@ -199,16 +205,18 @@ export function CareerPathApplicationStrategy({
                   <div>
                     <div className="flex items-center gap-2 text-sm font-semibold text-white">
                       <ListChecks className="size-4 text-cyan-300" />
-                      Execution checklist
+                      {t("careerPath.executionChecklist")}
                     </div>
 
                     <p className="mt-1 text-xs leading-5 text-white/45">
-                      The first concrete actions to start applying with proof.
+                      {t("careerPath.executionChecklistDescription")}
                     </p>
                   </div>
 
                   <div className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] text-white/45">
-                    {featuredActions.length} shown
+                    {t("careerPath.shownCount", {
+                      count: featuredActions.length,
+                    })}
                   </div>
                 </div>
 
@@ -222,32 +230,32 @@ export function CareerPathApplicationStrategy({
                         <div className="flex items-start gap-3">
                           <CheckCircle2 className="mt-1 size-3.5 shrink-0 text-cyan-300" />
 
-                          <span>{action}</span>
+                          <span>{t("careerPath.noActionItems") === action ? action : action}</span>
                         </div>
                       </li>
                     ))}
                   </ul>
                 ) : (
                   <div className="rounded-2xl border border-white/5 bg-white/[0.025] p-4 text-sm text-white/45">
-                    No action items listed yet.
+                    {t("careerPath.noActionItems")}
                   </div>
                 )}
 
                 <div className="mt-5 rounded-2xl border border-violet-300/10 bg-violet-400/[0.045] p-4">
                   <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-violet-100/55">
                     <Sparkles className="size-3.5" />
-                    Launch principle
+                    {t("careerPath.launchPrinciple")}
                   </div>
 
                   <p className="text-sm leading-7 text-white/58">
-                    Apply only after your resume, LinkedIn and portfolio proof tell the same story for the role you want next.
+                    {t("careerPath.launchPrincipleDescription")}
                   </p>
                   <button
                     type="button"
                     onClick={() => navigate({ to: "/applications" })}
                     className="mt-4 inline-flex items-center gap-2 rounded-full border border-cyan-300/10 bg-cyan-400/[0.055] px-3 py-1.5 text-xs text-cyan-50/75 transition hover:border-cyan-300/25 hover:bg-cyan-400/[0.10] hover:text-cyan-50"
                   >
-                    Open Application Tracker
+                    {t("careerPath.openApplicationTracker")}
                     <ArrowRight className="size-3.5" />
                   </button>
                 </div>

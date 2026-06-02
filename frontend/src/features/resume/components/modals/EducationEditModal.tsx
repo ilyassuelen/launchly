@@ -5,6 +5,7 @@ import { ResumeFieldGroup } from "@/features/resume/components/ui/ResumeFieldGro
 import { ResumeInput } from "@/features/resume/components/ui/ResumeInput";
 import { ResumeTextarea } from "@/features/resume/components/ui/ResumeTextarea";
 import { ResumeActionButton } from "@/features/resume/components/ui/ResumeActionButton";
+import { useI18n } from "@/i18n/I18nContext";
 
 type EducationEditModalProps = {
   open: boolean;
@@ -71,13 +72,14 @@ export function EducationEditModal({
 
   onSave,
 }: EducationEditModalProps) {
+  const { t } = useI18n();
   return (
     <ResumeEditModal
       open={open}
       title={
-        school || "Edit Education"
+        school || t("resume.editEducation")
       }
-      subtitle="Manage education details, dates and description."
+      subtitle={t("resume.educationModalSubtitle")}
       onClose={onClose}
       footer={
         <div className="flex items-center justify-end gap-3">
@@ -85,7 +87,7 @@ export function EducationEditModal({
             variant="ghost"
             onClick={onClose}
           >
-            Cancel
+            {t("common.cancel")}
           </ResumeActionButton>
 
           <ResumeActionButton
@@ -93,14 +95,14 @@ export function EducationEditModal({
             variant="primary"
             onClick={onSave}
           >
-            Save Changes
+            {t("common.saveChanges")}
           </ResumeActionButton>
         </div>
       }
     >
       <div className="space-y-6">
 
-        <ResumeFieldGroup label="School">
+        <ResumeFieldGroup label={t("resume.school")}>
           <ResumeInput
             value={school}
             onChange={(e) =>
@@ -108,11 +110,11 @@ export function EducationEditModal({
                 e.target.value,
               )
             }
-            placeholder="e.g. Masterschool"
+            placeholder={t("resume.schoolPlaceholder")}
           />
         </ResumeFieldGroup>
 
-        <ResumeFieldGroup label="Degree">
+        <ResumeFieldGroup label={t("resume.degree")}>
           <ResumeInput
             value={degree}
             onChange={(e) =>
@@ -120,13 +122,13 @@ export function EducationEditModal({
                 e.target.value,
               )
             }
-            placeholder="e.g. AI Engineering"
+            placeholder={t("resume.degreePlaceholder")}
           />
         </ResumeFieldGroup>
 
         <div className="grid gap-5 md:grid-cols-2">
 
-          <ResumeFieldGroup label="Start Date">
+          <ResumeFieldGroup label={t("resume.startDate")}>
             <ResumeInput
               value={startDate || ""}
               onChange={(e) =>
@@ -134,11 +136,11 @@ export function EducationEditModal({
                   e.target.value,
                 )
               }
-              placeholder="e.g. Jan 2024"
+              placeholder={t("resume.startDatePlaceholder")}
             />
           </ResumeFieldGroup>
 
-          <ResumeFieldGroup label="End Date">
+          <ResumeFieldGroup label={t("resume.endDate")}>
             <ResumeInput
               value={endDate || ""}
               onChange={(e) =>
@@ -146,13 +148,13 @@ export function EducationEditModal({
                   e.target.value,
                 )
               }
-              placeholder="e.g. Present"
+              placeholder={t("resume.endDatePlaceholder")}
             />
           </ResumeFieldGroup>
         </div>
 
         {onChangeDescription && (
-          <ResumeFieldGroup label="Description">
+          <ResumeFieldGroup label={t("resume.description")}>
             <ResumeTextarea
               value={description || ""}
               onChange={(e) =>
@@ -161,7 +163,7 @@ export function EducationEditModal({
                 )
               }
               rows={5}
-              placeholder="Add relevant education details, achievements or focus areas"
+              placeholder={t("resume.educationDescriptionPlaceholder")}
             />
           </ResumeFieldGroup>
         )}

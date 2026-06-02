@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell, Card } from "@/components/launchly/AppShell";
 import { useAuth } from "@/context/AuthContext";
+import { useI18n } from "@/i18n/I18nContext";
 import {
   AlertTriangle,
   Bell,
@@ -66,6 +67,7 @@ export const Route = createFileRoute("/settings")({
 
 function Settings() {
   const { user, loading, refreshUser, logoutUser } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
 
   const [firstName, setFirstName] =
@@ -194,12 +196,12 @@ function Settings() {
       await refreshUser();
 
       setSuccess(
-        "Preferences saved successfully.",
+        t("settings.preferencesSaved"),
       );
     } catch (err: any) {
       setError(
         err?.message ||
-          "Failed to save preferences.",
+          t("settings.failedToSave"),
       );
     } finally {
       setSavingPreferences(false);
@@ -333,7 +335,7 @@ function Settings() {
       <div className="flex min-h-screen items-center justify-center bg-[oklch(0.145_0.02_270)] text-white">
         <div className="flex items-center gap-2 text-sm text-white/60">
           <Loader2 className="size-4 animate-spin text-cyan-300" />
-          Loading settings...
+          {t("common.loading")}
         </div>
       </div>
     );
@@ -347,8 +349,8 @@ function Settings() {
 
   return (
     <AppShell
-      title="Settings"
-      subtitle="Manage your account, preferences and security."
+      title={t("settings.title")}
+      subtitle={t("settings.subtitle")}
     >
       <div className="space-y-4">
         {(error || success) && (
@@ -482,22 +484,22 @@ function Settings() {
 
               <SectionHeader
                 icon={Globe2}
-                title="Preferences"
-                description="Choose the default language for AI-generated responses."
+                title={t("settings.preferencesTitle")}
+                description={t("settings.preferencesDescription")}
               />
 
               <div className="mt-6 grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
                 <SelectField
-                  label="AI response language"
+                  label={t("settings.globalLanguage")}
                   value={language}
                   onChange={setLanguage}
                   options={[
                     {
-                      label: "English",
+                      label: t("settings.english"),
                       value: "english",
                     },
                     {
-                      label: "German",
+                      label: t("settings.german"),
                       value: "german",
                     },
                   ]}
@@ -511,10 +513,10 @@ function Settings() {
                   {savingPreferences ? (
                     <>
                       <Loader2 className="size-4 animate-spin" />
-                      Saving...
+                      {t("common.saving")}
                     </>
                   ) : (
-                    "Save preferences"
+                    t("settings.savePreferences")
                   )}
                 </button>
               </div>

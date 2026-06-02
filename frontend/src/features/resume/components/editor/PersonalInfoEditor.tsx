@@ -3,6 +3,7 @@ import {
   Upload,
 } from "lucide-react";
 import type { Resume } from "@/features/resume/types/resume";
+import { useI18n } from "@/i18n/I18nContext";
 
 import { uploadResumePhoto } from "@/features/resume/api/uploadResumePhoto";
 import type React from "react";
@@ -27,6 +28,7 @@ export function PersonalInfoEditor({
   activeSection,
   setActiveSection,
 }: Props) {
+  const { t } = useI18n();
   const basics = resume.basics || {};
 
   const handlePhotoUpload = async (
@@ -57,7 +59,7 @@ export function PersonalInfoEditor({
   return (
     <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-4">
       <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-        Personal informations
+        {t("resume.personalInformation")}
       </div>
 
       <div className="mt-4 space-y-3">
@@ -73,14 +75,14 @@ export function PersonalInfoEditor({
                     }${basics.photo}`
                 : "https://ui-avatars.com/api/?name=User"
             }
-            alt="Profile"
+            alt={t("resume.profilePhotoAlt")}
             className="size-24 rounded-full border border-white/10 object-cover"
           />
 
           <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white transition hover:bg-white/[0.08]">
             <Upload className="size-4" />
 
-            Upload photo
+            {t("resume.uploadPhoto")}
 
             <input
               type="file"
@@ -93,7 +95,7 @@ export function PersonalInfoEditor({
 
         <div>
           <div className="mb-1 text-[11px] text-muted-foreground">
-            Full name
+            {t("resume.fullName")}
           </div>
 
           <input
@@ -107,7 +109,7 @@ export function PersonalInfoEditor({
 
         <div>
           <div className="mb-1 text-[11px] text-muted-foreground">
-            Target role
+            {t("resume.targetRole")}
           </div>
 
           <input
@@ -121,7 +123,7 @@ export function PersonalInfoEditor({
 
         <div>
           <div className="mb-1 text-[11px] text-muted-foreground">
-            Email
+            {t("auth.email")}
           </div>
 
           <input
@@ -136,7 +138,7 @@ export function PersonalInfoEditor({
         {basics.website && (
           <div>
             <div className="mb-1 text-[11px] text-muted-foreground">
-              Website
+              {t("resume.website")}
             </div>
 
             <div className="flex items-center gap-2">
@@ -172,7 +174,7 @@ export function PersonalInfoEditor({
             {activeSection === "website-label" && (
               <div className="mt-3 rounded-2xl border border-cyan-400/15 bg-cyan-400/[0.03] p-3">
                 <div className="mb-2 text-[11px] text-muted-foreground">
-                  Website label
+                  {t("resume.websiteLabel")}
                 </div>
 
                 <input
@@ -183,7 +185,7 @@ export function PersonalInfoEditor({
                       e.target.value,
                     )
                   }
-                  placeholder="e.g. Portfolio"
+                  placeholder={t("resume.websiteLabelPlaceholder")}
                   className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-cyan-200 outline-none transition focus:border-violet-400/40"
                 />
               </div>
@@ -194,7 +196,7 @@ export function PersonalInfoEditor({
         {basics.location && (
           <div>
             <div className="mb-1 text-[11px] text-muted-foreground">
-              Location
+              {t("resume.location")}
             </div>
 
             <input

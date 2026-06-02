@@ -19,6 +19,8 @@ import {
   Card,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import {
   getCoverLetters,
   createCoverLetter,
@@ -41,6 +43,8 @@ export const Route =
 function CoverLettersPage() {
   const navigate =
     useNavigate();
+
+  const { t } = useI18n();
 
   const [
     coverLetters,
@@ -98,7 +102,7 @@ function CoverLettersPage() {
       return (
         data.content?.subject ||
         coverLetter.title ||
-        "Untitled Cover Letter"
+        t("coverLetter.untitledCoverLetter")
       );
   };
 
@@ -109,7 +113,7 @@ function CoverLettersPage() {
           await createCoverLetter(
             {
               title:
-                "New Cover Letter",
+                t("coverLetter.newCoverLetter"),
 
               template:
                 "classic",
@@ -180,15 +184,15 @@ function CoverLettersPage() {
   if (loading) {
     return (
       <div className="p-10 text-white">
-        Loading cover letters...
+        {t("coverLetter.loadingCoverLetters")}
       </div>
     );
   }
 
   return (
     <AppShell
-      title="Cover Letters"
-      subtitle="Manage your cover letter variants."
+      title={t("coverLetter.title")}
+      subtitle={t("coverLetter.manageVariants")}
     >
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
 
@@ -203,11 +207,11 @@ function CoverLettersPage() {
           </div>
 
           <div className="mt-5 text-lg font-semibold">
-            Create Cover Letter
+            {t("coverLetter.createCoverLetter")}
           </div>
 
           <div className="mt-1 text-sm text-muted-foreground">
-            Create a new variant
+            {t("coverLetter.createNewVariant")}
           </div>
         </button>
 
@@ -260,11 +264,11 @@ function CoverLettersPage() {
 
                   <div className="mt-1 text-xs text-muted-foreground">
 
-                      Template · {
+                      {t("coverLetter.template")} · {
                           coverLetter.template
                               ? coverLetter.template.charAt(0).toUpperCase() +
                                   coverLetter.template.slice(1)
-                              : "Classic"
+                              : t("coverLetter.classic")
                       }
                   </div>
                 </div>

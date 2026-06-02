@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 import { Card } from "@/components/launchly/AppShell";
+import { useI18n } from "@/i18n/I18nContext";
 
 import type { CareerPathGenerateRequest } from "../types/careerPath";
 
@@ -20,6 +21,8 @@ export function CareerPathForm({
   isGenerating,
   onSubmit,
 }: CareerPathFormProps) {
+  const { t } = useI18n();
+
   const [targetRole, setTargetRole] = useState("AI Engineer");
   const [currentLevel, setCurrentLevel] = useState("Junior");
   const [timeframeMonths, setTimeframeMonths] = useState(6);
@@ -44,63 +47,75 @@ export function CareerPathForm({
           <div>
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-violet-400/20 bg-violet-500/[0.10] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-violet-100/80 backdrop-blur-xl">
               <WandSparkles className="h-3.5 w-3.5 text-violet-300" />
-              Roadmap Generator
+              {t("careerPath.roadmapGenerator")}
             </div>
 
             <h2 className="max-w-2xl text-2xl font-semibold leading-tight text-white lg:text-3xl">
-              Build a profile-based roadmap in seconds.
+              {t("careerPath.formTitle")}
             </h2>
 
             <p className="mt-2 max-w-3xl text-sm leading-6 text-white/52">
-              Choose a target role, level and timeframe. Launchly turns your saved profile signals into a realistic career path.
+              {t("careerPath.formDescription")}
             </p>
           </div>
-
-
         </div>
 
         <form onSubmit={handleSubmit}>
           <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)_190px_auto] lg:items-end">
             <label className="space-y-2">
               <span className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
-                Target role
+                {t("careerPath.targetRole")}
               </span>
               <input
                 value={targetRole}
                 onChange={(event) => setTargetRole(event.target.value)}
                 required
                 className="w-full rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-violet-400/50 focus:bg-violet-500/[0.06]"
-                placeholder="AI Engineer"
+                placeholder={t("careerPath.targetRolePlaceholder")}
               />
             </label>
 
             <label className="space-y-2">
               <span className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
-                Current level
+                {t("careerPath.currentLevel")}
               </span>
               <input
                 value={currentLevel}
                 onChange={(event) => setCurrentLevel(event.target.value)}
                 className="w-full rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-cyan-400/50 focus:bg-cyan-500/[0.05]"
-                placeholder="Junior"
+                placeholder={t("careerPath.currentLevelPlaceholder")}
               />
             </label>
 
             <label className="space-y-2">
               <span className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
-                Timeframe
+                {t("careerPath.timeframe")}
               </span>
               <select
                 value={timeframeMonths}
-                onChange={(event) => setTimeframeMonths(Number(event.target.value))}
+                onChange={(event) =>
+                  setTimeframeMonths(Number(event.target.value))
+                }
                 className="w-full rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-white outline-none transition focus:border-fuchsia-400/50 focus:bg-fuchsia-500/[0.05]"
               >
-                <option value={3}>3 months</option>
-                <option value={6}>6 months</option>
-                <option value={9}>9 months</option>
-                <option value={12}>12 months</option>
-                <option value={18}>18 months</option>
-                <option value={24}>24 months</option>
+                <option value={3}>
+                  {t("careerPath.monthsOption", { count: 3 })}
+                </option>
+                <option value={6}>
+                  {t("careerPath.monthsOption", { count: 6 })}
+                </option>
+                <option value={9}>
+                  {t("careerPath.monthsOption", { count: 9 })}
+                </option>
+                <option value={12}>
+                  {t("careerPath.monthsOption", { count: 12 })}
+                </option>
+                <option value={18}>
+                  {t("careerPath.monthsOption", { count: 18 })}
+                </option>
+                <option value={24}>
+                  {t("careerPath.monthsOption", { count: 24 })}
+                </option>
               </select>
             </label>
 
@@ -112,12 +127,12 @@ export function CareerPathForm({
               {isGenerating ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Generating...
+                  {t("careerPath.generating")}
                 </>
               ) : (
                 <>
                   <Sparkles className="h-4 w-4" />
-                  Generate roadmap
+                  {t("careerPath.generateRoadmap")}
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}
@@ -126,7 +141,7 @@ export function CareerPathForm({
 
           <div className="mt-4 flex items-center gap-2 text-xs text-white/42">
             <Target className="h-3.5 w-3.5 text-violet-300" />
-            Based on your saved resume, LinkedIn profile, portfolio, applications and interview results.
+            {t("careerPath.formFooter")}
           </div>
         </form>
       </div>

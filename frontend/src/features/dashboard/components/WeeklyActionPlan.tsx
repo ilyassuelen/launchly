@@ -7,6 +7,8 @@ import {
   Card,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import type {
   DashboardWeeklyPlanItem,
 } from "@/features/dashboard/types/dashboard";
@@ -18,6 +20,7 @@ type WeeklyActionPlanProps = {
 export function WeeklyActionPlan({
   items,
 }: WeeklyActionPlanProps) {
+  const { t } = useI18n();
   return (
     <Card className="relative overflow-hidden">
       <div className="absolute bottom-0 right-0 h-32 w-32 rounded-full bg-cyan-400/10 blur-3xl" />
@@ -25,18 +28,20 @@ export function WeeklyActionPlan({
       <div className="relative mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm font-semibold">
           <CalendarCheck className="size-4 text-cyan-300" />
-          Weekly action plan
+          {t("dashboard.weeklyActionPlanTitle")}
         </div>
 
         <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-1 text-[11px] text-white/50">
-          {items.length} tasks
+          {t("dashboard.tasks", {
+            count: items.length,
+          })}
         </span>
       </div>
 
       <div className="relative space-y-3">
         {items.length === 0 && (
           <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-sm text-white/50">
-            Run an AI review to generate your weekly career action plan.
+            {t("dashboard.weeklyActionPlanEmpty")}
           </div>
         )}
 

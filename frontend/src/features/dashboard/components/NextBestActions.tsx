@@ -9,6 +9,8 @@ import {
 
 import { Card } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import type {
   DashboardActionItem,
   DashboardInsight,
@@ -38,6 +40,7 @@ export function NextBestActions({
   insights,
   onNavigate,
 }: NextBestActionsProps) {
+  const { t } = useI18n();
   const visibleInsights = insights.slice(0, 3);
 
   return (
@@ -46,25 +49,27 @@ export function NextBestActions({
 
       <div className="relative mb-4">
         <div className="text-sm font-semibold">
-          Next best actions
+          {t("dashboard.nextBestActionsTitle")}
         </div>
 
         <div className="mt-1 text-xs text-muted-foreground">
-          Prioritized from your latest AI career review.
+          {t("dashboard.nextBestActionsDescription")}
         </div>
       </div>
 
       <div className="relative space-y-3">
         {visibleInsights.length === 0 && (
           <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-5 text-sm text-white/50">
-            Run an AI review to generate your next best actions.
+            {t("dashboard.nextBestActionsEmpty")}
           </div>
         )}
 
         {visibleInsights.map((insight, index) => {
           const Icon = getInsightIcon(insight.type);
           const targetPath = insight.target_path || "/dashboard";
-          const actionLabel = insight.action_label || "Open";
+          const actionLabel =
+            insight.action_label ||
+            t("dashboard.open");
 
           return (
             <div

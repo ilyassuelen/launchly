@@ -11,6 +11,8 @@ import {
   Card,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 import type {
   DashboardMarketFit,
 } from "@/features/dashboard/types/dashboard";
@@ -30,6 +32,7 @@ function clampScore(value?: number | null) {
 export function MarketFitPanel({
   marketFit,
 }: MarketFitPanelProps) {
+  const { t } = useI18n();
   const score = clampScore(marketFit?.score);
   const recruiterConfidence = clampScore(marketFit?.recruiter_confidence);
   const positioning = clampScore(marketFit?.positioning);
@@ -44,16 +47,16 @@ export function MarketFitPanel({
         <div>
           <div className="flex items-center gap-2 text-sm font-semibold">
             <Radar className="size-4 text-cyan-300" />
-            Market fit analysis
+            {t("dashboard.marketFitAnalysisTitle")}
           </div>
 
           <div className="mt-1 text-xs text-muted-foreground">
-            How competitive your current profile looks.
+            {t("dashboard.marketFitAnalysisDescription")}
           </div>
         </div>
 
         <div className="rounded-full border border-cyan-300/15 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100">
-          {marketFit?.label || "Pending"}
+          {marketFit?.label || t("dashboard.pending")}
         </div>
       </div>
 
@@ -67,7 +70,7 @@ export function MarketFitPanel({
             </div>
 
             <div className="mt-1 text-[10px] uppercase tracking-[0.2em] text-cyan-200/70">
-              fit score
+              {t("dashboard.fitScore")}
             </div>
           </div>
         </div>
@@ -77,11 +80,11 @@ export function MarketFitPanel({
             <div className="flex items-center justify-between gap-3 text-xs">
               <span className="inline-flex min-w-0 items-center gap-1 text-muted-foreground">
                 <Target className="size-3 shrink-0" />
-                <span className="leading-4">Career Goal</span>
+                <span className="leading-4">{t("dashboard.careerGoal")}</span>
               </span>
 
               <span className="max-w-[120px] text-right font-semibold leading-4 text-cyan-200">
-                {marketFit?.best_role_match || "Not enough data"}
+                {marketFit?.best_role_match || t("dashboard.notEnoughData")}
               </span>
             </div>
           </div>
@@ -89,25 +92,25 @@ export function MarketFitPanel({
           <div className="grid grid-cols-2 gap-2">
             <MetricCard
               icon={Eye}
-              label="Recruiter confidence"
+              label={t("dashboard.recruiterConfidence")}
               value={recruiterConfidence}
             />
 
             <MetricCard
               icon={Sparkles}
-              label="Positioning"
+              label={t("dashboard.positioning")}
               value={positioning}
             />
 
             <MetricCard
               icon={Briefcase}
-              label="Portfolio match"
+              label={t("dashboard.portfolioMatch")}
               value={portfolioMatch}
             />
 
             <MetricCard
               icon={ArrowUpRight}
-              label="Skills"
+              label={t("dashboard.skills")}
               value={skills}
             />
           </div>
@@ -116,18 +119,18 @@ export function MarketFitPanel({
 
       <div className="relative mt-5 grid grid-cols-3 gap-3">
         <InfoCard
-          label="Demand"
-          value={marketFit?.demand || "Unknown"}
+          label={t("dashboard.demand")}
+          value={marketFit?.demand || t("dashboard.unknown")}
         />
 
         <InfoCard
-          label="Visibility"
-          value={marketFit?.visibility || "Unknown"}
+          label={t("dashboard.visibility")}
+          value={marketFit?.visibility || t("dashboard.unknown")}
         />
 
         <InfoCard
-          label="Readiness"
-          value={marketFit?.hiring_readiness || "Pending"}
+          label={t("dashboard.readiness")}
+          value={marketFit?.hiring_readiness || t("dashboard.pending")}
         />
       </div>
     </Card>

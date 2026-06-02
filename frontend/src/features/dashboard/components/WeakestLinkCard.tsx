@@ -8,6 +8,8 @@ import {
   Progress,
 } from "@/components/launchly/AppShell";
 
+import { useI18n } from "@/i18n/I18nContext";
+
 type WeakestLinkCardProps = {
   profileStrength: Record<string, number>;
   onOpen?: (path: string) => void;
@@ -16,33 +18,33 @@ type WeakestLinkCardProps = {
 const AREAS = [
   {
     key: "Resume",
-    label: "Resume",
+    labelKey: "dashboard.resume",
     path: "/resumes",
-    action: "Improve resume",
+    actionKey: "dashboard.improveResume",
   },
   {
     key: "Recruiter View",
-    label: "Recruiter View",
+    labelKey: "dashboard.recruiterView",
     path: "/recruiter-view",
-    action: "Review scan",
+    actionKey: "dashboard.reviewScan",
   },
   {
     key: "LinkedIn",
-    label: "LinkedIn",
+    labelKey: "dashboard.linkedIn",
     path: "/linkedin",
-    action: "Optimize profile",
+    actionKey: "dashboard.optimizeProfile",
   },
   {
     key: "Portfolio",
-    label: "Portfolio",
+    labelKey: "dashboard.portfolio",
     path: "/portfolio",
-    action: "Strengthen portfolio",
+    actionKey: "dashboard.strengthenPortfolio",
   },
   {
     key: "Applications",
-    label: "Applications",
+    labelKey: "dashboard.applications",
     path: "/applications",
-    action: "Build pipeline",
+    actionKey: "dashboard.buildPipeline",
   },
 ];
 
@@ -54,29 +56,33 @@ function clampScore(value?: number | null) {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
-function getMessage(score: number, label: string) {
+function getMessage(
+  score: number,
+  label: string,
+  t: (key: string, params?: Record<string, string | number>) => string,
+) {
   if (score === 0) {
-    return `${label} has no saved signal yet. Run or save an analysis there first.`;
+    return t("dashboard.noSavedSignal", { label });
   }
-
   if (score < 60) {
-    return `${label} is currently the weakest career signal and should be fixed first.`;
+    return t("dashboard.weakestSignal", { label });
   }
-
   if (score < 75) {
-    return `${label} is improving, but still limits your overall career readiness.`;
+    return t("dashboard.improvingButLimits", { label });
   }
-
-  return `${label} is the lowest area, but it is already in a healthy range.`;
+  return t("dashboard.healthyLowestArea", { label });
 }
 
 export function WeakestLinkCard({
   profileStrength,
   onOpen,
 }: WeakestLinkCardProps) {
+  const { t } = useI18n();
   const weakestArea = AREAS
     .map((area) => ({
       ...area,
+      label: t(area.labelKey),
+      action: t(area.actionKey),
       score: clampScore(profileStrength?.[area.key]),
     }))
     .sort((a, b) => a.score - b.score)[0];
@@ -88,16 +94,16 @@ export function WeakestLinkCard({
       <div className="relative">
         <div className="flex items-center gap-2 text-sm font-semibold">
           <AlertTriangle className="size-4 text-orange-300" />
-          Weakest link
+          {t("dashboard.weakestLinkTitle")}
         </div>
 
         <div className="mt-1 text-xs text-muted-foreground">
-          The one area most likely holding your profile back.
+          {t("dashboard.weakestLinkDescription")}
         </div>
 
         <div className="mt-5 rounded-2xl border border-orange-400/10 bg-orange-400/[0.05] p-4">
           <div className="text-xs uppercase tracking-[0.2em] text-orange-200/70">
-            Focus area
+            {t("dashboard.focusArea")}
           </div>
 
           <div className="mt-2 text-2xl font-semibold text-white">
@@ -106,7 +112,7 @@ export function WeakestLinkCard({
 
           <div className="mt-3">
             <Progress
-              label="Current strength"
+              label={t("dashboard.currentStrength")}
               value={weakestArea.score}
               color={weakestArea.score < 70 ? "pink" : undefined}
             />
@@ -116,6 +122,7 @@ export function WeakestLinkCard({
             {getMessage(
               weakestArea.score,
               weakestArea.label,
+              t,
             )}
           </div>
         </div>

@@ -9,6 +9,7 @@ import {
 import type {
   ApplicationItem,
 } from "@/features/applications/types/application";
+import { useI18n } from "@/i18n/I18nContext";
 
 type ApplicationDraft = {
   company_name: string;
@@ -50,6 +51,8 @@ export function ApplicationModal({
   onSave,
   onDelete,
 }: ApplicationModalProps) {
+  const { t } = useI18n();
+
   if (!open) {
     return null;
   }
@@ -62,12 +65,12 @@ export function ApplicationModal({
             <div>
               <div className="text-2xl font-bold text-white">
                 {mode === "create"
-                  ? "Add application"
-                  : "Edit application"}
+                  ? t("applications.addApplication")
+                  : t("applications.editApplication")}
               </div>
 
               <div className="mt-2 text-sm leading-7 text-white/50">
-                Add the basics. New applications start in Applied and can be moved later.
+                {t("applications.modalDescription")}
               </div>
             </div>
 
@@ -85,7 +88,7 @@ export function ApplicationModal({
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <div className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-white/60">
-                Company
+                {t("applications.company")}
               </div>
 
               <input
@@ -96,14 +99,14 @@ export function ApplicationModal({
                     event.target.value,
                   )
                 }
-                placeholder="e.g. Vercel"
+                placeholder={t("applications.companyPlaceholder")}
                 className="w-full rounded-2xl border border-white/10 bg-black/30 px-5 py-3.5 text-base text-white outline-none transition placeholder:text-white/30 focus:border-violet-400/40"
               />
             </div>
 
             <div>
               <div className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-white/60">
-                Job title
+                {t("applications.jobTitle")}
               </div>
 
               <input
@@ -114,14 +117,14 @@ export function ApplicationModal({
                     event.target.value,
                   )
                 }
-                placeholder="e.g. Junior AI Engineer"
+                placeholder={t("applications.jobTitlePlaceholder")}
                 className="w-full rounded-2xl border border-white/10 bg-black/30 px-5 py-3.5 text-base text-white outline-none transition placeholder:text-white/30 focus:border-violet-400/40"
               />
             </div>
           </div>
 
           <DateField
-            label="Applied date"
+            label={t("applications.appliedDate")}
             value={draft.applied_date}
             onChange={(value) =>
               onChange(
@@ -134,7 +137,7 @@ export function ApplicationModal({
           {mode === "edit" && (
             <div>
               <div className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-white/60">
-                Notes
+                {t("applications.notes")}
               </div>
 
               <textarea
@@ -146,7 +149,7 @@ export function ApplicationModal({
                   )
                 }
                 rows={4}
-                placeholder="Optional notes, recruiter details or next steps..."
+                placeholder={t("applications.notesPlaceholder")}
                 className="w-full resize-none rounded-2xl border border-white/10 bg-black/30 px-5 py-3.5 text-sm leading-7 text-white outline-none transition placeholder:text-white/30 focus:border-violet-400/40"
               />
             </div>
@@ -163,7 +166,7 @@ export function ApplicationModal({
                 className="inline-flex items-center gap-2 rounded-2xl border border-red-400/15 bg-red-400/[0.06] px-5 py-3 text-sm font-semibold text-red-200 transition hover:bg-red-400/[0.10] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Trash2 className="size-4" />
-                Delete
+                {t("common.delete")}
               </button>
             )}
           </div>
@@ -175,7 +178,7 @@ export function ApplicationModal({
               disabled={isSaving}
               className="rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-3 text-sm text-white/70 transition hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Cancel
+              {t("common.cancel")}
             </button>
 
             <button
@@ -199,10 +202,10 @@ export function ApplicationModal({
               )}
 
               {isSaving
-                ? "Saving..."
+                ? t("common.saving")
                 : mode === "create"
-                  ? "Add application"
-                  : "Save changes"}
+                  ? t("applications.addApplication")
+                  : t("common.saveChanges")}
             </button>
           </div>
         </div>

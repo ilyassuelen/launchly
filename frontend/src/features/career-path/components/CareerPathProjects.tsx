@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import { Card } from "@/components/launchly/AppShell";
+import { useI18n } from "@/i18n/I18nContext";
 
 import type { CareerPathProjectItem } from "../types/careerPath";
 
@@ -53,14 +54,28 @@ function getBuildGradient(difficulty: string) {
   return "from-emerald-300 to-cyan-300 shadow-[0_0_22px_rgba(52,211,153,0.14)]";
 }
 
-function getDifficultyLabel(difficulty: string) {
-  return difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+function getDifficultyLabel(
+  difficulty: string,
+  t: (key: string) => string,
+) {
+  const normalized = difficulty.toLowerCase();
+
+  if (normalized === "hard") {
+    return t("careerPath.difficultyHard");
+  }
+
+  if (normalized === "medium") {
+    return t("careerPath.difficultyMedium");
+  }
+
+  return t("careerPath.difficultyEasy");
 }
 
 export function CareerPathProjects({
   projectPlan,
 }: CareerPathProjectsProps) {
-  const nextProject = projectPlan[0]?.title || "No project selected";
+  const { t } = useI18n();
+  const nextProject = projectPlan[0]?.title || t("careerPath.noProjectSelected");
   const hardProjects = projectPlan.filter(
     (project) => project.difficulty.toLowerCase() === "hard",
   ).length;
@@ -75,22 +90,22 @@ export function CareerPathProjects({
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/10 bg-emerald-400/[0.06] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-100/70">
               <Code2 className="size-3.5 text-emerald-300" />
-              Portfolio Proof Lab
+              {t("careerPath.portfolioProofLab")}
             </div>
 
             <h2 className="mt-4 text-2xl font-semibold tracking-tight text-white lg:text-3xl">
-              Turn roadmap skills into visible proof
+              {t("careerPath.projectsTitle")}
             </h2>
 
             <p className="mt-3 max-w-3xl text-sm leading-7 text-white/55">
-              Build focused portfolio evidence that connects your target role, skill gaps and recruiter-facing proof into one clear story.
+              {t("careerPath.projectsDescription")}
             </p>
           </div>
 
           <div className="grid gap-2 sm:grid-cols-2 lg:min-w-[460px]">
             <div className="rounded-2xl border border-white/7 bg-black/20 px-4 py-3">
               <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/35">
-                Builds
+                {t("careerPath.builds")}
               </div>
 
               <div className="mt-1 text-xl font-semibold text-white">
@@ -100,7 +115,7 @@ export function CareerPathProjects({
 
             <div className="rounded-2xl border border-orange-300/10 bg-orange-400/[0.045] px-4 py-3">
               <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-orange-100/55">
-                Hard builds
+                {t("careerPath.hardBuilds")}
               </div>
 
               <div className="mt-1 text-xl font-semibold text-orange-100">
@@ -114,7 +129,7 @@ export function CareerPathProjects({
 
         {projectPlan.length === 0 ? (
           <div className="rounded-[2rem] border border-dashed border-white/10 bg-white/[0.03] p-8 text-sm text-white/50">
-            No project recommendations available yet.
+            {t("careerPath.noProjectRecommendations")}
           </div>
         ) : (
           <div className="grid gap-4 xl:grid-cols-2">
@@ -138,11 +153,15 @@ export function CareerPathProjects({
                           <div className="mb-2 flex flex-wrap items-center gap-2">
                             <div className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/45">
                               <Sparkles className="size-3" />
-                              Proof Project {String(index + 1).padStart(2, "0")}
+                              {t("careerPath.proofProjectNumber", {
+                                number: String(index + 1).padStart(2, "0"),
+                              })}
                             </div>
 
                             <div className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${getDifficultyClassName(project.difficulty)}`}>
-                              {getDifficultyLabel(project.difficulty)} difficulty
+                              {t("careerPath.difficultyLabel", {
+                                difficulty: getDifficultyLabel(project.difficulty, t),
+                              })}
                             </div>
                           </div>
 
@@ -160,7 +179,7 @@ export function CareerPathProjects({
                         <div className="mt-5">
                           <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-white/35">
                             <CheckCircle2 className="size-3.5 text-emerald-300" />
-                            Skills practiced
+                            {t("careerPath.skillsPracticed")}
                           </div>
 
                           <div className="flex flex-wrap gap-2">
@@ -175,7 +194,9 @@ export function CareerPathProjects({
 
                             {project.skills_practiced.length > 6 && (
                               <span className="rounded-full border border-white/5 bg-white/[0.025] px-2.5 py-1 text-xs text-white/35">
-                                +{project.skills_practiced.length - 6} more
+                                {t("careerPath.moreCount", {
+                                  count: project.skills_practiced.length - 6,
+                                })}
                               </span>
                             )}
                           </div>
@@ -188,7 +209,7 @@ export function CareerPathProjects({
                         <div>
                           <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-100/55">
                             <Star className="size-3.5" />
-                            Portfolio value
+                            {t("careerPath.portfolioValue")}
                           </div>
 
                           <p className="line-clamp-5 text-sm leading-7 text-white/62">
@@ -202,7 +223,7 @@ export function CareerPathProjects({
                       <div className="mt-4 rounded-2xl border border-white/5 bg-black/20 p-3">
                         <div className="mb-2 flex items-center justify-between text-xs">
                           <span className="font-semibold uppercase tracking-[0.16em] text-white/35">
-                            Build intensity
+                            {t("careerPath.buildIntensity")}
                           </span>
 
                           <span className="font-semibold text-white/65">
@@ -220,7 +241,7 @@ export function CareerPathProjects({
 
                       <div className="mt-4 flex items-center gap-2 rounded-2xl border border-white/5 bg-black/15 px-3 py-2 text-xs text-white/45">
                         <Target className="size-3.5 text-emerald-300" />
-                        Turns roadmap gaps into recruiter evidence
+                        {t("careerPath.turnsGapsIntoEvidence")}
                       </div>
                     </div>
                   </div>

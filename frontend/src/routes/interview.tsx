@@ -13,6 +13,7 @@ import {
   Card,
 } from "@/components/launchly/AppShell";
 import { useAuth } from "@/context/AuthContext";
+import { useI18n } from "@/i18n/I18nContext";
 
 import { useInterview } from "@/features/interview/hooks/useInterview";
 import { InterviewSetupPanel } from "@/features/interview/components/InterviewSetupPanel";
@@ -41,6 +42,7 @@ export const Route = createFileRoute("/interview")({
 function Interview() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   const {
     mode,
@@ -93,7 +95,7 @@ function Interview() {
       <div className="flex min-h-screen items-center justify-center bg-[oklch(0.145_0.02_270)] text-white">
         <div className="flex items-center gap-3 text-sm text-white/60">
           <Loader2 className="size-4 animate-spin text-cyan-300" />
-          Loading interview simulator...
+          {t("interview.loading")}
         </div>
       </div>
     );
@@ -110,8 +112,8 @@ function Interview() {
 
   return (
     <AppShell
-      title="Interview Simulator"
-      subtitle="Practice realistic AI interviews with resume-aware questions, adaptive follow-ups, and structured feedback."
+      title={t("interview.title")}
+      subtitle={t("interview.subtitle")}
     >
       <div className="space-y-4">
         {error && (
