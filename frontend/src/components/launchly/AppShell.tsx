@@ -83,7 +83,7 @@ export function AppShell({
 
           <nav
             aria-label="Main navigation"
-            className="flex min-w-0 flex-1 items-center justify-start gap-0.5 overflow-x-auto rounded-[1.35rem] border border-white/[0.08] bg-black/20 p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="mx-auto flex min-w-0 flex-1 items-center justify-center gap-1 overflow-x-auto rounded-[1.5rem] border border-white/[0.17] bg-white/[0.045] p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {items.map((item) => {
               const active = isActive(item.url);
@@ -91,16 +91,13 @@ export function AppShell({
                 <Link
                   key={item.titleKey}
                   to={item.url}
-                  className={`group relative flex min-w-max items-center gap-1.5 rounded-2xl px-2.5 py-1.5 text-[0.88rem] font-medium tracking-[-0.018em] transition ${
+                  className={`group relative flex min-w-max items-center gap-1.5 rounded-[1.15rem] px-3.5 py-2 text-[0.86rem] font-semibold tracking-[-0.015em] transition ${
                     active
-                      ? "bg-white/[0.095] text-foreground shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08),0_10px_24px_rgba(0,0,0,0.18)]"
-                      : "text-muted-foreground/90 hover:bg-white/[0.06] hover:text-foreground"
+                      ? "bg-white/[0.09] text-foreground shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]"
+                      : "text-muted-foreground/85 hover:bg-white/[0.055] hover:text-foreground"
                   }`}
                 >
-                  {active && (
-                    <span className="absolute inset-x-3 -bottom-0.5 h-px rounded-full bg-gradient-brand opacity-80" />
-                  )}
-                  <item.icon className={`size-3 shrink-0 transition ${active ? "text-[oklch(0.82_0.16_215)]" : "text-muted-foreground group-hover:text-foreground"}`} />
+                  <item.icon className={`size-3.5 shrink-0 transition ${active ? "text-[oklch(0.82_0.16_215)]" : "text-muted-foreground/80 group-hover:text-foreground"}`} />
                   <span className="whitespace-nowrap">{t(item.titleKey)}</span>
                 </Link>
               );
