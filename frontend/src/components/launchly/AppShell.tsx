@@ -1,19 +1,14 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, FileText, Mail, Mic, Linkedin, Github, Map,
-  Briefcase, Settings, Search, Bell, Sparkles, Plus,
-  User, LogOut, ChevronDown,
+  Briefcase, Settings, Sparkles,
+  User, LogOut,
 } from "lucide-react";
 import logo from "../../../static/logo.png";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/context/AuthContext";
 import { useI18n } from "@/i18n/I18nContext";
-import {
-  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
-  SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger,
-  SidebarHeader, SidebarFooter, useSidebar,
-} from "@/components/ui/sidebar";
 
 const items = [
   { titleKey: "nav.dashboard", url: "/dashboard", icon: LayoutDashboard },
@@ -27,73 +22,13 @@ const items = [
   { titleKey: "nav.applications", url: "/applications", icon: Briefcase },
 ];
 
-function AppSidebar({
-  defaultCollapsed = false,
-}: {
-  defaultCollapsed?: boolean;
-}) {
-  const { state, setOpen } = useSidebar();
-  const { t } = useI18n();
-  const collapsed = state === "collapsed";
-
-  useEffect(() => {
-    if (defaultCollapsed) {
-      setOpen(false);
-    }
-  }, [defaultCollapsed, setOpen]);
-  const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const isActive = (url: string) => pathname === url || pathname.startsWith(url + "/");
-
-  return (
-    <Sidebar collapsible="icon" className="border-r border-white/5">
-      <SidebarHeader className="px-3 py-4">
-        <Link to="/" className="flex items-center justify-center">
-          <img
-            src={logo}
-            alt="Launchly logo"
-            className={`${collapsed ? "h-8" : "h-10"} w-auto object-contain transition-all`}
-          />
-        </Link>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          {!collapsed && <SidebarGroupLabel>{t("nav.workspace")}</SidebarGroupLabel>}
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map(item => (
-                <SidebarMenuItem key={item.titleKey}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)}
-                    className={`${isActive(item.url) ? "bg-gradient-brand-soft text-foreground ring-1 ring-white/10" : ""}`}>
-                    <Link to={item.url} className="flex items-center gap-2">
-                      <item.icon className="size-4" />
-                      {!collapsed && <span>{t(item.titleKey)}</span>}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild isActive={isActive("/settings")}>
-              <Link to="/settings"><Settings className="size-4" />{!collapsed && <span>{t("nav.settings")}</span>}</Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-    </Sidebar>
-  );
-}
 
 export function AppShell({
   children,
   title,
   subtitle,
   action,
-  defaultSidebarCollapsed = false,
+  defaultSidebarCollapsed: _defaultSidebarCollapsed = false,
 }: {
   children: React.ReactNode;
   title: string;
@@ -106,6 +41,9 @@ export function AppShell({
   const navigate = useNavigate();
   const { logoutUser } = useAuth();
   const { t } = useI18n();
+
+  const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const isActive = (url: string) => pathname === url || pathname.startsWith(url + "/");
 
   function handleLogout() {
     logoutUser();
@@ -132,70 +70,93 @@ export function AppShell({
   }, [menuOpen]);
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-background">
-        <AppSidebar
-          defaultCollapsed={defaultSidebarCollapsed}
-        />
-        <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-40 flex h-16 items-center gap-3 border-b border-white/5 bg-background/70 px-4 backdrop-blur md:px-6">
-            <SidebarTrigger className="text-muted-foreground" />
-            <div className="hidden flex-1 md:block">
+    <div className="min-h-screen w-full bg-background">
+      <header className="sticky top-0 z-40 px-4 pt-4 md:px-6 xl:px-8">
+        <div className="mx-auto flex min-h-[4.8rem] w-full items-center gap-4 rounded-[1.75rem] border border-white/[0.08] bg-[radial-gradient(circle_at_0%_0%,rgba(124,92,255,0.18),transparent_34%),radial-gradient(circle_at_100%_0%,rgba(34,211,238,0.13),transparent_30%),rgba(9,13,24,0.82)] px-4 shadow-[0_22px_80px_rgba(0,0,0,0.34)] backdrop-blur-2xl md:px-5 xl:px-6">
+          <Link to="/" className="flex shrink-0 items-center">
+            <img
+              src={logo}
+              alt="Launchly logo"
+              className="h-9 w-auto object-contain md:h-10"
+            />
+          </Link>
 
-            </div>
-            <div className="ml-auto flex items-center gap-2">
-              <button className="grid size-9 place-items-center rounded-lg glass hover:bg-white/10">
-                <Bell className="size-4" />
+          <nav
+            aria-label="Main navigation"
+            className="flex min-w-0 flex-1 items-center justify-start gap-0.5 overflow-x-auto rounded-[1.35rem] border border-white/[0.08] bg-black/20 p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {items.map((item) => {
+              const active = isActive(item.url);
+              return (
+                <Link
+                  key={item.titleKey}
+                  to={item.url}
+                  className={`group relative flex min-w-max items-center gap-1.5 rounded-2xl px-2.5 py-1.5 text-[0.88rem] font-medium tracking-[-0.018em] transition ${
+                    active
+                      ? "bg-white/[0.095] text-foreground shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08),0_10px_24px_rgba(0,0,0,0.18)]"
+                      : "text-muted-foreground/90 hover:bg-white/[0.06] hover:text-foreground"
+                  }`}
+                >
+                  {active && (
+                    <span className="absolute inset-x-3 -bottom-0.5 h-px rounded-full bg-gradient-brand opacity-80" />
+                  )}
+                  <item.icon className={`size-3 shrink-0 transition ${active ? "text-[oklch(0.82_0.16_215)]" : "text-muted-foreground group-hover:text-foreground"}`} />
+                  <span className="whitespace-nowrap">{t(item.titleKey)}</span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="ml-auto flex shrink-0 items-center gap-2">
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="flex size-10 items-center justify-center rounded-2xl bg-gradient-brand text-primary-foreground shadow-[0_14px_36px_rgba(34,211,238,0.22)] transition hover:scale-[1.03]"
+              >
+                <User className="size-4" />
               </button>
 
-              <div className="relative" ref={menuRef}>
-                <button
-                  onClick={() => setMenuOpen(!menuOpen)}
-                  className="flex size-9 items-center justify-center rounded-full bg-gradient-brand text-primary-foreground transition hover:scale-[1.03]"
-                >
-                  <User className="size-4" />
-                </button>
+              {menuOpen && (
+                <div className="absolute right-0 top-12 z-50 w-52 overflow-hidden rounded-2xl border border-white/10 bg-[rgba(10,14,24,0.96)] shadow-[0_20px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      navigate({ to: "/settings" });
+                    }}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-sm text-white/80 transition hover:bg-white/[0.05] hover:text-white"
+                  >
+                    <Settings className="size-4" />
+                    {t("common.settings")}
+                  </button>
 
-                {menuOpen && (
-                  <div className="absolute right-0 top-12 z-50 w-52 overflow-hidden rounded-2xl border border-white/10 bg-[rgba(10,14,24,0.96)] shadow-[0_20px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
-                    <button
-                      onClick={() => {
-                        setMenuOpen(false);
-                        navigate({ to: "/settings" });
-                      }}
-                      className="flex w-full items-center gap-3 px-4 py-3 text-sm text-white/80 transition hover:bg-white/[0.05] hover:text-white"
-                    >
-                      <Settings className="size-4" />
-                      {t("common.settings")}
-                    </button>
+                  <div className="h-px bg-white/5" />
 
-                    <div className="h-px bg-white/5" />
-
-                    <button
-                      onClick={handleLogout}
-                      className="flex w-full items-center gap-3 px-4 py-3 text-sm text-red-200 transition hover:bg-red-400/10"
-                    >
-                      <LogOut className="size-4" />
-                      {t("common.logout")}
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </header>
-          <div className="px-4 pt-6 md:px-8">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">{title}</h1>
-                {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
-              </div>
-              {action}
+                  <button
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-sm text-red-200 transition hover:bg-red-400/10"
+                  >
+                    <LogOut className="size-4" />
+                    {t("common.logout")}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
-          <main className="flex-1 px-4 pb-16 pt-6 md:px-8 animate-fade-up">{children}</main>
+        </div>
+      </header>
+
+      <div className="px-4 pt-8 md:px-8 xl:px-10">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">{title}</h1>
+            {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
+          </div>
+          {action}
         </div>
       </div>
-    </SidebarProvider>
+
+      <main className="w-full px-4 pb-16 pt-6 md:px-8 xl:px-10 animate-fade-up">{children}</main>
+    </div>
   );
 }
 
