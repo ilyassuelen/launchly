@@ -83,7 +83,7 @@ export function AppShell({
 
           <nav
             aria-label="Main navigation"
-            className="mx-auto flex min-w-0 flex-1 items-center justify-center gap-1 overflow-x-auto rounded-[1.5rem] border border-white/[0.17] bg-white/[0.045] p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="mx-auto flex min-w-0 flex-1 items-center justify-start gap-1 overflow-x-auto rounded-[1.5rem] border border-white/[0.17] bg-white/[0.045] p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {items.map((item) => {
               const active = isActive(item.url);
