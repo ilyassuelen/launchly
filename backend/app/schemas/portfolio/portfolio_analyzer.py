@@ -28,7 +28,17 @@ class GitHubRepository(BaseModel):
     open_issues: int = 0
     default_branch: str = "main"
     updated_at: Optional[str] = None
+    commits_90d: int = 0
+    last_commit_at: Optional[str] = None
     readme: str = ""
+
+class GitHubActivity(BaseModel):
+    recent_commits_30d: int = 0
+    recent_commits_90d: int = 0
+    active_repositories_90d: int = 0
+    last_activity_at: Optional[str] = None
+    consistency_score: int = Field(ge=0, le=100)
+    activity_level: Literal["high", "medium", "low"] = "low"
 
 
 class RepoReview(BaseModel):
@@ -39,6 +49,8 @@ class RepoReview(BaseModel):
     topics: List[str] = []
     stars: int = 0
     forks: int = 0
+    commits_90d: int = 0
+    last_commit_at: Optional[str] = None
     score: int = Field(ge=0, le=100)
     tag: str
     recruiter_attention: Literal["high", "medium", "low"]
@@ -54,6 +66,7 @@ class PortfolioSignals(BaseModel):
     architecture: int = Field(ge=0, le=100)
     readme_quality: int = Field(ge=0, le=100)
     business_impact: int = Field(ge=0, le=100)
+    github_activity: int = Field(ge=0, le=100)
 
 
 class PortfolioAnalyzerResponse(BaseModel):
@@ -61,6 +74,7 @@ class PortfolioAnalyzerResponse(BaseModel):
     github_profile: GitHubProfile
     portfolio_score: int = Field(ge=0, le=100)
     signals: PortfolioSignals
+    github_activity: GitHubActivity
     top_wins: List[str]
     red_flags: List[str]
     repos: List[RepoReview]

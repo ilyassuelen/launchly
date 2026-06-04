@@ -28,6 +28,22 @@ export interface PortfolioSignals {
   readme_quality: number;
 
   business_impact: number;
+
+  github_activity: number;
+}
+
+export interface GitHubActivity {
+  recent_commits_30d: number;
+
+  recent_commits_90d: number;
+
+  active_repositories_90d: number;
+
+  last_activity_at: string | null;
+
+  consistency_score: number;
+
+  activity_level: "high" | "medium" | "low";
 }
 
 export type RecruiterAttention =
@@ -49,6 +65,10 @@ export interface RepoReview {
   stars: number;
 
   forks: number;
+
+  commits_90d: number;
+
+  last_commit_at: string | null;
 
   score: number;
 
@@ -75,6 +95,8 @@ export interface PortfolioAnalyzerResponse {
   portfolio_score: number;
 
   signals: PortfolioSignals;
+
+  github_activity: GitHubActivity;
 
   top_wins: string[];
 

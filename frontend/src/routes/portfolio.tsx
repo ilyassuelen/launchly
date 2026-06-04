@@ -32,6 +32,8 @@ import {
   Code2,
   Flame,
   Eye,
+  Activity,
+  Clock3,
 } from "lucide-react";
 
 import {
@@ -115,10 +117,47 @@ function getAttentionMeta(
   };
 }
 
+function getActivityLevelLabel(
+  level: string | undefined,
+  t: (key: string) => string,
+) {
+  if (level === "high") {
+    return t("portfolio.githubActivityHigh");
+  }
+
+  if (level === "medium") {
+    return t("portfolio.githubActivityMedium");
+  }
+
+  return t("portfolio.githubActivityLow");
+}
+
+function formatActivityDate(
+  value: string | null | undefined,
+  language: "english" | "german",
+  t: (key: string) => string,
+) {
+  if (!value) {
+    return t("portfolio.noRecentActivity");
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat(language === "german" ? "de" : "en", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+}
+
 function Portfolio() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const { t } = useI18n();
+  const { language, t } = useI18n();
 
   const {
     analysis,
@@ -190,6 +229,7 @@ function Portfolio() {
   const portfolioScore = analysis?.portfolio_score || 0;
   const signals = analysis?.signals;
   const repos = analysis?.repos || [];
+  const githubActivity = analysis?.github_activity;
 
   return (
     <AppShell
@@ -202,10 +242,10 @@ function Portfolio() {
           <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/70 to-transparent" />
 
           <div className="relative grid gap-6 xl:grid-cols-[270px_minmax(0,1fr)_minmax(320px,0.72fr)]">
-            <div className="relative overflow-hidden rounded-[2rem] border border-cyan-300/15 bg-black/25 p-6 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_24px_80px_rgba(0,0,0,0.26)]">
+            <div className="relative overflow-hidden rounded-[2rem] border border-cyan-300/15 bg-black/25 p-6 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_24px_80px_rgba(0,0,0,0.26)] flex items-center justify-center">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.22),transparent_58%)]" />
 
-              <div className="relative">
+              <div className="relative flex w-full flex-col items-center justify-center">
                 <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/15 bg-cyan-300/[0.08] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-100/75">
                   <Github className="size-3.5 text-cyan-300" />
                   {t("portfolio.portfolioQuality")}
@@ -298,6 +338,65 @@ function Portfolio() {
                     color={getProgressColor(signals?.business_impact || 0)}
                   />
                 </div>
+
+                {githubActivity && (
+                <div className="rounded-2xl border border-cyan-300/10 bg-white/[0.035] p-4 md:col-span-2">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <div>
+                      <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-cyan-100/60">
+                        <Activity className="size-3.5 text-cyan-300" />
+                        {t("portfolio.githubActivity")}
+                      </div>
+                      <div className="mt-2 text-sm font-semibold text-white">
+                        {getActivityLevelLabel(githubActivity.activity_level, t)}
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-white/10 bg-black/20 px-3 py-2 text-center">
+                      <div className="text-xl font-semibold text-white">
+                        {githubActivity.consistency_score}
+                      </div>
+                      <div className="text-[10px] uppercase tracking-[0.14em] text-white/35">
+                        {t("portfolio.scoreLabel")}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="rounded-2xl border border-white/5 bg-black/20 px-3 py-2.5">
+                      <div className="text-[10px] uppercase tracking-[0.14em] text-white/35">
+                        {t("portfolio.commits30d")}
+                      </div>
+                      <div className="mt-1 text-lg font-semibold text-white">
+                        {githubActivity.recent_commits_30d}
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-white/5 bg-black/20 px-3 py-2.5">
+                      <div className="text-[10px] uppercase tracking-[0.14em] text-white/35">
+                        {t("portfolio.commits90d")}
+                      </div>
+                      <div className="mt-1 text-lg font-semibold text-white">
+                        {githubActivity.recent_commits_90d}
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-white/5 bg-black/20 px-3 py-2.5">
+                      <div className="text-[10px] uppercase tracking-[0.14em] text-white/35">
+                        {t("portfolio.activeRepos")}
+                      </div>
+                      <div className="mt-1 text-lg font-semibold text-white">
+                        {githubActivity.active_repositories_90d}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 flex items-center gap-2 rounded-2xl border border-white/5 bg-black/20 px-3 py-2.5 text-xs text-white/50">
+                    <Clock3 className="size-3.5 text-cyan-200" />
+                    {t("portfolio.lastActivity")}: {formatActivityDate(githubActivity.last_activity_at, language, t)}
+                  </div>
+                </div>
+              )}
               </div>
             </div>
 
@@ -492,6 +591,20 @@ function Portfolio() {
                               <GitFork className="size-3.5" />
                               {repo.forks}
                             </span>
+
+                            <span className="inline-flex items-center gap-1">
+                              <Activity className="size-3.5" />
+                              {t("portfolio.repoCommits90d", {
+                                  count: repo.commits_90d || 0,
+                              })}
+                            </span>
+
+                            {repo.last_commit_at && (
+                              <span className="inline-flex items-center gap-1">
+                                <Clock3 className="size-3.5" />
+                                {formatActivityDate(repo.last_commit_at, language, t)}
+                              </span>
+                            )}
 
                             <a
                               href={repo.html_url}

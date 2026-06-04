@@ -13,6 +13,7 @@ from backend.app.prompts.portfolio.portfolio_analyzer_prompts import (
 )
 
 from backend.app.schemas.portfolio.portfolio_analyzer import (
+    GitHubActivity,
     PortfolioAnalyzerRequest,
     PortfolioAnalyzerResponse,
     PortfolioSignals,
@@ -20,6 +21,7 @@ from backend.app.schemas.portfolio.portfolio_analyzer import (
 )
 
 from backend.app.services.portfolio.github_service import (
+    fetch_github_activity,
     fetch_github_profile,
     fetch_github_repositories,
 )
@@ -155,6 +157,22 @@ def _normalize_attention(value: str, score: int) -> str:
     return _attention_from_score(score)
 
 
+def _blend_portfolio_score(
+    ai_score: int,
+    github_activity: GitHubActivity,
+) -> int:
+    """
+    Blend AI portfolio quality with GitHub activity conservatively.
+    Repository quality remains the dominant factor, while recent activity
+    can add or reduce a small amount of confidence.
+    """
+    activity_score = github_activity.consistency_score
+
+    blended_score = round((ai_score * 0.86) + (activity_score * 0.14))
+
+    return _clamp(blended_score)
+
+
 async def analyze_portfolio(
     payload: PortfolioAnalyzerRequest,
 ) -> PortfolioAnalyzerResponse:
@@ -176,6 +194,11 @@ async def analyze_portfolio(
             detail="No public repositories found for this GitHub user",
         )
 
+    github_activity = await fetch_github_activity(
+        payload.github_username,
+        repositories,
+    )
+
     compact_repos: List[Dict[str, Any]] = []
 
     for repo in repositories:
@@ -192,6 +215,8 @@ async def analyze_portfolio(
                 "forks": repo.forks,
                 "open_issues": repo.open_issues,
                 "updated_at": repo.updated_at,
+                "commits_90d": getattr(repo, "commits_90d", 0),
+                "last_commit_at": getattr(repo, "last_commit_at", None),
                 "local_score": local_score,
                 "readme_excerpt": repo.readme[:2500],
             }
@@ -314,6 +339,8 @@ async def analyze_portfolio(
                 topics=source_repo.topics,
                 stars=source_repo.stars,
                 forks=source_repo.forks,
+                commits_90d=getattr(source_repo, "commits_90d", 0),
+                last_commit_at=getattr(source_repo, "last_commit_at", None),
                 score=score,
                 tag=item.get("tag") or _tag_from_score(score),
                 recruiter_attention=recruiter_attention,
@@ -343,6 +370,8 @@ async def analyze_portfolio(
                     topics=repo.topics,
                     stars=repo.stars,
                     forks=repo.forks,
+                    commits_90d=getattr(repo, "commits_90d", 0),
+                    last_commit_at=getattr(repo, "last_commit_at", None),
                     score=score,
                     tag=_tag_from_score(score),
                     recruiter_attention=recruiter_attention,
@@ -359,13 +388,18 @@ async def analyze_portfolio(
         / len(repo_reviews)
     )
 
-    portfolio_score = _clamp(
+    ai_portfolio_score = _clamp(
         int(
             parsed.get(
                 "portfolio_score",
                 fallback_score,
             )
         )
+    )
+
+    portfolio_score = _blend_portfolio_score(
+        ai_score=ai_portfolio_score,
+        github_activity=github_activity,
     )
 
     signals_data = parsed.get("signals", {})
@@ -425,7 +459,9 @@ async def analyze_portfolio(
                     )
                 )
             ),
+            github_activity=github_activity.consistency_score,
         ),
+        github_activity=github_activity,
         top_wins=parsed.get("top_wins", [])[:5],
         red_flags=parsed.get("red_flags", [])[:5],
         repos=repo_reviews,
