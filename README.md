@@ -163,7 +163,7 @@ Launchly also includes supporting workflows for broader career preparation:
 # 🖥️ Platform Preview
 
 <p align="center">
-  <img src="frontend/static/launchly.gif" alt="Launchly Platform Preview" width="600"/>
+  <img src="frontend/static/launchly_demo.gif" alt="Launchly Platform Preview" width="600"/>
 </p>
 
 ---
