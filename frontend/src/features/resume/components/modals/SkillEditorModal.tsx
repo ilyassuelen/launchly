@@ -1,3 +1,7 @@
+import { X } from "lucide-react";
+import { createPortal } from "react-dom";
+
+import { ResumeInput } from "@/features/resume/components/ui/ResumeInput";
 import { useI18n } from "@/i18n/I18nContext";
 
 type SkillEditorModalProps = {
@@ -53,113 +57,96 @@ export function SkillEditorModal({
     return null;
   }
 
-  return (
-    <div className="fixed inset-0 z-[9999] overflow-y-auto bg-black/70 backdrop-blur-md">
-
-      <div className="relative mx-auto mt-8 mb-8 w-full max-w-3xl rounded-[28px] border border-white/10 bg-[#0b1020] shadow-[0_30px_100px_rgba(0,0,0,0.65)]">
-
-        <div className="border-b border-white/5 px-8 py-6">
-
-          <div className="flex items-start justify-between gap-6">
-
-            <div>
-              <div className="text-2xl font-bold text-white">
-                {t("resume.editTechnicalSkill")}
-              </div>
-
-              <div className="mt-2 text-sm leading-7 text-white/50">
-                {t("resume.editTechnicalSkillDescription")}
-              </div>
-            </div>
-
-            <button
-              onClick={() =>
-                setEditingSkillId(
-                  null,
-                )
-              }
-              className="grid size-12 place-items-center rounded-2xl border border-white/10 bg-white/[0.03] text-xl text-white/70 transition hover:bg-white/[0.08]"
-            >
-              ✕
-            </button>
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-8 backdrop-blur-sm">
+      <div className="w-full max-w-2xl overflow-hidden rounded-[1.5rem] border border-white/10 bg-[rgb(13,17,29)] shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
+        <div className="flex items-start justify-between gap-6 border-b border-white/10 px-7 py-6">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight text-white">
+              {t("resume.editTechnicalSkill")}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-white/45">
+              {t("resume.editTechnicalSkillDescription")}
+            </p>
           </div>
+
+          <button
+            type="button"
+            onClick={() =>
+              setEditingSkillId(
+                null,
+              )
+            }
+            className="grid size-10 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.03] text-white/50 transition hover:bg-white/[0.06] hover:text-white"
+            aria-label={t("common.cancel")}
+          >
+            <X className="size-5" />
+          </button>
         </div>
 
-        <div className="px-8 py-7">
-
+        <div className="px-7 py-6">
           <div>
+            <label className="mb-2 block text-sm font-medium text-white/80">
+              {t("resume.skillCategory")}
+            </label>
+            <ResumeInput
+              value={skillDraftName}
+              onChange={(e) =>
+                setSkillDraftName(
+                  e.target.value,
+                )
+              }
+              placeholder={t("resume.skillCategoryPlaceholder")}
+            />
+          </div>
 
-            <div>
-              <div className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-white/60">
-                {t("resume.skillCategory")}
-              </div>
+          <div className="mt-5">
+            <label className="mb-2 block text-sm font-medium text-white/80">
+              {t("resume.keywords")}
+            </label>
+            <ResumeInput
+              value={skillKeywordInput}
+              onChange={(e) =>
+                setSkillKeywordInput(
+                  e.target.value,
+                )
+              }
+              onKeyDown={(e) => {
+                if (
+                  e.key ===
+                  "Enter"
+                ) {
+                  e.preventDefault();
 
-              <input
-                value={
-                  skillDraftName
+                  addSkillKeyword();
                 }
-                onChange={(e) =>
-                  setSkillDraftName(
-                    e.target.value,
-                  )
-                }
-                placeholder={t("resume.skillCategoryPlaceholder")}
-                className="w-full rounded-2xl border border-white/10 bg-black/30 px-5 py-3.5 text-base text-white outline-none transition focus:border-violet-400/40"
-              />
-            </div>
+              }}
+              placeholder={t("resume.keywordInputPlaceholder")}
+            />
 
-            <div className="mt-7">
+            <p className="mt-2 text-xs leading-5 text-white/40">
+              {t("resume.keywordHelperText")}
+            </p>
 
-              <div className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-white/60">
-                {t("resume.keywords")}
-              </div>
-
-              <input
-                value={
-                  skillKeywordInput
-                }
-                onChange={(e) =>
-                  setSkillKeywordInput(
-                    e.target.value,
-                  )
-                }
-                onKeyDown={(e) => {
-                  if (
-                    e.key ===
-                    "Enter"
-                  ) {
-                    e.preventDefault();
-
-                    addSkillKeyword();
-                  }
-                }}
-                placeholder={t("resume.keywordInputPlaceholder")}
-                className="w-full rounded-2xl border border-white/10 bg-black/30 px-5 py-3.5 text-sm text-white outline-none transition focus:border-violet-400/40"
-              />
-
-              <div className="mt-3 text-sm text-white/40">
-                {t("resume.keywordHelperText")}
-              </div>
-
-              <div className="mt-5 flex flex-wrap gap-3">
-
+            {skillDraftKeywords.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
                 {skillDraftKeywords.map(
                   (keyword) => (
                     <div
-                      key={
-                        keyword
-                      }
-                      className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-1.5 text-sm font-medium text-cyan-100"
+                      key={keyword}
+                      className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-3 py-1.5 text-xs font-medium text-white/70"
                     >
                       {keyword}
 
                       <button
+                        type="button"
                         onClick={() =>
                           removeSkillKeyword(
                             keyword,
                           )
                         }
-                        className="text-cyan-100/60 transition hover:text-red-300"
+                        className="text-white/40 transition hover:text-red-300"
+                        aria-label={t("common.cancel")}
                       >
                         ✕
                       </button>
@@ -167,33 +154,33 @@ export function SkillEditorModal({
                   ),
                 )}
               </div>
-            </div>
+            )}
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 border-t border-white/5 px-8 py-4">
-
+        <div className="flex items-center justify-end gap-3 border-t border-white/10 px-7 py-5">
           <button
+            type="button"
             onClick={() =>
               setEditingSkillId(
                 null,
               )
             }
-            className="rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-3 text-sm text-white/70 transition hover:bg-white/[0.06]"
+            className="rounded-xl border border-white/10 bg-transparent px-4 py-2.5 text-sm font-semibold text-white/55 transition hover:bg-white/[0.04] hover:text-white"
           >
             {t("common.cancel")}
           </button>
 
           <button
-            onClick={
-              saveSkillEditor
-            }
-            className="rounded-2xl bg-gradient-brand px-7 py-3 text-sm font-semibold text-primary-foreground shadow-[0_10px_30px_rgba(168,85,247,0.35)] transition hover:scale-[1.02]"
+            type="button"
+            onClick={saveSkillEditor}
+            className="rounded-xl border border-cyan-300/20 bg-cyan-300/[0.10] px-4 py-2.5 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/[0.16]"
           >
             {t("common.saveChanges")}
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

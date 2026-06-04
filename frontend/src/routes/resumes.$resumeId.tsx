@@ -225,14 +225,6 @@ function ResumeBuilder() {
     useState("");
 
 
-  const scrollToTop = () => {
-      requestAnimationFrame(() => {
-          window.scrollTo({
-              top: 0,
-              behavior: "instant",
-          });
-      });
-  };
 
   const [
     skillDraftKeywords,
@@ -377,11 +369,9 @@ const selectedProfile =
       !!selectedProfile ||
       !!editingSkillId;
 
-    if (hasOpenModal) {
-      scrollToTop();
-    } else {
-      document.body.style.overflow = "auto";
-    }
+    document.body.style.overflow = hasOpenModal
+      ? "hidden"
+      : "auto";
 
     return () => {
       document.body.style.overflow = "auto";
@@ -1093,8 +1083,6 @@ ${(p.bullets || []).join(" ")}
     );
 
     setSkillKeywordInput("");
-
-    scrollToTop();
   };
 
   const saveSkillEditor = () => {
@@ -1457,9 +1445,7 @@ ${(p.bullets || []).join(" ")}
 
   return (
     <AppShell
-      defaultSidebarCollapsed
-      title={t("resume.title")}
-      subtitle={t("resume.builderSubtitle")}
+
     >
       <div className="grid gap-4 lg:grid-cols-12">
 

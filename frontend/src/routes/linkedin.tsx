@@ -169,16 +169,6 @@ function LinkedInPage() {
     });
   }, [user, loading]);
 
-  useEffect(() => {
-    if (!editingProject) {
-      return;
-    }
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  }, [editingProject]);
 
   const skills = useMemo(
     () =>
@@ -271,20 +261,13 @@ function LinkedInPage() {
   };
 
   const openNewProjectModal = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
+    setEditingProject({
+      id: createProjectId(),
+      title: "",
+      description: "",
+      skills: [],
     });
-
-    window.setTimeout(() => {
-      setEditingProject({
-        id: createProjectId(),
-        title: "",
-        description: "",
-        skills: [],
-      });
-      setProjectSkillInput("");
-    }, 250);
+    setProjectSkillInput("");
   };
 
   const addProjectSkill = () => {
