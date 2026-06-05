@@ -229,8 +229,6 @@ function CareerPath() {
 
   return (
     <AppShell
-      title={t("careerPath.title")}
-      subtitle={t("careerPath.subtitle")}
     >
       <div className="space-y-6">
         <Card className="relative min-h-[450px] overflow-hidden border-cyan-300/10 bg-[linear-gradient(135deg,rgba(15,23,42,0.96),rgba(8,13,24,0.98)_55%,rgba(18,24,46,0.9))] p-0 shadow-[0_24px_80px_rgba(6,182,212,0.06)]">

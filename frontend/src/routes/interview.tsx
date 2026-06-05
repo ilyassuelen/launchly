@@ -112,8 +112,6 @@ function Interview() {
 
   return (
     <AppShell
-      title={t("interview.title")}
-      subtitle={t("interview.subtitle")}
     >
       <div className="space-y-4">
         {error && (

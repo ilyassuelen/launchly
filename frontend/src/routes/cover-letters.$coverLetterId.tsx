@@ -407,9 +407,6 @@ const textareaClassName =
 
   return (
     <AppShell
-      defaultSidebarCollapsed
-      title={t("coverLetter.builderTitle")}
-      subtitle={t("coverLetter.builderSubtitle")}
     >
       <div className="grid gap-4 lg:grid-cols-12">
 

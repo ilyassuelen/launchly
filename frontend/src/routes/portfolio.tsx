@@ -233,8 +233,6 @@ function Portfolio() {
 
   return (
     <AppShell
-      title={t("portfolio.title")}
-      subtitle={t("portfolio.subtitle")}
     >
       <div className="space-y-4">
         <Card className="relative overflow-hidden border-cyan-300/15 bg-[linear-gradient(135deg,rgba(15,23,42,0.98),rgba(8,13,24,0.98)_48%,rgba(18,32,58,0.88))] shadow-[0_28px_90px_rgba(6,182,212,0.10),0_0_0_1px_rgba(255,255,255,0.03)]">

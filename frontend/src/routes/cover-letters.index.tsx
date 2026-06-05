@@ -191,8 +191,6 @@ function CoverLettersPage() {
 
   return (
     <AppShell
-      title={t("coverLetter.title")}
-      subtitle={t("coverLetter.manageVariants")}
     >
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
 

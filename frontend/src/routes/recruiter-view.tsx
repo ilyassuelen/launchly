@@ -339,8 +339,6 @@ ${(p.bullets || []).join(" ")}
   }
   return (
     <AppShell
-      title={t("recruiterView.title")}
-      subtitle={t("recruiterView.subtitle")}
       action={
         <div className="relative z-50 flex items-center pointer-events-auto">
           <button
