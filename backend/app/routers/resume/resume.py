@@ -5,7 +5,9 @@ from copy import deepcopy
 from fastapi import (
     APIRouter,
     Depends,
+    Header,
     HTTPException,
+    Response,
     UploadFile,
     File,
 )
@@ -18,6 +20,7 @@ from backend.app.models.user.user import User
 from backend.app.schemas.resume.resume import ResumeCreate
 from backend.app.core.deps import get_current_user
 
+from backend.app.services.resume.resume_pdf_service import generate_resume_pdf
 from backend.app.services.storage.resume_photo_storage import (
     save_resume_photo,
     delete_resume_photo,
@@ -370,3 +373,57 @@ def delete_resume(
         "success": True,
         "message": "Resume deleted",
     }
+
+
+@router.get("/{resume_id}/export-pdf")
+async def export_resume_pdf(
+    resume_id: int,
+    authorization: str = Header(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    resume = (
+        db.query(Resume)
+        .filter(
+            Resume.id == resume_id,
+            Resume.user_id == current_user.id,
+        )
+        .first()
+    )
+
+    if not resume:
+        raise HTTPException(
+            status_code=404,
+            detail="Resume not found",
+        )
+
+    access_token = authorization.replace("Bearer ", "").strip()
+
+    pdf_bytes = await generate_resume_pdf(
+        resume_id=resume_id,
+        access_token=access_token,
+    )
+
+    first_name = current_user.first_name.strip()
+    last_name = current_user.last_name.strip()
+
+    safe_first_name = "".join(
+        char for char in first_name
+        if char.isalnum() or char in ["-", "_"]
+    )
+
+    safe_last_name = "".join(
+        char for char in last_name
+        if char.isalnum() or char in ["-", "_"]
+    )
+
+    filename = f"{safe_first_name}_{safe_last_name}_Resume.pdf"
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Access-Control-Expose-Headers": "Content-Disposition",
+        },
+    )

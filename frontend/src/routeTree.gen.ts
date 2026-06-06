@@ -24,6 +24,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ResumesIndexRouteImport } from './routes/resumes.index'
 import { Route as CoverLettersIndexRouteImport } from './routes/cover-letters.index'
 import { Route as ResumesResumeIdRouteImport } from './routes/resumes.$resumeId'
+import { Route as ResumePrintResumeIdRouteImport } from './routes/resume-print.$resumeId'
 import { Route as CoverLettersCoverLetterIdRouteImport } from './routes/cover-letters.$coverLetterId'
 
 const SettingsRoute = SettingsRouteImport.update({
@@ -101,6 +102,11 @@ const ResumesResumeIdRoute = ResumesResumeIdRouteImport.update({
   path: '/resumes/$resumeId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResumePrintResumeIdRoute = ResumePrintResumeIdRouteImport.update({
+  id: '/resume-print/$resumeId',
+  path: '/resume-print/$resumeId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CoverLettersCoverLetterIdRoute =
   CoverLettersCoverLetterIdRouteImport.update({
     id: '/cover-letters/$coverLetterId',
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/resume-export': typeof ResumeExportRoute
   '/settings': typeof SettingsRoute
   '/cover-letters/$coverLetterId': typeof CoverLettersCoverLetterIdRoute
+  '/resume-print/$resumeId': typeof ResumePrintResumeIdRoute
   '/resumes/$resumeId': typeof ResumesResumeIdRoute
   '/cover-letters/': typeof CoverLettersIndexRoute
   '/resumes/': typeof ResumesIndexRoute
@@ -140,6 +147,7 @@ export interface FileRoutesByTo {
   '/resume-export': typeof ResumeExportRoute
   '/settings': typeof SettingsRoute
   '/cover-letters/$coverLetterId': typeof CoverLettersCoverLetterIdRoute
+  '/resume-print/$resumeId': typeof ResumePrintResumeIdRoute
   '/resumes/$resumeId': typeof ResumesResumeIdRoute
   '/cover-letters': typeof CoverLettersIndexRoute
   '/resumes': typeof ResumesIndexRoute
@@ -159,6 +167,7 @@ export interface FileRoutesById {
   '/resume-export': typeof ResumeExportRoute
   '/settings': typeof SettingsRoute
   '/cover-letters/$coverLetterId': typeof CoverLettersCoverLetterIdRoute
+  '/resume-print/$resumeId': typeof ResumePrintResumeIdRoute
   '/resumes/$resumeId': typeof ResumesResumeIdRoute
   '/cover-letters/': typeof CoverLettersIndexRoute
   '/resumes/': typeof ResumesIndexRoute
@@ -179,6 +188,7 @@ export interface FileRouteTypes {
     | '/resume-export'
     | '/settings'
     | '/cover-letters/$coverLetterId'
+    | '/resume-print/$resumeId'
     | '/resumes/$resumeId'
     | '/cover-letters/'
     | '/resumes/'
@@ -197,6 +207,7 @@ export interface FileRouteTypes {
     | '/resume-export'
     | '/settings'
     | '/cover-letters/$coverLetterId'
+    | '/resume-print/$resumeId'
     | '/resumes/$resumeId'
     | '/cover-letters'
     | '/resumes'
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/resume-export'
     | '/settings'
     | '/cover-letters/$coverLetterId'
+    | '/resume-print/$resumeId'
     | '/resumes/$resumeId'
     | '/cover-letters/'
     | '/resumes/'
@@ -234,6 +246,7 @@ export interface RootRouteChildren {
   ResumeExportRoute: typeof ResumeExportRoute
   SettingsRoute: typeof SettingsRoute
   CoverLettersCoverLetterIdRoute: typeof CoverLettersCoverLetterIdRoute
+  ResumePrintResumeIdRoute: typeof ResumePrintResumeIdRoute
   ResumesResumeIdRoute: typeof ResumesResumeIdRoute
   CoverLettersIndexRoute: typeof CoverLettersIndexRoute
   ResumesIndexRoute: typeof ResumesIndexRoute
@@ -346,6 +359,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResumesResumeIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/resume-print/$resumeId': {
+      id: '/resume-print/$resumeId'
+      path: '/resume-print/$resumeId'
+      fullPath: '/resume-print/$resumeId'
+      preLoaderRoute: typeof ResumePrintResumeIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cover-letters/$coverLetterId': {
       id: '/cover-letters/$coverLetterId'
       path: '/cover-letters/$coverLetterId'
@@ -370,6 +390,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResumeExportRoute: ResumeExportRoute,
   SettingsRoute: SettingsRoute,
   CoverLettersCoverLetterIdRoute: CoverLettersCoverLetterIdRoute,
+  ResumePrintResumeIdRoute: ResumePrintResumeIdRoute,
   ResumesResumeIdRoute: ResumesResumeIdRoute,
   CoverLettersIndexRoute: CoverLettersIndexRoute,
   ResumesIndexRoute: ResumesIndexRoute,

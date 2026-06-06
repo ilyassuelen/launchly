@@ -1,9 +1,14 @@
 import {
   Wand2,
   Download,
+  Loader2,
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
+
+import { useState } from "react";
+
+import { exportResumePdf } from "@/features/resume/api/resumePdfApi";
 
 import { Card } from "@/components/launchly/AppShell";
 import { useI18n } from "@/i18n/I18nContext";
@@ -24,9 +29,7 @@ type Props = {
     | "saving"
     | "saved";
 
-  handleSaveResume: () => void;
-
-  handlePrint: () => void;
+  handleSaveResume: () => void | Promise<void>;
 
   printRef: React.RefObject<HTMLDivElement>;
   previewContentRef: React.RefObject<HTMLDivElement>;
@@ -39,11 +42,11 @@ export function ResumePreviewPanel({
   hasOverflow,
   saveStatus,
   handleSaveResume,
-  handlePrint,
   printRef,
   previewContentRef,
 }: Props) {
   const { t } = useI18n();
+  const [isExporting, setIsExporting] = useState(false);
   return (
     <Card className="relative flex h-[calc(100vh-120px)] min-h-[900px] flex-col overflow-hidden p-0 lg:col-span-7">
 
@@ -103,11 +106,30 @@ export function ResumePreviewPanel({
             </button>
 
             <button
-              onClick={handlePrint}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-brand px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[0_10px_30px_rgba(168,85,247,0.35)] transition hover:scale-[1.02]"
+              disabled={isExporting}
+              onClick={async () => {
+                try {
+                  setIsExporting(true);
+
+                  await handleSaveResume();
+                  await exportResumePdf(resume.id);
+                } finally {
+                  setIsExporting(false);
+                }
+              }}
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-brand px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[0_10px_30px_rgba(168,85,247,0.35)] transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <Download className="size-4" />
-              {t("resume.export")}
+              {isExporting ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  Generating PDF...
+                </>
+              ) : (
+                <>
+                  <Download className="size-4" />
+                  {t("resume.export")}
+                </>
+              )}
             </button>
 
           </div>
