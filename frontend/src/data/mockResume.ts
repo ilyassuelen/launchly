@@ -1,6 +1,7 @@
-import type { Resume } from "../types/resume";
+import type { Resume } from "@/features/resume/types/resume";
 
 export const mockResume: Resume = {
+  id: "mock-resume",
 
   title: "New Resume",
 
@@ -52,8 +53,7 @@ export const mockResume: Resume = {
     githubLabel: "GitHub",
 
     socialProfiles: [],
-
-    avatar: "",
+    photo: "",
   },
 
   summary: {
