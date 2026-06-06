@@ -127,6 +127,11 @@ export const dashboard = {
       aiCoachFeedEmpty: "Run an AI review to generate personalized career insights.",
       marketFitAnalysisTitle: "Market fit analysis",
       marketFitAnalysisDescription: "How competitive your current profile looks.",
+      marketExcellentMatch: "Excellent match",
+      marketStrongMatch: "Strong match",
+      marketGoodPotential: "Good potential",
+      marketNeedsPositioning: "Needs positioning",
+      marketAwaitingSignal: "Awaiting signal",
 
       marketIntelligence: "Market intelligence",
       marketPositioning: "Market positioning",
@@ -315,6 +320,11 @@ export const dashboard = {
       aiCoachFeedEmpty: "Starte ein AI-Review, um personalisierte Karriere-Insights zu generieren.",
       marketFitAnalysisTitle: "Marktpositionierung",
       marketFitAnalysisDescription: "Wie gut dein Profil aktuell für deine Zielrolle aufgestellt ist.",
+      marketExcellentMatch: "Exzellenter Fit",
+      marketStrongMatch: "Starker Fit",
+      marketGoodPotential: "Gutes Potenzial",
+      marketNeedsPositioning: "Positionierung ausbauen",
+      marketAwaitingSignal: "Signal ausstehend",
 
       marketIntelligence: "Marktanalyse",
       marketPositioning: "Marktpositionierung",
