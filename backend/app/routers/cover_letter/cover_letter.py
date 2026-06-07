@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException, Response
 from sqlalchemy.orm import Session
 
 from backend.app.core.database import get_db
@@ -11,6 +11,9 @@ from backend.app.models.user.user import User
 from backend.app.schemas.cover_letter.cover_letter import CoverLetterCreate
 
 from backend.app.core.deps import get_current_user
+from backend.app.services.cover_letter.cover_letter_pdf_service import (
+    generate_cover_letter_pdf,
+)
 
 router = APIRouter(prefix="/cover-letters",)
 
@@ -220,3 +223,64 @@ def delete_cover_letter(
         "message":
             "Cover letter deleted",
     }
+
+
+@router.get("/{cover_letter_id}/export-pdf")
+async def export_cover_letter_pdf(
+    cover_letter_id: str,
+    authorization: str = Header(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user,
+    ),
+):
+    cover_letter = (
+        db.query(CoverLetter)
+        .filter(
+            CoverLetter.id
+            == cover_letter_id,
+            CoverLetter.user_id
+            == current_user.id,
+        )
+        .first()
+    )
+
+    if not cover_letter:
+        raise HTTPException(
+            status_code=404,
+            detail="Cover letter not found",
+        )
+
+    access_token = authorization.replace(
+        "Bearer ",
+        "",
+    ).strip()
+
+    pdf_bytes = await generate_cover_letter_pdf(
+        cover_letter_id=cover_letter_id,
+        access_token=access_token,
+    )
+
+    first_name = current_user.first_name.strip()
+    last_name = current_user.last_name.strip()
+
+    safe_first_name = "".join(
+        char for char in first_name
+        if char.isalnum() or char in ["-", "_"]
+    )
+
+    safe_last_name = "".join(
+        char for char in last_name
+        if char.isalnum() or char in ["-", "_"]
+    )
+
+    filename = f"{safe_first_name}_{safe_last_name}_Cover_Letter.pdf"
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Access-Control-Expose-Headers": "Content-Disposition",
+        },
+    )

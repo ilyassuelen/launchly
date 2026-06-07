@@ -26,6 +26,7 @@ import { Route as CoverLettersIndexRouteImport } from './routes/cover-letters.in
 import { Route as ResumesResumeIdRouteImport } from './routes/resumes.$resumeId'
 import { Route as ResumePrintResumeIdRouteImport } from './routes/resume-print.$resumeId'
 import { Route as CoverLettersCoverLetterIdRouteImport } from './routes/cover-letters.$coverLetterId'
+import { Route as CoverLetterPrintCoverLetterIdRouteImport } from './routes/cover-letter-print.$coverLetterId'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
@@ -113,6 +114,12 @@ const CoverLettersCoverLetterIdRoute =
     path: '/cover-letters/$coverLetterId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const CoverLetterPrintCoverLetterIdRoute =
+  CoverLetterPrintCoverLetterIdRouteImport.update({
+    id: '/cover-letter-print/$coverLetterId',
+    path: '/cover-letter-print/$coverLetterId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/resume-export': typeof ResumeExportRoute
   '/settings': typeof SettingsRoute
+  '/cover-letter-print/$coverLetterId': typeof CoverLetterPrintCoverLetterIdRoute
   '/cover-letters/$coverLetterId': typeof CoverLettersCoverLetterIdRoute
   '/resume-print/$resumeId': typeof ResumePrintResumeIdRoute
   '/resumes/$resumeId': typeof ResumesResumeIdRoute
@@ -146,6 +154,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/resume-export': typeof ResumeExportRoute
   '/settings': typeof SettingsRoute
+  '/cover-letter-print/$coverLetterId': typeof CoverLetterPrintCoverLetterIdRoute
   '/cover-letters/$coverLetterId': typeof CoverLettersCoverLetterIdRoute
   '/resume-print/$resumeId': typeof ResumePrintResumeIdRoute
   '/resumes/$resumeId': typeof ResumesResumeIdRoute
@@ -166,6 +175,7 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/resume-export': typeof ResumeExportRoute
   '/settings': typeof SettingsRoute
+  '/cover-letter-print/$coverLetterId': typeof CoverLetterPrintCoverLetterIdRoute
   '/cover-letters/$coverLetterId': typeof CoverLettersCoverLetterIdRoute
   '/resume-print/$resumeId': typeof ResumePrintResumeIdRoute
   '/resumes/$resumeId': typeof ResumesResumeIdRoute
@@ -187,6 +197,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/resume-export'
     | '/settings'
+    | '/cover-letter-print/$coverLetterId'
     | '/cover-letters/$coverLetterId'
     | '/resume-print/$resumeId'
     | '/resumes/$resumeId'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/resume-export'
     | '/settings'
+    | '/cover-letter-print/$coverLetterId'
     | '/cover-letters/$coverLetterId'
     | '/resume-print/$resumeId'
     | '/resumes/$resumeId'
@@ -225,6 +237,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/resume-export'
     | '/settings'
+    | '/cover-letter-print/$coverLetterId'
     | '/cover-letters/$coverLetterId'
     | '/resume-print/$resumeId'
     | '/resumes/$resumeId'
@@ -245,6 +258,7 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute
   ResumeExportRoute: typeof ResumeExportRoute
   SettingsRoute: typeof SettingsRoute
+  CoverLetterPrintCoverLetterIdRoute: typeof CoverLetterPrintCoverLetterIdRoute
   CoverLettersCoverLetterIdRoute: typeof CoverLettersCoverLetterIdRoute
   ResumePrintResumeIdRoute: typeof ResumePrintResumeIdRoute
   ResumesResumeIdRoute: typeof ResumesResumeIdRoute
@@ -373,6 +387,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoverLettersCoverLetterIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cover-letter-print/$coverLetterId': {
+      id: '/cover-letter-print/$coverLetterId'
+      path: '/cover-letter-print/$coverLetterId'
+      fullPath: '/cover-letter-print/$coverLetterId'
+      preLoaderRoute: typeof CoverLetterPrintCoverLetterIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -389,6 +410,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   ResumeExportRoute: ResumeExportRoute,
   SettingsRoute: SettingsRoute,
+  CoverLetterPrintCoverLetterIdRoute: CoverLetterPrintCoverLetterIdRoute,
   CoverLettersCoverLetterIdRoute: CoverLettersCoverLetterIdRoute,
   ResumePrintResumeIdRoute: ResumePrintResumeIdRoute,
   ResumesResumeIdRoute: ResumesResumeIdRoute,

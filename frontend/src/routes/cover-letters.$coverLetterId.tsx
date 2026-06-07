@@ -35,6 +35,7 @@ import {
 import {
   analyzeCoverLetter,
 } from "@/features/cover-letter/api/coverLetterApi";
+import { exportCoverLetterPdf } from "@/features/cover-letter/api/coverLetterPdfApi";
 
 import type {
   CoverLetterAnalysis,
@@ -129,6 +130,11 @@ function CoverLetterBuilder() {
   const [
       isAnalyzing,
       setIsAnalyzing,
+  ] = useState(false);
+
+  const [
+      isExportingPdf,
+      setIsExportingPdf,
   ] = useState(false);
 
   const typography =
@@ -1023,10 +1029,26 @@ ${
                     </button>
 
                     <button
-                      onClick={handlePrint}
-                      className="grid size-10 place-items-center rounded-xl text-white/70 transition hover:bg-white/[0.08] hover:text-white"
+                      disabled={isExportingPdf}
+                      onClick={async () => {
+                        try {
+                          setIsExportingPdf(true);
+
+                          await handleSave();
+                          await exportCoverLetterPdf(
+                            coverLetter.id || coverLetterId,
+                          );
+                        } finally {
+                          setIsExportingPdf(false);
+                        }
+                      }}
+                      className="grid size-10 place-items-center rounded-xl text-white/70 transition hover:bg-white/[0.08] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      <Download className="size-4" />
+                      {isExportingPdf ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <Download className="size-4" />
+                      )}
                     </button>
                   </div>
                 </div>

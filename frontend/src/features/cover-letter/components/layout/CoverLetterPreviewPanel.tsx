@@ -1,9 +1,12 @@
 import {
   Copy,
   Download,
+  Loader2,
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
+
+import { useState } from "react";
 
 import {
   Card,
@@ -11,7 +14,8 @@ import {
 
 import { useI18n } from "@/i18n/I18nContext";
 
-import { ClassicCoverLetter } from "@/components/cover-letter/templates/ClassicCoverLetter";
+import { exportCoverLetterPdf } from "@/features/cover-letter/api/coverLetterPdfApi";
+import { CoverLetterRenderer } from "@/components/cover-letter/CoverLetterRenderer";
 
 import type { CoverLetter } from "@/features/cover-letter/types/coverLetter";
 
@@ -33,7 +37,7 @@ interface Props {
     | "saving"
     | "saved";
 
-  handleSaveCoverLetter: () => void;
+  handleSaveCoverLetter: () => void | Promise<void>;
 
   printRef: React.RefObject<HTMLDivElement | null>;
 }
@@ -52,6 +56,8 @@ export function CoverLetterPreviewPanel({
   printRef,
 }: Props) {
   const { t } = useI18n();
+  const [isExporting, setIsExporting] = useState(false);
+
   return (
     <Card className="relative overflow-hidden border-white/5 bg-[#050816] p-0">
 
@@ -125,8 +131,27 @@ export function CoverLetterPreviewPanel({
                 <Copy className="size-4" />
               </button>
 
-              <button className="grid size-10 place-items-center rounded-xl text-white/70 transition hover:bg-white/[0.08] hover:text-white">
-                <Download className="size-4" />
+              <button
+                disabled={isExporting}
+                onClick={async () => {
+                  try {
+                    setIsExporting(true);
+
+                    await handleSaveCoverLetter();
+                    await exportCoverLetterPdf(
+                      coverLetter.id,
+                    );
+                  } finally {
+                    setIsExporting(false);
+                  }
+                }}
+                className="grid size-10 place-items-center rounded-xl text-white/70 transition hover:bg-white/[0.08] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isExporting ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Download className="size-4" />
+                )}
               </button>
 
               <div className="mx-1 h-5 w-px bg-white/10" />
