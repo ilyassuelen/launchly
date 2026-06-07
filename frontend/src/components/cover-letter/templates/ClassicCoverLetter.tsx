@@ -33,7 +33,7 @@ export function ClassicCoverLetter({
       : "Date";
 
   return (
-    <div className="relative box-border h-[1123px] w-[794px] overflow-hidden bg-[#fcfcfb]">
+    <div className="relative box-border min-h-[1123px] w-[794px] bg-[#fcfcfb]">
 
       {/* paper texture */}
       <div className="absolute inset-0 opacity-[0.018] [background-image:radial-gradient(#000_0.6px,transparent_0.6px)] [background-size:18px_18px]" />

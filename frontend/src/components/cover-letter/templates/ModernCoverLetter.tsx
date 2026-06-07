@@ -31,7 +31,7 @@ export function ModernCoverLetter({
       : "Date";
 
   return (
-    <div className="relative box-border h-[1123px] w-[794px] overflow-hidden rounded-[28px] bg-[#fbfbfd] shadow-[0_60px_180px_rgba(0,0,0,0.42)]">
+    <div className="relative box-border min-h-[1123px] w-[794px] overflow-visible rounded-[28px] bg-[#fbfbfd] shadow-[0_60px_180px_rgba(0,0,0,0.42)] print:rounded-none print:shadow-none">
 
       {/* ambient glow */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(139,92,246,0.08),transparent_35%)]" />
@@ -63,7 +63,7 @@ export function ModernCoverLetter({
 
           </div>
 
-          <div className="rounded-2xl border border-black/5 bg-white px-5 py-4 text-right shadow-sm">
+          <div className="rounded-2xl border border-black/5 bg-white px-5 py-4 text-right shadow-sm print:shadow-none">
 
             <div
               className="font-semibold uppercase tracking-[0.24em] text-violet-500"
@@ -125,7 +125,7 @@ export function ModernCoverLetter({
         </div>
 
         {/* RECIPIENT */}
-        <div className="mt-16 rounded-[24px] border border-black/5 bg-white/80 px-7 py-6 shadow-sm backdrop-blur-sm">
+        <div className="mt-16 rounded-[24px] border border-black/5 bg-white/80 px-7 py-6 shadow-sm backdrop-blur-sm print:shadow-none print:backdrop-blur-none">
 
           <div
               className="font-semibold uppercase tracking-[0.24em] text-violet-500/80"

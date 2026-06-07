@@ -31,7 +31,7 @@ export function MinimalCoverLetter({
       : "Date";
 
   return (
-    <div className="relative box-border h-[1123px] w-[794px] overflow-hidden bg-white shadow-[0_40px_120px_rgba(0,0,0,0.35)]">
+    <div className="relative box-border min-h-[1123px] w-[794px] overflow-hidden bg-white shadow-[0_40px_120px_rgba(0,0,0,0.35)]">
 
       <div
         className="relative flex flex-col px-[78px] py-[82px] text-black"

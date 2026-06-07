@@ -36,7 +36,7 @@ export function StartupCoverLetter({
         : "Prepared For";
 
   return (
-    <div className="relative box-border h-[1123px] w-[794px] overflow-hidden rounded-[30px] bg-[#f8fafc] shadow-[0_60px_180px_rgba(0,0,0,0.42)]">
+    <div className="relative box-border min-h-[1123px] w-[794px] overflow-hidden rounded-[30px] bg-[#f8fafc] shadow-[0_60px_180px_rgba(0,0,0,0.42)]">
 
       {/* accent */}
       <div className="absolute left-0 top-0 h-full w-[10px] bg-gradient-to-b from-violet-500 via-fuchsia-500 to-cyan-400" />
@@ -95,7 +95,7 @@ export function StartupCoverLetter({
 
           </div>
 
-          <div className="rounded-2xl bg-black px-5 py-4 text-right text-white shadow-xl">
+          <div className="rounded-2xl bg-black px-5 py-4 text-right text-white shadow-xl print:shadow-none">
 
             <div
               className="uppercase tracking-[0.24em] text-white/50"
@@ -107,7 +107,7 @@ export function StartupCoverLetter({
             </div>
 
             <div
-              className="mt-2 font-semibold"
+              className="mt-2 font-semibold text-center"
               style={{
                 fontSize: `${14 * scale}px`,
               }}
@@ -162,7 +162,7 @@ export function StartupCoverLetter({
           {/* RIGHT */}
           <div>
 
-            <div className="rounded-[24px] border border-black/6 bg-white px-5 py-6 shadow-sm">
+            <div className="rounded-[24px] border border-black/6 bg-white px-5 py-6 shadow-none">
 
               <div
                 className="font-semibold uppercase tracking-[0.22em] text-violet-500"
