@@ -1711,6 +1711,10 @@ ${resume?.languages
           selectedProject?.stack ||
           ""
         }
+        description={
+          selectedProject?.description ||
+          ""
+        }
         bullets={
           selectedProject?.bullets ||
           []
@@ -1754,6 +1758,20 @@ ${resume?.languages
             selectedProject.id,
             {
               stack: value,
+            },
+          );
+        }}
+        onChangeDescription={(
+          value,
+        ) => {
+          if (!selectedProject) {
+            return;
+          }
+
+          updateProjectDetails(
+            selectedProject.id,
+            {
+              description: value,
             },
           );
         }}

@@ -16,12 +16,18 @@ type ProjectEditModalProps = {
 
   links?: string[];
 
+  description?: string;
+
   onChangeTitle: (
     value: string,
   ) => void;
 
   onChangeStack: (
     value: string,
+  ) => void;
+
+  onChangeDescription?: (
+      value: string,
   ) => void;
 
   onChangeBullet: (
@@ -54,9 +60,13 @@ export function ProjectEditModal({
 
   links = [],
 
+  description,
+
   onChangeTitle,
 
   onChangeStack,
+
+  onChangeDescription,
 
   onChangeBullet,
 
@@ -129,6 +139,24 @@ export function ProjectEditModal({
               placeholder={t("resume.techStackPlaceholder")}
             />
           </div>
+
+          {onChangeDescription && (
+            <div className="mt-5">
+              <label className="mb-2 block text-sm font-medium text-white/80">
+                {t("resume.projectDescription")}
+              </label>
+              <ResumeTextarea
+                value={description || ""}
+                onChange={(e) =>
+                  onChangeDescription(
+                    e.target.value,
+                  )
+                }
+                rows={4}
+                placeholder={t("resume.projectDescriptionPlaceholder")}
+              />
+            </div>
+          )}
 
           <div className="mt-6">
             <div className="mb-3 flex items-center justify-between gap-3">
