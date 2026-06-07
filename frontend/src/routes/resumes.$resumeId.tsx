@@ -610,6 +610,16 @@ const selectedProfile =
 
   const buildResumeContext = () => {
       return `
+
+Candidate:
+${resume?.basics?.fullName || ""}
+${resume?.basics?.email || ""}
+${resume?.basics?.phone || ""}
+${resume?.basics?.location || ""}
+${resume?.basics?.website || ""}
+${resume?.basics?.linkedin || ""}
+${resume?.basics?.github || ""}
+
 Headline:
 ${resume?.basics?.title || ""}
 
@@ -642,6 +652,26 @@ ${(p.bullets || []).join(" ")}
 `,
   )
   .join("\n") || ""}
+
+Education:
+${resume?.education
+  ?.map(
+    (e: any) => `
+${e.school || ""}
+${e.degree || ""}
+${e.startDate || ""} ${e.endDate || ""}
+${Array.isArray(e.description) ? e.description.join(" ") : e.description || ""}
+${(e.bullets || []).join(" ")}
+`,
+  )
+  .join("\n") || ""}
+
+Languages:
+${resume?.languages
+  ?.map(
+    (l: any) => `${l.name || ""} ${l.level || ""}`,
+  )
+  .join(", ") || ""}
 `;
   };
 

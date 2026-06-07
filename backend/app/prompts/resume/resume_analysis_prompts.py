@@ -53,6 +53,18 @@ SMART SUGGESTION RULES:
 - Prefer suggestions that improve recruiter trust and clarity
 - Keep suggestions concise and highly scannable
 - Prioritize measurable improvements
+- Do not repeat standard suggestions if the resume already contains clear evidence.
+- If the resume already includes metrics, do not suggest generic quantification unless key projects or target-role sections lack measurable outcomes.
+- Suggestions must reference the specific section or project where the issue appears.
+- Avoid generic suggestions like "Quantify achievements", "Highlight relevant experience" or "Specify technical skills" unless they are clearly justified by missing evidence.
+- For any resume, prefer suggestions that are specific to the strongest role-relevant section, project, job, education entry or portfolio item.
+- For technical resumes, focus on implementation depth, architecture, data handling, deployment, testing or system design when relevant.
+- For non-technical resumes, focus on business impact, ownership, client/customer outcomes, operational improvements, process quality, communication, leadership or domain-specific evidence when relevant.
+
+- Before suggesting improvements, identify what the resume already does well and avoid criticizing areas that already contain clear evidence.
+- At least one suggestion should reference a specific section, role, project, education entry or skill group from the resume.
+- Do not use the same suggestion pattern repeatedly across different resumes.
+- If the resume is already strong in one area, suggest a more advanced refinement instead of a basic improvement.
 
 The analysis should feel:
 - modern
@@ -117,27 +129,56 @@ IMPORTANT:
 - Do not invent expertise or experience
 - Evaluate whether achievements feel measurable and credible
 - Evaluate whether projects demonstrate real ownership and implementation depth
-- If the resume lacks measurable outcomes, mention this clearly
+- Only mention missing measurable outcomes if most important role-relevant sections lack metrics or concrete evidence.
 - Prefer evidence-based recruiter feedback over generic encouragement
 - Adapt naturally to both technical and non-technical resumes
 
-GOOD EXAMPLE:
+ATS SCORING RULES:
+- Generate an ATS score based on the actual resume content and target role.
+- ATS scoring should be realistic and individualized.
+- Do not default to the same score across resumes.
+- Evaluate keyword relevance in the context of the target role.
+- Completeness should evaluate whether the resume includes the core sections expected for the target role.
+- Do not penalize missing optional sections like certifications, awards or volunteer work unless they are important for the target role.
+- Evaluate experience quality based on evidence, ownership, impact and credibility.
 
-{{
-  "title": "Quantify achievements",
-  "description": "Mention measurable results like time savings, revenue impact or efficiency improvements.",
-  "type": "improvement",
-  "priority": "high"
-}}
+READABILITY RULES:
+Readability evaluates whether information can be quickly understood by a recruiter.
 
-GERMAN EXAMPLE:
+A resume with:
+- clear section separation
+- concise bullet points
+- logical organization
+- clear project descriptions
+- scannable content
 
-{{
-  "title": "Erfolge quantifizieren",
-  "description": "Nenne messbare Ergebnisse wie Zeitersparnis oder Effizienzsteigerungen.",
-  "type": "improvement",
-  "priority": "high"
-}}
+should generally receive a readability score between 10 and 15.
+
+Do not assign a readability score below 8 unless the resume contains:
+- extremely long paragraphs
+- confusing structure
+- repetitive content
+- unclear wording
+- difficult-to-follow explanations
+
+FORMATTING RULES:
+Because only plain text is available, formatting should evaluate:
+- section organization
+- use of bullet points
+- consistency of information
+- logical ordering of content
+
+Do not evaluate:
+- fonts
+- colors
+- spacing
+- columns
+- PDF design
+
+A resume with clearly separated sections and structured content should generally receive at least 10/15.
+
+- Scores must be internally consistent.
+- The total ATS score should approximately match the category breakdown.
 
 STRUCTURED DATA RULES:
 - Extract structured resume data from the resume content
@@ -145,6 +186,61 @@ STRUCTURED DATA RULES:
 - Do not invent skills, tools, projects, education or experience
 - Keep structured data concise and reusable for career path, recruiter view and interview preparation
 - If something is not visible, return an empty array. Do not return placeholder objects with "unknown".
+
+SMART SUGGESTION QUALITY CHECK:
+Before returning suggestions, verify that each suggestion is specific to this resume and not a standard template suggestion.
+
+Generate between 2 and 3 suggestions.
+Prefer quality over quantity.
+Do not invent weaknesses just to reach 3 suggestions.
+
+Suggestion titles should sound natural and recruiter-like.
+If language is German:
+- Use natural German recruiter language.
+- Avoid literal translations from English.
+
+Bad:
+- Quantify achievements
+- Highlight relevant experience
+- Specify technical skills
+
+Better:
+- Strengthen project evidence
+- Clarify ownership in recent role
+- Connect education projects to target role
+- Make customer impact more visible
+- Show implementation depth
+- Improve role-specific positioning
+
+A suggestion is invalid if it could be shown to 100 different resumes without changing the wording.
+
+Reject suggestions such as:
+- Quantify achievements
+- Clarify technical skills
+- Highlight experience
+- Add more details
+- Improve projects
+
+Every suggestion must reference:
+- a specific project
+OR
+- a specific role
+OR
+- a specific education entry
+OR
+- a specific skill area
+
+If no specific reference can be made, do not generate the suggestion.
+
+ATS SCORE LIMITS:
+- completeness: 0-20
+- keyword_relevance: 0-25
+- experience_quality: 0-25
+- formatting: 0-15
+- readability: 0-15
+- total score: 0-100
+
+The total ATS score should be consistent with the breakdown values.
 
 Return JSON format:
 
@@ -162,6 +258,17 @@ Return JSON format:
     "strongest_area": "...",
     "improvement_opportunity": "...",
     "recruiter_impression": "..."
+  }},
+
+  "ats_score": {{
+    "score": 0,
+    "breakdown": {{
+      "completeness": 0,
+      "keyword_relevance": 0,
+      "experience_quality": 0,
+      "formatting": 0,
+      "readability": 0
+    }}
   }},
 
   "summary": "...",

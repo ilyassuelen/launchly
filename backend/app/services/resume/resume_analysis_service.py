@@ -16,6 +16,8 @@ from backend.app.prompts.resume.resume_analysis_prompts import (
 )
 
 from backend.app.schemas.resume.resume_analysis import (
+    ATSBreakdown,
+    ATSScore,
     RecruiterAnalysis,
     ResumeAnalysisRequest,
     ResumeAnalysisResponse,
@@ -170,6 +172,7 @@ def _normalize_smart_suggestion(item: Any) -> dict | None:
     }
 
 
+
 def _normalize_smart_suggestions(parsed: dict) -> list[dict]:
     """
     Clean, sort and limit AI-generated resume suggestions
@@ -191,6 +194,113 @@ def _normalize_smart_suggestions(parsed: dict) -> list[dict]:
             2,
         ),
     )[:3]
+
+
+def _clamp_score(
+    value: Any,
+    *,
+    minimum: int,
+    maximum: int,
+) -> int:
+    try:
+        number = int(round(float(value)))
+    except (TypeError, ValueError):
+        return minimum
+
+    return max(
+        minimum,
+        min(maximum, number),
+    )
+
+
+def _normalize_llm_ats_score(
+    *,
+    parsed: dict,
+    fallback_score: ATSScore,
+) -> ATSScore:
+    """
+    Use the LLM-provided ATS score when it is present and valid.
+    Fall back to the local heuristic score if the AI response is missing,
+    incomplete or malformed.
+    """
+    raw_ats_score = _safe_dict(
+        parsed.get("ats_score"),
+    )
+
+    raw_breakdown = _safe_dict(
+        raw_ats_score.get("breakdown"),
+    )
+
+    required_breakdown_keys = [
+        "completeness",
+        "keyword_relevance",
+        "experience_quality",
+        "formatting",
+        "readability",
+    ]
+
+    if not raw_ats_score or not all(
+        key in raw_breakdown
+        for key in required_breakdown_keys
+    ):
+        return fallback_score
+
+    breakdown = ATSBreakdown(
+        completeness=_clamp_score(
+            raw_breakdown.get("completeness"),
+            minimum=0,
+            maximum=20,
+        ),
+        keyword_relevance=_clamp_score(
+            raw_breakdown.get("keyword_relevance"),
+            minimum=0,
+            maximum=25,
+        ),
+        experience_quality=_clamp_score(
+            raw_breakdown.get("experience_quality"),
+            minimum=0,
+            maximum=25,
+        ),
+        formatting=_clamp_score(
+            raw_breakdown.get("formatting"),
+            minimum=0,
+            maximum=15,
+        ),
+        readability=_clamp_score(
+            raw_breakdown.get("readability"),
+            minimum=0,
+            maximum=15,
+        ),
+    )
+
+    breakdown.completeness = max(
+        breakdown.completeness,
+        fallback_score.breakdown.completeness,
+    )
+
+    calculated_total = (
+        breakdown.completeness +
+        breakdown.keyword_relevance +
+        breakdown.experience_quality +
+        breakdown.formatting +
+        breakdown.readability
+    )
+
+    llm_total = _clamp_score(
+        raw_ats_score.get("score"),
+        minimum=0,
+        maximum=100,
+    )
+
+    score = calculated_total
+
+    if abs(llm_total - calculated_total) <= 3:
+        score = llm_total
+
+    return ATSScore(
+        score=score,
+        breakdown=breakdown,
+    )
 
 
 def _extract_structured_resume_data(
@@ -358,9 +468,14 @@ async def analyze_resume(
         parsed,
     )
 
-    ats_score = calculate_ats_score(
+    fallback_ats_score = calculate_ats_score(
         resume_content=clean_resume_content,
         target_role=clean_target_role,
+    )
+
+    ats_score = _normalize_llm_ats_score(
+        parsed=parsed,
+        fallback_score=fallback_ats_score,
     )
 
     structured_resume_data = _extract_structured_resume_data(
