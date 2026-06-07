@@ -85,6 +85,8 @@ export async function analyzeCoverLetter(
     job_posting: string;
     subject: string;
     body: string;
+    resume_context?: string;
+    structured_resume_data?: Record<string, any> | null;
     cover_letter_id?: number | string;
   },
 ) {

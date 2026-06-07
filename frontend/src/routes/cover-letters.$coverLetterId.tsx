@@ -392,6 +392,11 @@ const textareaClassName =
 
               body,
 
+              resume_context:
+                coverLetter.resumeContext || "",
+              structured_resume_data:
+                coverLetter.structuredResumeData || null,
+
               cover_letter_id:
                 coverLetter.id,
             });
@@ -764,23 +769,29 @@ const textareaClassName =
             resumeId,
           );
 
-        const resume =
-          response?.data ||
-          response;
+        const savedResume =
+          response?.id
+            ? response
+            : response?.data || response;
 
-        if (!resume) {
+        if (!savedResume) {
           return;
         }
 
-        const resumeData = resume.data || resume;
+        const resumeData =
+          savedResume.data || savedResume;
 
         const structuredResumeData =
-          resume.latest_resume_analysis?.structured_resume_data ||
+          savedResume.latest_resume_analysis?.structured_resume_data ||
+          resumeData.latest_resume_analysis?.structured_resume_data ||
           null;
+
+        console.log("latest_resume_analysis:", savedResume.latest_resume_analysis);
+        console.log("structuredResumeData:", structuredResumeData);
 
         const resumeContext = `
 Headline:
-${resumeData.basics?.title || resume.title || ""}
+${resumeData.basics?.title || savedResume.title || ""}
 
 Summary:
 ${resumeData.summary?.content || resumeData.summary || ""}
@@ -810,17 +821,21 @@ ${
 
 Projects:
 ${
-  structuredResumeData?.projects?.length
-    ? structuredResumeData.projects
+  resumeData.projects?.length
+    ? resumeData.projects
         .map(
           (p: any) =>
-            `${p.name || p.title || ""}: ${p.description || p.evidence || ""}`,
+            `${p.title || p.name || ""}
+Description: ${p.description || ""}
+Technologies: ${(p.technologies || []).join(", ")}
+Achievements:
+${(p.bullets || []).join("\n")}`,
         )
-        .join("\n")
-    : resumeData.projects
+        .join("\n\n")
+    : structuredResumeData?.projects
         ?.map(
           (p: any) =>
-            `${p.title || ""}: ${p.description || ""}`,
+            `${p.name || p.title || ""}: ${p.evidence || p.description || ""}`,
         )
         .join("\n") || ""
 }

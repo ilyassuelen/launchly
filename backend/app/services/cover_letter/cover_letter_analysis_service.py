@@ -44,18 +44,23 @@ async def analyze_cover_letter(
     clean_job_posting = prepare_data(payload.job_posting)
     clean_subject = prepare_data(payload.subject)
     clean_body = prepare_data(payload.body)
+    clean_resume_context = prepare_data(
+        payload.resume_context or ""
+    )
     prompt = build_cover_letter_analysis_prompt(
         tone=payload.tone,
         language=payload.language,
         job_posting=clean_job_posting,
         subject=clean_subject,
         body=clean_body,
+        resume_context=clean_resume_context,
+        structured_resume_data=payload.structured_resume_data,
     )
 
     try:
         response = await client.chat.completions.create(
             model="gpt-4o-mini",
-            temperature=0.5,
+            temperature=0.3,
             response_format={
                 "type": "json_object",
             },

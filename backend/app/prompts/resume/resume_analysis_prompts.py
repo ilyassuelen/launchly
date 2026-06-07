@@ -184,8 +184,24 @@ STRUCTURED DATA RULES:
 - Extract structured resume data from the resume content
 - Only include information that is clearly visible in the resume
 - Do not invent skills, tools, projects, education or experience
-- Keep structured data concise and reusable for career path, recruiter view and interview preparation
+- Keep structured data concise and reusable for career path, recruiter view, cover letter generation and interview preparation
 - If something is not visible, return an empty array. Do not return placeholder objects with "unknown".
+
+PROJECT STRUCTURED DATA RULES:
+- For each project, preserve the strongest concrete evidence from the resume
+- The evidence field must capture the strongest proof that the project was actually executed
+- Preserve concrete implementation details, responsibilities, decisions, deliverables, workflows, methodologies, technical depth, business impact, operational impact or domain expertise whenever visible
+- For project evidence, prefer retaining information from multiple project bullets
+- Do not collapse an entire project into a single generic sentence if multiple meaningful details are available
+- Evidence should normally contain more information than the project description
+- The `evidence` field must be more detailed than a generic summary
+- Project evidence should mention concrete implementation work when visible, such as architecture, APIs, data flow, parsing, retrieval, databases, integrations, analysis workflows, reporting, testing, reliability, deployment or system design
+- If the resume contains multiple strong project bullets, compress them into 1-3 concise evidence sentences instead of reducing them to one vague phrase
+- Do not invent metrics, users, scale, deployment status or business impact
+- If no measurable result is visible, focus on concrete implementation evidence instead of claiming outcomes
+- Keep project descriptions product-focused and project evidence implementation-focused
+- Preserve role-relevant tools and technologies from the resume whenever they are clearly tied to the project
+- Avoid weak evidence phrases like "worked on", "helped with" or "developed a platform" unless followed by concrete implementation details
 
 SMART SUGGESTION QUALITY CHECK:
 Before returning suggestions, verify that each suggestion is specific to this resume and not a standard template suggestion.
@@ -285,7 +301,7 @@ Return JSON format:
       "name": "...",
       "description": "...",
       "technologies": ["..."],
-      "evidence": "..."
+      "evidence": "1-3 concise sentences containing the strongest concrete evidence from the resume. Preserve implementation details, responsibilities, deliverables, workflows, methodologies, outcomes or domain expertise when visible."
     }}
   ],
 

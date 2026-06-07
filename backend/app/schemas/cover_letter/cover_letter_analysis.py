@@ -22,6 +22,8 @@ class CoverLetterAnalysisRequest(BaseModel):
     subject: str
     body: str
     cover_letter_id: int | None = None
+    resume_context: str | None = None
+    structured_resume_data: dict | None = None
 
 
 class CoverLetterAnalysisResponse(BaseModel):
