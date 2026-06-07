@@ -522,11 +522,13 @@ export function ExecutiveTemplate({
                     </div>
                   </div>
 
-                  {getTextItems(item.description).length > 0 ? (
-                      <ul className="mt-3 space-y-1.5">
-                        {getTextItems(item.description).map((text) => (
+                  {(item.bullets || []).filter((bullet) => bullet?.trim()).length > 0 ? (
+                    <ul className="mt-3 space-y-1.5">
+                      {(item.bullets || [])
+                        .filter((bullet) => bullet?.trim())
+                        .map((bullet) => (
                           <li
-                            key={text}
+                            key={bullet}
                             className="grid grid-cols-[8px_1fr] gap-3 text-[#374151]"
                             style={{
                               fontSize: scaleFont(13, typography),
@@ -538,10 +540,30 @@ export function ExecutiveTemplate({
                               aria-hidden="true"
                             />
 
-                            <span>{text}</span>
+                            <span>{bullet}</span>
                           </li>
                         ))}
-                      </ul>
+                    </ul>
+                  ) : getTextItems(item.description).length > 0 ? (
+                    <ul className="mt-3 space-y-1.5">
+                      {getTextItems(item.description).map((text) => (
+                        <li
+                          key={text}
+                          className="grid grid-cols-[8px_1fr] gap-3 text-[#374151]"
+                          style={{
+                            fontSize: scaleFont(13, typography),
+                            lineHeight: typography.lineHeight,
+                          }}
+                        >
+                          <span
+                            className="mt-[0.55em] block size-1.5 rounded-full bg-[#8b6b3f]"
+                            aria-hidden="true"
+                          />
+
+                          <span>{text}</span>
+                        </li>
+                      ))}
+                    </ul>
                   ) : null}
 
                 </div>

@@ -711,6 +711,30 @@ ${(p.bullets || []).join(" ")}
     }));
   };
 
+  const updateEducationBullet = (
+      educationId: number | string,
+      bulletIndex: number,
+      value: string,
+  ) => {
+      setResume((prev) => ({
+        ...prev,
+        education: (prev.education || []).map(
+          (edu) =>
+            edu.id === educationId
+              ? {
+                  ...edu,
+                  bullets: (edu.bullets || []).map(
+                    (bullet, index) =>
+                      index === bulletIndex
+                        ? value
+                        : bullet,
+                  ),
+                }
+              : edu,
+        ),
+      }));
+  };
+
   const updateProjectBullet = (
     projectId: number | string,
     bulletIndex: number,
@@ -833,6 +857,9 @@ ${(p.bullets || []).join(" ")}
           startDate: "",
           endDate: "",
           description: [],
+          bullets: [
+              t("resume.describeYourImpact"),
+          ],
         },
       ],
     }));
@@ -1754,6 +1781,10 @@ ${(p.bullets || []).join(" ")}
                 ? selectedEducation.description.join("\n")
                 : selectedEducation?.description || ""
           }
+          bullets={
+              selectedEducation?.bullets ||
+              []
+          }
           onClose={() =>
             setSelectedEducationId(
               null,
@@ -1833,6 +1864,35 @@ ${(p.bullets || []).join(" ")}
                 description: value,
               },
             );
+          }}
+          onChangeBullet={(
+              index,
+              value,
+          ) => {
+              if (!selectedEducation) {
+                return;
+              }
+
+              updateEducationBullet(
+                selectedEducation.id,
+                index,
+                value,
+              );
+          }}
+          onAddBullet={() => {
+              if (!selectedEducation) {
+                return;
+              }
+
+              updateEducationDetails(
+                selectedEducation.id,
+                {
+                  bullets: [
+                    ...(selectedEducation.bullets || []),
+                    "",
+                  ],
+                },
+              );
           }}
       />
 

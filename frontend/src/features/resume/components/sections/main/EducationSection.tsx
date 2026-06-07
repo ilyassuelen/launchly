@@ -11,6 +11,7 @@ type EducationItem = {
   id: string;
   school: string;
   degree: string;
+  bullets?: string[];
 };
 
 type EducationSectionProps = {

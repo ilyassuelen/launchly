@@ -81,6 +81,8 @@ export interface EducationItem {
   endDate?: string;
 
   description?: string[];
+
+  bullets?: string[];
 }
 
 export interface ProjectItem {

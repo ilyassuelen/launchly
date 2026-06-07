@@ -18,6 +18,8 @@ type EducationEditModalProps = {
 
   description?: string;
 
+  bullets: string[];
+
   onChangeSchool: (
     value: string,
   ) => void;
@@ -38,6 +40,13 @@ type EducationEditModalProps = {
     value: string,
   ) => void;
 
+  onChangeBullet: (
+    index: number,
+    value: string,
+  ) => void;
+
+  onAddBullet: () => void;
+
   onClose: () => void;
 
   onSave: () => void;
@@ -56,6 +65,8 @@ export function EducationEditModal({
 
   description,
 
+  bullets,
+
   onChangeSchool,
 
   onChangeDegree,
@@ -65,6 +76,10 @@ export function EducationEditModal({
   onChangeEndDate,
 
   onChangeDescription,
+
+  onChangeBullet,
+
+  onAddBullet,
 
   onClose,
 
@@ -179,6 +194,46 @@ export function EducationEditModal({
               />
             </div>
           )}
+
+          <div className="mt-5">
+            <div className="mb-3 flex items-center justify-between">
+              <label className="text-sm font-medium text-white/80">
+                {t("resume.impactBullets")}
+              </label>
+
+              <button
+                type="button"
+                onClick={onAddBullet}
+                className="rounded-xl border border-cyan-300/20 bg-cyan-300/[0.10] px-3 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/[0.16]"
+              >
+                {t("resume.addBullet")}
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {bullets.map((bullet, index) => (
+                <div key={index}>
+                  <label className="mb-2 block text-sm font-medium text-white/80">
+                    {t("resume.bulletNumber", {
+                      count: index + 1,
+                    })}
+                  </label>
+
+                  <ResumeTextarea
+                    value={bullet}
+                    onChange={(e) =>
+                      onChangeBullet(
+                        index,
+                        e.target.value,
+                      )
+                    }
+                    rows={4}
+                    placeholder={t("resume.bulletPlaceholder")}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="flex items-center justify-end gap-3 border-t border-white/10 px-7 py-5">

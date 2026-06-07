@@ -505,26 +505,48 @@ export function MonoTemplate({
                   </div>
                 </div>
 
-                {getTextItems(item.description).length > 0 ? (
-                      <ul className="mt-2 space-y-1">
-                        {getTextItems(item.description).map((text) => (
-                          <li
-                            key={text}
-                            className="grid grid-cols-[8px_1fr] gap-2 text-black/75"
-                            style={{
-                              fontSize: scaleFont(13, typography),
-                              lineHeight: typography.lineHeight,
-                            }}
-                          >
-                            <span
-                              className="mt-[0.55em] block size-1 rounded-full bg-black/70"
-                              aria-hidden="true"
-                            />
+                {(item.bullets || []).filter((bullet) => bullet?.trim()).length > 0 ? (
+                  <ul className="mt-2 space-y-1">
+                    {(item.bullets || [])
+                      .filter((bullet) => bullet?.trim())
+                      .map((bullet) => (
+                        <li
+                          key={bullet}
+                          className="grid grid-cols-[8px_1fr] gap-2 text-black/75"
+                          style={{
+                            fontSize: scaleFont(13, typography),
+                            lineHeight: typography.lineHeight,
+                          }}
+                        >
+                          <span
+                            className="mt-[0.55em] block size-1 rounded-full bg-black/70"
+                            aria-hidden="true"
+                          />
 
-                            <span>{text}</span>
-                          </li>
-                        ))}
-                      </ul>
+                          <span>{bullet}</span>
+                        </li>
+                      ))}
+                  </ul>
+                ) : getTextItems(item.description).length > 0 ? (
+                  <ul className="mt-2 space-y-1">
+                    {getTextItems(item.description).map((text) => (
+                      <li
+                        key={text}
+                        className="grid grid-cols-[8px_1fr] gap-2 text-black/75"
+                        style={{
+                          fontSize: scaleFont(13, typography),
+                          lineHeight: typography.lineHeight,
+                        }}
+                      >
+                        <span
+                          className="mt-[0.55em] block size-1 rounded-full bg-black/70"
+                          aria-hidden="true"
+                        />
+
+                        <span>{text}</span>
+                      </li>
+                    ))}
+                  </ul>
                 ) : null}
 
               </div>

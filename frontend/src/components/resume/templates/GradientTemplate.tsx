@@ -446,7 +446,15 @@ export function GradientTemplate({
                   </div>
                 </div>
 
-                {getTextItems(item.description).length > 0 ? (
+                {(item.bullets || []).filter((bullet) => bullet?.trim()).length > 0 ? (
+                  <ul className="mt-2 space-y-1">
+                    {(item.bullets || [])
+                      .filter((bullet) => bullet?.trim())
+                      .map((bullet) => (
+                        <Bullet key={bullet}>{bullet}</Bullet>
+                      ))}
+                  </ul>
+                ) : getTextItems(item.description).length > 0 ? (
                   <ul className="mt-2 space-y-1">
                     {getTextItems(item.description).map((text) => (
                       <Bullet key={text}>{text}</Bullet>

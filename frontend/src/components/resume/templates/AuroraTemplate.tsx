@@ -396,7 +396,7 @@ export function AuroraTemplate({
           {experience.map(
             (item: ExperienceItem) => (
               <div key={item.id}>
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex items-baseline justify-between gap-4">
                   <div>
                     <div
                       className="font-bold"
@@ -470,34 +470,60 @@ export function AuroraTemplate({
         <div className="mt-5 space-y-4">
           {education.map((edu) => (
             <div key={edu.id}>
-              <div
-                className="font-bold"
-                style={{
-                  fontSize: scaleFont(18, typography),
-                }}
-              >
-                {edu.school}
+              <div className="flex items-baseline justify-between gap-4">
+                <div>
+                  <div
+                    className="font-bold"
+                    style={{
+                      fontSize: scaleFont(18, typography),
+                    }}
+                  >
+                    {edu.school}
+                  </div>
+
+                  <div
+                    className="mt-1 text-violet-700"
+                    style={{
+                      fontSize: scaleFont(12, typography),
+                    }}
+                  >
+                    {edu.degree}
+                  </div>
+                </div>
+
+                <div
+                  className="text-slate-500"
+                  style={{
+                    fontSize: scaleFont(11, typography),
+                  }}
+                >
+                  {edu.startDate} - {edu.endDate}
+                </div>
               </div>
 
-              <div
-                className="mt-1 text-violet-700"
-                style={{
-                  fontSize: scaleFont(12, typography),
-                }}
-              >
-                {edu.degree}
-              </div>
+              {(edu.bullets || []).filter((bullet) => bullet?.trim()).length > 0 ? (
+                <ul className="mt-3 space-y-1.5">
+                  {(edu.bullets || [])
+                    .filter((bullet) => bullet?.trim())
+                    .map((bullet) => (
+                      <li
+                        key={bullet}
+                        className="grid grid-cols-[8px_1fr] gap-3 text-slate-700"
+                        style={{
+                          fontSize: scaleFont(13, typography),
+                          lineHeight: typography.lineHeight,
+                        }}
+                      >
+                        <span
+                          className="mt-[0.55em] block size-1.5 rounded-full bg-violet-500"
+                          aria-hidden="true"
+                        />
 
-              <div
-                className="mt-1 text-slate-500"
-                style={{
-                  fontSize: scaleFont(11, typography),
-                }}
-              >
-                {edu.startDate} — {edu.endDate}
-              </div>
-
-              {getTextItems(edu.description).length > 0 ? (
+                        <span>{bullet}</span>
+                      </li>
+                    ))}
+                </ul>
+              ) : getTextItems(edu.description).length > 0 ? (
                 <ul className="mt-3 space-y-1.5">
                   {getTextItems(edu.description).map((text) => (
                     <li
