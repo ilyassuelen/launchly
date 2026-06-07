@@ -2,6 +2,7 @@ export const coverLetter = {
     english: {
       title: "Cover Letters",
       subtitle: "Create tailored cover letters for your applications.",
+      searchCoverLetters: "Search Cover Letters...",
       manageVariants: "Manage your cover letter variants.",
       loadingCoverLetters: "Loading cover letters...",
       untitledCoverLetter: "Untitled Cover Letter",
@@ -66,6 +67,7 @@ export const coverLetter = {
     german: {
       title: "Anschreiben",
       subtitle: "Erstelle passende Anschreiben für deine Bewerbungen.",
+      searchCoverLetters: "Anschreiben suchen...",
       manageVariants: "Verwalte deine Anschreiben.",
       loadingCoverLetters: "Anschreiben werden geladen...",
       untitledCoverLetter: "Unbenanntes Anschreiben",

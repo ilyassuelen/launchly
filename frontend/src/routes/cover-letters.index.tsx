@@ -12,6 +12,7 @@ import {
   Plus,
   Copy,
   Trash2,
+  Search,
 } from "lucide-react";
 
 import {
@@ -53,6 +54,9 @@ function CoverLettersPage() {
 
   const [loading, setLoading] =
     useState(true);
+
+  const [searchQuery, setSearchQuery] =
+    useState("");
 
   async function loadCoverLetters() {
     try {
@@ -105,6 +109,32 @@ function CoverLettersPage() {
         t("coverLetter.untitledCoverLetter")
       );
   };
+
+  const filteredCoverLetters =
+      coverLetters.filter((coverLetter) => {
+        const query =
+          searchQuery.trim().toLowerCase();
+
+        if (!query) {
+          return true;
+        }
+
+        const searchableText = [
+          getCoverLetterDisplayTitle(coverLetter),
+          coverLetter.title,
+          coverLetter.template,
+          coverLetter.data?.company,
+          coverLetter.data?.jobTitle,
+          coverLetter.data?.content?.subject,
+          coverLetter.data?.content?.body,
+          JSON.stringify(coverLetter.data || {}),
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        return searchableText.includes(query);
+  });
 
   const handleCreateCoverLetter =
     async () => {
@@ -192,13 +222,33 @@ function CoverLettersPage() {
   return (
     <AppShell
     >
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <div className="space-y-5">
+        <div className="flex flex-col gap-4 rounded-3xl border border-white/5 bg-white/[0.02] p-4 md:flex-row md:items-center md:justify-between">
+
+
+          <div className="relative w-full md:max-w-sm">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/35" />
+            <input
+              value={searchQuery}
+              onChange={(event) =>
+                setSearchQuery(
+                  event.target.value,
+                )
+              }
+              placeholder={t("coverLetter.searchCoverLetters")}
+              className="h-11 w-full rounded-2xl border border-white/10 bg-black/20 pl-10 pr-4 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-violet-400/40 focus:bg-black/30"
+            />
+          </div>
+        </div>
+
+        <div className="overflow-x-auto pb-4 [scrollbar-width:thin]">
+          <div className="flex min-w-max gap-5">
 
         <button
           onClick={
             handleCreateCoverLetter
           }
-          className="group flex min-h-[340px] flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-white/[0.02] transition hover:border-violet-400/30 hover:bg-violet-500/[0.03]"
+          className="group flex min-h-[340px] w-[260px] shrink-0 flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-white/[0.02] transition hover:border-violet-400/30 hover:bg-violet-500/[0.03]"
         >
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] transition group-hover:scale-105">
             <Plus className="size-7 text-white/70" />
@@ -213,7 +263,7 @@ function CoverLettersPage() {
           </div>
         </button>
 
-        {coverLetters.map(
+        {filteredCoverLetters.map(
           (coverLetter) => (
             <Card
               key={
@@ -222,6 +272,8 @@ function CoverLettersPage() {
               className="
                 group
                 relative
+                w-[260px]
+                shrink-0
                 overflow-hidden
                 rounded-3xl
                 border
@@ -300,6 +352,8 @@ function CoverLettersPage() {
             </Card>
           ),
         )}
+          </div>
+        </div>
       </div>
     </AppShell>
   );
