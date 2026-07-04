@@ -86,6 +86,14 @@ export const resume = {
       personalInformation: "Personal information",
       profilePhotoAlt: "Profile",
       uploadPhoto: "Upload photo",
+      importResume: "Import from file",
+      importResumeDescription:
+        "Upload an existing resume (PDF or DOCX) to auto-fill the fields below.",
+      importResumeAction: "Upload resume",
+      importInProgress: "Reading resume...",
+      importFailed: "Couldn't read this file. Please try a different PDF or DOCX.",
+      importConfirmOverwrite:
+        "This will replace your current resume content with data from the uploaded file. Continue?",
       fullName: "Full name",
       targetRole: "Target role",
       website: "Website",
@@ -247,6 +255,14 @@ export const resume = {
       personalInformation: "Persönliche Informationen",
       profilePhotoAlt: "Profilbild",
       uploadPhoto: "Foto hochladen",
+      importResume: "Aus Datei importieren",
+      importResumeDescription:
+        "Lade einen bestehenden Lebenslauf (PDF oder DOCX) hoch, um die Felder unten automatisch auszufüllen.",
+      importResumeAction: "Lebenslauf hochladen",
+      importInProgress: "Lebenslauf wird gelesen...",
+      importFailed: "Diese Datei konnte nicht gelesen werden. Bitte versuche eine andere PDF- oder DOCX-Datei.",
+      importConfirmOverwrite:
+        "Dadurch werden die aktuellen Inhalte deines Lebenslaufs durch die Daten aus der hochgeladenen Datei ersetzt. Fortfahren?",
       fullName: "Vollständiger Name",
       targetRole: "Zielrolle",
       website: "Website",

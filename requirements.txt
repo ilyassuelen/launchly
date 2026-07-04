@@ -25,3 +25,6 @@ openai
 boto3
 
 playwright
+
+pypdf
+python-docx

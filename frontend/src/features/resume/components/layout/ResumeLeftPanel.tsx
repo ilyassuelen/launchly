@@ -1,6 +1,7 @@
 import { Card } from "@/components/launchly/AppShell";
 import { useI18n } from "@/i18n/I18nContext";
 
+import { ResumeImportUploader } from "@/features/resume/components/editor/ResumeImportUploader";
 import { PersonalInfoEditor } from "@/features/resume/components/editor/PersonalInfoEditor";
 import { SummaryEditor } from "@/features/resume/components/editor/SummaryEditor";
 import { ResumeStructureEditor } from "@/features/resume/components/editor/ResumeStructureEditor";
@@ -91,6 +92,11 @@ export function ResumeLeftPanel({
       </div>
 
       <div className="mt-5 space-y-5">
+
+        <ResumeImportUploader
+          resume={resume}
+          setResume={setResume}
+        />
 
         <PersonalInfoEditor
           resume={resume}
